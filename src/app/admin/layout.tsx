@@ -5,11 +5,6 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
 import {
-  FaTachometerAlt,
-  FaBoxOpen,
-  FaTags,
-  FaPlusCircle,
-  FaSignOutAlt,
   FaExternalLinkAlt,
 } from 'react-icons/fa';
 
