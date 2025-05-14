@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { products as initialProducts } from '@/data/products';
 import { db, storage } from '@/lib/firebase';
-import { collection, doc, getDocs, setDoc, updateDoc, onSnapshot, query as firestoreQuery, writeBatch } from 'firebase/firestore';
+import { collection, doc, setDoc, updateDoc, onSnapshot, query as firestoreQuery, writeBatch } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { Product, Variation } from '@/types/firebase';
 import Image from 'next/image';
@@ -13,7 +13,6 @@ interface RawVariation {
   name?: string;
   price?: number;
   tags?: string[];
-  [key: string]: any;
 }
 
 const AVAILABLE_TAGS = [
@@ -173,6 +172,7 @@ export default function ProductsPage() {
 
       if (selectedProduct && selectedProduct.id) {
         const productRef = doc(db, "products", String(selectedProduct.id));
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { variations: _removedVariations, ...productDetailsToUpdate } = finalProductData; 
         await updateDoc(productRef, productDetailsToUpdate);
       } else {

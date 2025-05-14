@@ -1,8 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { doc, setDoc, updateDoc, onSnapshot, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { 
+  collection, 
+  doc, 
+  getDoc, 
+  getDocs, 
+  updateDoc, 
+  deleteDoc, 
+  onSnapshot, 
+  writeBatch 
+} from 'firebase/firestore';
 
 interface Category {
   id: string;
@@ -428,7 +437,7 @@ export default function CategoriesPage() {
               
               <div className="px-4 sm:px-6 py-4">
                 <p className="text-gray-300">
-                  ¿Estás seguro de que deseas eliminar la categoría "{categoryToDelete.name}"? Esta acción no se puede deshacer.
+                  ¿Estás seguro de que deseas eliminar la categoría &quot;{categoryToDelete.name}&quot;? Esta acción no se puede deshacer.
                 </p>
               </div>
               
