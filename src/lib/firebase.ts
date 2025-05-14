@@ -15,9 +15,10 @@ const firebaseConfig = {
 
 // Inicializar Firebase
 let app: FirebaseApp;
-let db: Firestore;
-let auth: Auth;
-let storage: FirebaseStorage;
+// Declarar db, auth, storage aquí si se exportan directamente
+// let db: Firestore;
+// let auth: Auth;
+// let storage: FirebaseStorage;
 
 if (getApps().length === 0) {
   app = initializeApp(firebaseConfig);
@@ -25,8 +26,8 @@ if (getApps().length === 0) {
   app = getApps()[0];
 }
 
-db = getFirestore(app);
-auth = getAuth(app);
-storage = getStorage(app);
+const db: Firestore = getFirestore(app);
+const auth: Auth = getAuth(app);
+const storage: FirebaseStorage = getStorage(app);
 
 export { app, db, auth, storage }; 

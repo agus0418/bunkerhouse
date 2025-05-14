@@ -3,12 +3,17 @@
 import { useState, useEffect } from 'react';
 import { products as initialProducts } from '@/data/products';
 import { db, storage } from '@/lib/firebase';
-import { collection, doc, getDocs, setDoc, updateDoc, deleteDoc, onSnapshot, query as firestoreQuery, where, writeBatch } from 'firebase/firestore';
+import { collection, doc, getDocs, setDoc, updateDoc, onSnapshot, query as firestoreQuery, writeBatch } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { Product, Variation, Category as ProductCategory } from '@/types/firebase';
+import { Product, Variation } from '@/types/firebase';
+import Image from 'next/image';
 
-interface FirebaseProduct extends Omit<Product, 'id'> { 
-  // No necesita el id aquí porque Firestore lo maneja por separado
+interface RawVariation {
+  id?: string | number;
+  name?: string;
+  price?: number;
+  tags?: string[];
+  [key: string]: any;
 }
 
 const AVAILABLE_TAGS = [
@@ -29,17 +34,14 @@ export default function ProductsPage() {
   const [isVariationsModalOpen, setIsVariationsModalOpen] = useState(false);
   const [isAddVariationModalOpen, setIsAddVariationModalOpen] = useState(false);
   
-  // Estado para el formulario de variación (usado para añadir Y editar)
   const [variationFormData, setVariationFormData] = useState<Partial<Variation>>({ name: '', price: undefined, tags: [] });
-  // Estado para saber si estamos editando una variación existente y cuál es
   const [editingVariation, setEditingVariation] = useState<Variation | null>(null);
-  // No necesitamos un modal separado para editar variación, reutilizaremos el de añadir.
 
   const [activeTab, setActiveTab] = useState<TabType>('COMIDAS');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string | null>(null);
   const [allUniqueCategories, setAllUniqueCategories] = useState<string[]>([]);
-  const [imageFile, setImageFile] = useState<File | null>(null); // Nuevo estado para el archivo de imagen
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   useEffect(() => {
     setIsLoading(true);
@@ -58,13 +60,11 @@ export default function ProductsPage() {
           });
           await batch.commit();
           console.log("Initial products loaded to Firestore.");
-          // Convertir IDs de initialProducts a string para que coincidan con el tipo Product esperado por el estado
           const productsForState: Product[] = initialProducts.map(p => ({
             ...p,
-            id: String(p.id), // Convertir id a string
-            // Asegurar que las variaciones tengan el formato correcto, aunque sus IDs ya son number y coinciden
+            id: String(p.id), 
             variations: (p.variations || []).map((v, index) => ({
-              id: v.id || Date.now() + index, // Variation.id es number, lo cual está bien
+              id: v.id || Date.now() + index, 
               name: v.name,
               price: v.price,
               tags: v.tags || []
@@ -79,14 +79,13 @@ export default function ProductsPage() {
         const prods = querySnapshot.docs.map(doc => {
           const data = doc.data();
           return {
-            id: doc.id, // Firestore ID es string
+            id: doc.id, 
             ...data,
-            // Asegurar que variations es un array y que sus IDs son numbers si es necesario internamente
-            variations: (data.variations || []).map((v: any, index: number) => ({ 
-              id: v.id || Date.now() + index, // Si el ID de Firebase es string, o no existe, generar uno numérico
-              name: v.name,
-              price: v.price,
-              tags: v.tags || []
+            variations: (data.variations || []).map((v: RawVariation, index: number) => ({
+              id: typeof v.id === 'number' ? v.id : (typeof v.id === 'string' && !isNaN(Number(v.id)) ? Number(v.id) : Date.now() + index),
+              name: v.name || 'Nombre no disponible',
+              price: typeof v.price === 'number' ? v.price : 0,
+              tags: Array.isArray(v.tags) ? v.tags : []
             })),
           } as Product;
         });
@@ -109,14 +108,13 @@ export default function ProductsPage() {
   }, [products]);
 
   const handleSaveProduct = async (formData: FormData) => {
-    let productData: Partial<Product> = {
+    const productData: Partial<Product> = {
       name: formData.get('name') as string,
       description: formData.get('description') as string || undefined,
       price: parseFloat(formData.get('price') as string),
       image: formData.get('image') as string,
       category: formData.get('category') as string,
       type: formData.get('type') as TabType,
-      // variations se manejan por separado
     };
 
     if (!productData.name || productData.price === undefined || !productData.category || !productData.type) {
@@ -175,7 +173,7 @@ export default function ProductsPage() {
 
       if (selectedProduct && selectedProduct.id) {
         const productRef = doc(db, "products", String(selectedProduct.id));
-        const { variations, ...productDetailsToUpdate } = finalProductData; 
+        const { variations: _removedVariations, ...productDetailsToUpdate } = finalProductData; 
         await updateDoc(productRef, productDetailsToUpdate);
       } else {
         const newProductRef = doc(collection(db, "products"));
@@ -186,7 +184,7 @@ export default function ProductsPage() {
     } catch (e) {
       if (!error) {
         console.error("Error saving product (Firestore or other): ", e);
-        setError("Error al guardar el producto en Firestore.");
+        setError("Error al guardar el producto en Firestore: " + (e as Error).message);
       }
     } finally {
       setIsLoading(false);
@@ -206,16 +204,14 @@ export default function ProductsPage() {
     const currentProductVariations = selectedProduct.variations || [];
 
     if (editingVariation) {
-      // Editando una variación existente
       updatedVariations = currentProductVariations.map(v => 
         v.id === editingVariation.id 
           ? { ...v, name: variationFormData.name!, price: variationFormData.price!, tags: variationFormData.tags || [] } 
           : v
       );
     } else {
-      // Añadiendo una nueva variación
       const newVarToAdd: Variation = {
-        id: Date.now(), // ID numérico local
+        id: Date.now(),
         name: variationFormData.name!,
         price: variationFormData.price!,
         tags: variationFormData.tags || [],
@@ -224,7 +220,6 @@ export default function ProductsPage() {
     }
 
     try {
-      // --- BEGIN DEBUG LOGGING ---
       console.log('[handleSaveVariation] Inside try block. Selected Product:', JSON.stringify(selectedProduct, null, 2));
       if (selectedProduct && typeof selectedProduct.id !== 'undefined' && selectedProduct.id !== null) {
         console.log('[handleSaveVariation] selectedProduct.id:', selectedProduct.id);
@@ -233,16 +228,14 @@ export default function ProductsPage() {
         const idForDoc = String(selectedProduct.id);
         console.log('[handleSaveVariation] idForDoc (after String()):', idForDoc);
 
-        if (idForDoc.trim() === "") { // Comprobar si es cadena vacía o solo espacios
+        if (idForDoc.trim() === "") {
             console.error("[handleSaveVariation] ID for doc is an empty or whitespace string! This will fail.");
             setError("El ID del producto es una cadena vacía o solo contiene espacios, lo cual no es válido.");
             setIsLoading(false);
             return;
         }
-        // --- END DEBUG LOGGING ---
-        const productRef = doc(db, "products", idForDoc); // Usar el ID procesado
+        const productRef = doc(db, "products", idForDoc);
         await updateDoc(productRef, { variations: updatedVariations });
-        // La actualización local la manejará onSnapshot
         handleCloseVariationModals(); 
       } else {
         console.error("[handleSaveVariation] selectedProduct is null, or its id is null/undefined inside try block. This shouldn't happen if guards are correct.");
@@ -250,11 +243,11 @@ export default function ProductsPage() {
         setIsLoading(false);
         return;
       }
-    } catch (e: any) {
+    } catch (e) {
       console.error("Error saving variation (FULL ERROR OBJECT): ", e);
-      console.error("Error saving variation (MESSAGE): ", e.message);
-      console.error("Error saving variation (STACK): ", e.stack);
-      setError(`Error al guardar la variación: ${e.message}. Revise la consola del navegador para más detalles.`);
+      console.error("Error saving variation (MESSAGE): ", (e as Error).message);
+      console.error("Error saving variation (STACK): ", (e as Error).stack);
+      setError("Error al guardar la variación: " + (e as Error).message + ". Revise la consola del navegador para más detalles.");
     } finally {
       setIsLoading(false);
     }
@@ -268,7 +261,6 @@ export default function ProductsPage() {
       const productRef = doc(db, "products", String(selectedProduct.id));
       const updatedVariations = (selectedProduct.variations || []).filter(v => v.id !== variationId);
       await updateDoc(productRef, { variations: updatedVariations });
-      // onSnapshot actualizará el estado local
     } catch (e) {
       console.error("Error deleting variation: ", e);
       setError("Error al eliminar la variación.");
@@ -298,14 +290,14 @@ export default function ProductsPage() {
     setIsVariationsModalOpen(false);
     handleCloseVariationModals();
     setSelectedProduct(null);
-    setImageFile(null); // Reiniciar el archivo de imagen al cerrar modales
+    setImageFile(null);
     setError(null);
   };
 
   const handleCloseVariationModals = () => {
     setIsAddVariationModalOpen(false); 
-    setEditingVariation(null); // Limpiar variación en edición
-    setVariationFormData({ name: '', price: undefined, tags: [] }); // Resetear formulario de variación
+    setEditingVariation(null);
+    setVariationFormData({ name: '', price: undefined, tags: [] });
   };
 
   const handleEditProduct = (product: Product) => {
@@ -328,11 +320,10 @@ export default function ProductsPage() {
     setIsAddVariationModalOpen(true);
   };
 
-  // Esta función ahora prepara el formulario para edición y abre el MISMO modal que "Añadir"
   const handleOpenEditVariationModal = (variation: Variation) => {
     setEditingVariation(variation);
     setVariationFormData({ name: variation.name, price: variation.price, tags: variation.tags || [] });
-    setIsAddVariationModalOpen(true); // Reutiliza el modal de añadir
+    setIsAddVariationModalOpen(true);
   };
   
   const handleTagToggle = (tagId: string) => {
@@ -352,7 +343,6 @@ export default function ProductsPage() {
     }
   };
 
-  // JSX RENDER
   return (
     <div className="space-y-6 p-4 md:p-6 bg-gray-900 min-h-screen">
       {error && (
@@ -434,8 +424,15 @@ export default function ProductsPage() {
       <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {filteredProducts.map((product) => (
           <div key={product.id} className="bg-gray-800 rounded-lg border border-gray-700 hover:shadow-xl transition-shadow duration-300 flex flex-col">
-            <div className="relative aspect-w-16 aspect-h-9 w-full">
-              <img src={product.image || '/placeholder-image.png'} alt={product.name} className="object-cover w-full h-56 rounded-t-lg" />
+            <div className="relative aspect-w-16 aspect-h-9 w-full h-56">
+              <Image 
+                src={product.image || '/placeholder-image.png'} 
+                alt={product.name} 
+                fill 
+                style={{ objectFit: 'cover' }}
+                className="rounded-t-lg" 
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent rounded-t-lg" />
               <div className="absolute bottom-0 left-0 right-0 p-4">
                 <h3 className="text-lg font-semibold text-white truncate" title={product.name}>{product.name}</h3>
@@ -469,13 +466,12 @@ export default function ProductsPage() {
         ))}
       </div>
 
-      {/* Modal de Edición de Producto */}
       {isEditModalOpen && (
         <div className="fixed inset-0 z-[80] overflow-y-auto bg-gray-900/80 flex items-center justify-center p-4 backdrop-blur-sm">
           <div className="bg-gray-800 p-5 sm:p-6 rounded-lg shadow-2xl w-full max-w-2xl border border-gray-700 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5 pb-4 border-b border-gray-700">
               <h2 className="text-xl font-semibold text-white">
-                {selectedProduct?.id ? 'Editar Producto' : 'Nuevo Producto'} {/* Cambio aquí para chequear id de selectedProduct */}
+                {selectedProduct?.id ? 'Editar Producto' : 'Nuevo Producto'}
               </h2>
               <button onClick={handleCloseModals} className="text-gray-400 hover:text-white">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
@@ -507,14 +503,8 @@ export default function ProductsPage() {
                 <label htmlFor="type" className="block text-sm font-medium text-gray-300 mb-1.5">Tipo</label>
                 <select name="type" id="type" defaultValue={selectedProduct?.type || 'COMIDAS'} className="w-full bg-gray-700 border border-gray-600 rounded-md p-2.5 text-white focus:ring-2 focus:ring-gray-500 focus:border-gray-500" required 
                   onChange={(e) => {
-                    // Actualizar el selectedProduct temporalmente para que getCategoriesByType funcione en el mismo modal
-                    // Esto no guarda en Firebase, solo afecta la UI del modal
                     if (selectedProduct) {
                       setSelectedProduct({ ...selectedProduct, type: e.target.value as TabType });
-                    } else {
-                      // Si es nuevo producto, podríamos tener un estado temporal para el formulario
-                      // o simplemente dejar que el select de categoría se actualice al guardar y reabrir.
-                      // Por simplicidad, para nuevo producto, el cambio de tipo no refrescará categorías dinámicamente aquí.
                     }
                   }}
                 >
@@ -548,7 +538,6 @@ export default function ProductsPage() {
         </div>
       )}
 
-      {/* Modal de Lista de Variaciones */}
       {isVariationsModalOpen && selectedProduct && (
         <div className="fixed inset-0 z-[90] overflow-y-auto bg-gray-900/80 flex items-center justify-center p-4 backdrop-blur-sm">
           <div className="bg-gray-800 p-5 sm:p-6 rounded-lg shadow-2xl w-full max-w-lg border border-gray-700 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
@@ -607,13 +596,12 @@ export default function ProductsPage() {
         </div>
       )}
 
-      {/* Modal para Añadir/Editar Variación (Reutilizado) */}
-      {isAddVariationModalOpen && selectedProduct && ( // Se controla solo con isAddVariationModalOpen
+      {isAddVariationModalOpen && selectedProduct && (
         <div className="fixed inset-0 z-[100] overflow-y-auto bg-gray-900/80 flex items-center justify-center p-4 backdrop-blur-sm">
           <div className="bg-gray-800 p-5 sm:p-6 rounded-lg shadow-2xl w-full max-w-md border border-gray-700 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5 pb-4 border-b border-gray-700">
               <h2 className="text-xl font-semibold text-white">
-                {editingVariation ? 'Editar Variación' : 'Añadir Nueva Variación'} {/* Título dinámico */}
+                {editingVariation ? 'Editar Variación' : 'Añadir Nueva Variación'}
               </h2>
               <button onClick={handleCloseVariationModals} className="text-gray-400 hover:text-white">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
@@ -667,7 +655,7 @@ export default function ProductsPage() {
               <div className="flex justify-end space-x-3 pt-5">
                 <button type="button" onClick={handleCloseVariationModals} className="px-5 py-2 text-sm font-medium text-gray-300 bg-gray-700/60 hover:bg-gray-700 rounded-lg transition-colors">Cancelar</button>
                 <button type="submit" className="px-5 py-2 text-sm font-medium text-white bg-gray-600 hover:bg-gray-500 rounded-lg transition-colors shadow-md">
-                  {editingVariation ? 'Guardar Cambios' : 'Añadir Variación'} {/* Botón dinámico */}
+                  {editingVariation ? 'Guardar Cambios' : 'Añadir Variación'}
                 </button>
               </div>
             </form>

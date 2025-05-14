@@ -16,24 +16,6 @@ export interface Variation {
   tags?: string[];
 }
 
-const processPrice = (price: string): number => {
-  if (!price) return 0;
-  return parseFloat(price.replace(',', '.'));
-};
-
-const getProductType = (category: string): 'COMIDAS' | 'BEBIDAS' => {
-  const bebidasCategories = [
-    'VINOS TINTOS',
-    'VINOS BLANCOS',
-    'CHAMPAGNE',
-    'CERVEZAS',
-    'SIN ALCOHOL',
-    'TRAGOS',
-    'LIMONADAS'
-  ];
-  return bebidasCategories.includes(category) ? 'BEBIDAS' : 'COMIDAS';
-};
-
 export const products: Product[] = [
   // Vinos Tintos
   {
