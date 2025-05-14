@@ -4,6 +4,14 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
+import {
+  FaTachometerAlt,
+  FaBoxOpen,
+  FaTags,
+  FaPlusCircle,
+  FaSignOutAlt,
+  FaExternalLinkAlt,
+} from 'react-icons/fa';
 
 export default function AdminLayout({
   children,
@@ -56,6 +64,12 @@ export default function AdminLayout({
         </svg>
       ),
     },
+    {
+      name: 'Ver Carta',
+      href: '/',
+      icon: <FaExternalLinkAlt className="w-5 h-5" />,
+      target: '_blank',
+    },
   ];
 
   return (
@@ -82,6 +96,8 @@ export default function AdminLayout({
             <Link
               key={item.name}
               href={item.href}
+              target={item.target}
+              rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
               className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 ${
                 pathname === item.href
                   ? 'bg-gray-700 text-white'

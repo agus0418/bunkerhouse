@@ -41,6 +41,7 @@ export default function ProductsPage() {
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string | null>(null);
   const [allUniqueCategories, setAllUniqueCategories] = useState<string[]>([]);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   useEffect(() => {
     setIsLoading(true);
@@ -199,6 +200,7 @@ export default function ProductsPage() {
     }
     setIsLoading(true);
     setError(null);
+    setSuccessMessage(null);
 
     let updatedVariations: Variation[];
     const currentProductVariations = selectedProduct.variations || [];
@@ -236,6 +238,31 @@ export default function ProductsPage() {
         }
         const productRef = doc(db, "products", idForDoc);
         await updateDoc(productRef, { variations: updatedVariations });
+        
+        // Actualizar estado local
+        setSelectedProduct(prevProduct => {
+          if (!prevProduct) return null;
+          return {
+            ...prevProduct,
+            variations: updatedVariations
+          };
+        });
+
+        setProductsState(prevProducts => 
+          prevProducts.map(p => 
+            p.id === selectedProduct.id 
+              ? { ...p, variations: updatedVariations } 
+              : p
+          )
+        );
+
+        // Mensaje de éxito
+        const successMsg = editingVariation 
+          ? "Variación actualizada correctamente."
+          : "Variación añadida correctamente.";
+        setSuccessMessage(successMsg);
+        setTimeout(() => setSuccessMessage(null), 3000);
+        
         handleCloseVariationModals(); 
       } else {
         console.error("[handleSaveVariation] selectedProduct is null, or its id is null/undefined inside try block. This shouldn't happen if guards are correct.");
@@ -257,10 +284,32 @@ export default function ProductsPage() {
     if (!selectedProduct) return;
     if (!confirm("¿Estás seguro de que quieres eliminar esta variación?")) return;
     setIsLoading(true);
+    setError(null);
+    setSuccessMessage(null); 
     try {
       const productRef = doc(db, "products", String(selectedProduct.id));
       const updatedVariations = (selectedProduct.variations || []).filter(v => v.id !== variationId);
       await updateDoc(productRef, { variations: updatedVariations });
+
+      setSelectedProduct(prevProduct => {
+        if (!prevProduct) return null;
+        return {
+          ...prevProduct,
+          variations: updatedVariations
+        };
+      });
+
+      setProductsState(prevProducts => 
+        prevProducts.map(p => 
+          p.id === selectedProduct.id 
+            ? { ...p, variations: updatedVariations } 
+            : p
+        )
+      );
+      
+      setSuccessMessage("Variación eliminada correctamente.");
+      setTimeout(() => setSuccessMessage(null), 3000);
+
     } catch (e) {
       console.error("Error deleting variation: ", e);
       setError("Error al eliminar la variación.");
@@ -352,6 +401,15 @@ export default function ProductsPage() {
             <button onClick={() => setError(null)} className="text-red-200 hover:text-white text-2xl">&times;</button>
           </div>
           <p className="text-sm mt-1">{error}</p>
+        </div>
+      )}
+      {successMessage && (
+        <div className="bg-green-700/90 backdrop-blur-sm text-white p-4 rounded-lg fixed top-5 right-5 z-[100] shadow-lg max-w-md">
+          <div className="flex justify-between items-center">
+            <p className="font-semibold">Éxito</p>
+            <button onClick={() => setSuccessMessage(null)} className="text-green-100 hover:text-white text-2xl">&times;</button>
+          </div>
+          <p className="text-sm mt-1">{successMessage}</p>
         </div>
       )}
       
