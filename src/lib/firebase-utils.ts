@@ -1,46 +1,73 @@
 import { collection, doc, getDocs, setDoc, updateDoc, deleteDoc, query, where, getDoc } from 'firebase/firestore';
 import { db } from './firebase';
-import { FirebaseProduct, FirebaseCategories } from '@/types/firebase';
+import { FirebaseProduct, FirebaseCategories, Product } from '@/types/firebase';
 
 export const firebaseUtils = {
   // Productos
-  async getProducts() {
+  async getProducts(): Promise<Product[]> {
     const productsRef = collection(db, 'products');
     const snapshot = await getDocs(productsRef);
-    return snapshot.docs.map(doc => ({
-      id: Number(doc.id),
-      ...doc.data()
-    } as FirebaseProduct));
+    return snapshot.docs.map(docSnap => {
+      const data = docSnap.data();
+      return {
+        id: docSnap.id,
+        name: data.name || '',
+        description: data.description || '',
+        price: data.price || 0,
+        image: data.image || '',
+        category: data.category || '',
+        type: data.type || '',
+        variations: (data.variations || []).map((v: any, index: number) => ({
+          id: v.id || Date.now() + index,
+          name: v.name,
+          price: v.price,
+          tags: v.tags || []
+        })),
+      } as Product;
+    });
   },
 
-  async getProductById(id: number) {
-    const productsRef = collection(db, 'products');
-    const q = query(productsRef, where('id', '==', id));
-    const snapshot = await getDocs(q);
-    if (snapshot.empty) return null;
+  async getProductById(id: string): Promise<Product | null> {
+    const productDocRef = doc(db, 'products', id);
+    const docSnap = await getDoc(productDocRef);
+    if (!docSnap.exists()) return null;
+    
+    const data = docSnap.data();
     return {
-      id: Number(snapshot.docs[0].id),
-      ...snapshot.docs[0].data()
-    } as FirebaseProduct;
+      id: docSnap.id,
+      name: data.name || '',
+      description: data.description || '',
+      price: data.price || 0,
+      image: data.image || '',
+      category: data.category || '',
+      type: data.type || '',
+      variations: (data.variations || []).map((v: any, index: number) => ({
+        id: v.id || Date.now() + index,
+        name: v.name,
+        price: v.price,
+        tags: v.tags || []
+      })),
+    } as Product;
   },
 
-  async saveProduct(product: FirebaseProduct) {
-    const productRef = doc(db, 'products', product.id.toString());
-    await setDoc(productRef, product);
+  async saveProduct(product: Omit<Product, 'id'>): Promise<string> {
+    const newProductRef = doc(collection(db, 'products'));
+    await setDoc(newProductRef, product); 
+    return newProductRef.id;
   },
 
-  async updateProduct(id: number, data: Partial<FirebaseProduct>) {
-    const productRef = doc(db, 'products', id.toString());
+  async updateProduct(id: string, data: Partial<Omit<Product, 'id'>>) {
+    const productRef = doc(db, 'products', id);
     await updateDoc(productRef, data);
   },
 
-  async deleteProduct(id: number) {
-    const productRef = doc(db, 'products', id.toString());
+  async deleteProduct(id: string) {
+    const productRef = doc(db, 'products', id);
     await deleteDoc(productRef);
   },
 
   // Categorías
-  async getCategories() {
+  async getCategories(): Promise<FirebaseCategories | null> {
     const categoriesRef = doc(db, 'categories', 'main');
     const docSnap = await getDoc(categoriesRef);
     if (!docSnap.exists()) return null;
