@@ -13,7 +13,7 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -68,18 +68,17 @@ export default function AdminLayout({
   ];
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100">
+    <div className="min-h-screen bg-gray-900 text-gray-100 flex">
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-800 transform transition-transform duration-200 ease-in-out ${
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out 
+                  ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:relative md:shadow-none`}
       >
         <div className="flex items-center justify-between h-16 px-4 bg-gray-900">
-          <h1 className="text-xl font-semibold">BunkerHouse</h1>
+          <Link href="/admin" className="text-xl font-semibold text-white hover:text-gray-200">BunkerHouse</Link>
           <button
             onClick={() => setIsSidebarOpen(false)}
-            className="p-2 rounded-md hover:bg-gray-700 focus:outline-none"
+            className="p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none md:hidden"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -93,6 +92,11 @@ export default function AdminLayout({
               href={item.href}
               target={item.target}
               rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
+              onClick={() => {
+                if (window.innerWidth < 768) {
+                  setIsSidebarOpen(false);
+                }
+              }}
               className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 ${
                 pathname === item.href
                   ? 'bg-gray-700 text-white'
@@ -106,19 +110,30 @@ export default function AdminLayout({
         </nav>
       </div>
 
+      {/* Overlay para cerrar sidebar en móviles */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 md:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        ></div>
+      )}
+
       {/* Main Content */}
-      <div className={`transition-all duration-200 ${isSidebarOpen ? 'ml-64' : 'ml-0'}`}>
+      <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="sticky top-0 z-40 bg-gray-800 border-b border-gray-700">
+        <header className="sticky top-0 z-30 bg-gray-800 border-b border-gray-700">
           <div className="flex items-center justify-between h-16 px-4">
             <button
               onClick={() => setIsSidebarOpen(true)}
-              className="p-2 rounded-md hover:bg-gray-700 focus:outline-none"
+              className="p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none md:hidden"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
+            <div className="flex-1 md:hidden"></div>
+            <div className="hidden md:flex-1"></div>
+            
             <div className="flex items-center space-x-4">
               <button
                 onClick={handleLogout}
@@ -134,7 +149,7 @@ export default function AdminLayout({
         </header>
 
         {/* Page Content */}
-        <main className="p-6">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-900 p-4 sm:p-6">
           <div className="max-w-7xl mx-auto">{children}</div>
         </main>
       </div>
