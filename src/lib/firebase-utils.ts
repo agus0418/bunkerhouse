@@ -1,6 +1,6 @@
-import { collection, doc, getDocs, setDoc, updateDoc, deleteDoc, query, where, getDoc } from 'firebase/firestore';
+import { collection, doc, getDocs, setDoc, updateDoc, deleteDoc, getDoc } from 'firebase/firestore';
 import { db } from './firebase';
-import { FirebaseProduct, FirebaseCategories, Product } from '@/types/firebase';
+import { FirebaseCategories, Product, Variation as FirebaseVariationType } from '@/types/firebase';
 
 export const firebaseUtils = {
   // Productos
@@ -17,10 +17,10 @@ export const firebaseUtils = {
         image: data.image || '',
         category: data.category || '',
         type: data.type || '',
-        variations: (data.variations || []).map((v: any, index: number) => ({
+        variations: (data.variations || []).map((v: Partial<FirebaseVariationType>, index: number) => ({
           id: v.id || Date.now() + index,
-          name: v.name,
-          price: v.price,
+          name: v.name || 'Nombre no disponible',
+          price: v.price === undefined ? 0 : v.price,
           tags: v.tags || []
         })),
       } as Product;
@@ -41,10 +41,10 @@ export const firebaseUtils = {
       image: data.image || '',
       category: data.category || '',
       type: data.type || '',
-      variations: (data.variations || []).map((v: any, index: number) => ({
+      variations: (data.variations || []).map((v: Partial<FirebaseVariationType>, index: number) => ({
         id: v.id || Date.now() + index,
-        name: v.name,
-        price: v.price,
+        name: v.name || 'Nombre no disponible',
+        price: v.price === undefined ? 0 : v.price,
         tags: v.tags || []
       })),
     } as Product;
