@@ -95,7 +95,7 @@ export default function Home() {
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight uppercase">
             Bunkerhouse
           </h1>
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
+          <div className="mt-8 flex flex-row items-center justify-center space-x-4 sm:space-x-6">
             <button
               onClick={() => handleTabClick('COMIDAS')}
               className={`px-8 py-3 rounded-md text-lg font-medium transition-colors duration-300 flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black ${activeTab === 'COMIDAS' ? 'bg-white text-black focus:ring-white' : 'bg-white/20 hover:bg-white/30 text-white focus:ring-white/50'}`}
