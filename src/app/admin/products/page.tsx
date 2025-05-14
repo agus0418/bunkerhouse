@@ -594,7 +594,7 @@ export default function ProductsPage() {
                     required
                   >
                     <option value="" disabled>Selecciona una categoría</option>
-                    {(নীরস => {
+                    {(() => {
                       console.log("[Category Select] Filtering categories. selectedProduct.type:", selectedProduct?.type, "allCategoriesFromDb:", allCategoriesFromDb);
                       const filtered = allCategoriesFromDb.filter(cat => cat.type === (selectedProduct?.type || 'COMIDAS'));
                       console.log("[Category Select] Filtered categories for dropdown:", filtered);
