@@ -3,14 +3,10 @@
 import { useState, useEffect } from 'react';
 import { db } from '@/lib/firebase';
 import { 
-  collection, 
   doc, 
   getDoc, 
-  getDocs, 
   updateDoc, 
-  deleteDoc, 
-  onSnapshot, 
-  writeBatch 
+  onSnapshot 
 } from 'firebase/firestore';
 
 interface Category {
