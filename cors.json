@@ -1,6 +1,6 @@
 [
     {
-      "origin": ["http://localhost:3002", "http://localhost:3000", "https://bunkerhouse.vercel.app"],
+      "origin": ["http://localhost:3002", "http://localhost:3001", "https://bunkerhouse.vercel.app"],
       "method": ["GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS"],
       "responseHeader": ["Content-Type", "Authorization", "X-Goog-Resumable", "Origin"],
       "maxAgeSeconds": 3600

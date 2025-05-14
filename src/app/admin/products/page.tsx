@@ -113,15 +113,18 @@ export default function ProductsPage() {
     const unsubscribeCategories = onSnapshot(categoriesRef, (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
-        const foodCats = (data.foodCategories || []).map((cat: any) => ({ id: cat.id || cat.name, name: cat.name, type: 'COMIDAS' as 'COMIDAS' | 'BEBIDAS' }));
-        const drinkCats = (data.drinkCategories || []).map((cat: any) => ({ id: cat.id || cat.name, name: cat.name, type: 'BEBIDAS' as 'COMIDAS' | 'BEBIDAS' }));
-        setAllCategoriesFromDb([...foodCats, ...drinkCats]);
+        console.log("[Categories Effect] Raw data from Firestore:", data);
+        const foodCats = (data.COMIDAS || []).map((categoryName: string) => ({ id: categoryName, name: categoryName, type: 'COMIDAS' as 'COMIDAS' | 'BEBIDAS' }));
+        const drinkCats = (data.BEBIDAS || []).map((categoryName: string) => ({ id: categoryName, name: categoryName, type: 'BEBIDAS' as 'COMIDAS' | 'BEBIDAS' }));
+        const combinedCategories = [...foodCats, ...drinkCats];
+        setAllCategoriesFromDb(combinedCategories);
+        console.log("[Categories Effect] Processed allCategoriesFromDb:", combinedCategories);
       } else {
-        console.log("Categories document 'main' not found!");
+        console.log("[Categories Effect] Categories document 'main' not found!");
         setAllCategoriesFromDb([]);
       }
     }, (error) => {
-      console.error("Error fetching categories from DB: ", error);
+      console.error("[Categories Effect] Error fetching categories from DB: ", error);
       setError("Error al cargar categorías de Firebase.");
     });
     return () => unsubscribeCategories();
@@ -591,10 +594,12 @@ export default function ProductsPage() {
                     required
                   >
                     <option value="" disabled>Selecciona una categoría</option>
-                    {allCategoriesFromDb
-                      .filter(cat => cat.type === (selectedProduct?.type || 'COMIDAS'))
-                      .map(cat => <option key={cat.id || cat.name} value={cat.name}>{cat.name}</option>)
-                    }
+                    {(নীরস => {
+                      console.log("[Category Select] Filtering categories. selectedProduct.type:", selectedProduct?.type, "allCategoriesFromDb:", allCategoriesFromDb);
+                      const filtered = allCategoriesFromDb.filter(cat => cat.type === (selectedProduct?.type || 'COMIDAS'));
+                      console.log("[Category Select] Filtered categories for dropdown:", filtered);
+                      return filtered.map((cat, idx) => <option key={`${cat.name}-${idx}`} value={cat.name}>{cat.name}</option>);
+                    })()}
                   </select>
                 </div>
               </div>
