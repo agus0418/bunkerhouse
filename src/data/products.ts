@@ -6,6 +6,14 @@ export interface Product {
   category: string;
   type: 'COMIDAS' | 'BEBIDAS';
   description?: string;
+  variations: Variation[];
+}
+
+export interface Variation {
+  id: number;
+  name: string;
+  price: number;
+  tags?: string[];
 }
 
 const processPrice = (price: string): number => {
@@ -35,7 +43,8 @@ export const products: Product[] = [
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/pexels-photo-391213.webp",
     category: "VINOS TINTOS",
     type: "BEBIDAS",
-    description: "Vino tinto de alta calidad"
+    description: "Vino tinto de alta calidad",
+    variations: []
   },
   {
     id: 1293,
@@ -44,7 +53,8 @@ export const products: Product[] = [
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/pexels-photo-391213.webp",
     category: "VINOS TINTOS",
     type: "BEBIDAS",
-    description: "Vino tinto premium"
+    description: "Vino tinto premium",
+    variations: []
   },
   {
     id: 1294,
@@ -53,7 +63,8 @@ export const products: Product[] = [
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/pexels-photo-391213.webp",
     category: "VINOS TINTOS",
     type: "BEBIDAS",
-    description: "Vino tinto de bodega tradicional"
+    description: "Vino tinto de bodega tradicional",
+    variations: []
   },
   {
     id: 1295,
@@ -62,7 +73,8 @@ export const products: Product[] = [
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/pexels-photo-391213.webp",
     category: "VINOS TINTOS",
     type: "BEBIDAS",
-    description: "Vino tinto joven y accesible"
+    description: "Vino tinto joven y accesible",
+    variations: []
   },
   {
     id: 1296,
@@ -71,7 +83,8 @@ export const products: Product[] = [
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/pexels-photo-391213.webp",
     category: "VINOS TINTOS",
     type: "BEBIDAS",
-    description: "Vino tinto de autor"
+    description: "Vino tinto de autor",
+    variations: []
   },
   {
     id: 1626,
@@ -80,7 +93,8 @@ export const products: Product[] = [
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/pexels-photo-391213.webp",
     category: "VINOS TINTOS",
     type: "BEBIDAS",
-    description: "Malbec premium de Catena Zapata"
+    description: "Malbec premium de Catena Zapata",
+    variations: []
   },
 
   // Vinos Blancos
@@ -91,7 +105,8 @@ export const products: Product[] = [
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/11/white_wine-scaled.jpg",
     category: "VINOS BLANCOS",
     type: "BEBIDAS",
-    description: "Vino blanco premium"
+    description: "Vino blanco premium",
+    variations: []
   },
   {
     id: 1298,
@@ -100,7 +115,8 @@ export const products: Product[] = [
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/11/white_wine-scaled.jpg",
     category: "VINOS BLANCOS",
     type: "BEBIDAS",
-    description: "Vino blanco de bodega tradicional"
+    description: "Vino blanco de bodega tradicional",
+    variations: []
   },
   {
     id: 1625,
@@ -109,7 +125,8 @@ export const products: Product[] = [
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/white_wine-scaled-1.jpg",
     category: "VINOS BLANCOS",
     type: "BEBIDAS",
-    description: "Vino blanco orgánico"
+    description: "Vino blanco orgánico",
+    variations: []
   },
   {
     id: 1637,
@@ -118,7 +135,8 @@ export const products: Product[] = [
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/white_wine-scaled-1.jpg",
     category: "VINOS BLANCOS",
     type: "BEBIDAS",
-    description: "Torrontés de alta calidad"
+    description: "Torrontés de alta calidad",
+    variations: []
   },
 
   // Champagne
@@ -129,7 +147,8 @@ export const products: Product[] = [
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/11/white_champagne-scaled.jpg",
     category: "CHAMPAGNE",
     type: "BEBIDAS",
-    description: "Champagne extra brut de alta calidad"
+    description: "Champagne extra brut de alta calidad",
+    variations: []
   },
   {
     id: 1300,
@@ -138,7 +157,8 @@ export const products: Product[] = [
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/11/white_champagne-scaled.jpg",
     category: "CHAMPAGNE",
     type: "BEBIDAS",
-    description: "Champagne dulce y elegante"
+    description: "Champagne dulce y elegante",
+    variations: []
   },
   {
     id: 1301,
@@ -147,7 +167,8 @@ export const products: Product[] = [
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/11/white_champagne-scaled.jpg",
     category: "CHAMPAGNE",
     type: "BEBIDAS",
-    description: "Champagne argentino premium"
+    description: "Champagne argentino premium",
+    variations: []
   },
   {
     id: 1624,
@@ -156,7 +177,8 @@ export const products: Product[] = [
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/white_champagne-scaled-1.jpg",
     category: "CHAMPAGNE",
     type: "BEBIDAS",
-    description: "Champagne de alta gama"
+    description: "Champagne de alta gama",
+    variations: []
   },
 
   // Cervezas
@@ -167,7 +189,8 @@ export const products: Product[] = [
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/11/beer_rubia.png",
     category: "CERVEZAS",
     type: "BEBIDAS",
-    description: "Cerveza rubia premium"
+    description: "Cerveza rubia premium",
+    variations: []
   },
   {
     id: 1303,
@@ -176,7 +199,8 @@ export const products: Product[] = [
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/11/beer_rubia.png",
     category: "CERVEZAS",
     type: "BEBIDAS",
-    description: "Cerveza rubia refrescante"
+    description: "Cerveza rubia refrescante",
+    variations: []
   },
   {
     id: 1564,
@@ -185,7 +209,8 @@ export const products: Product[] = [
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/beer_rubia.png",
     category: "CERVEZAS",
     type: "BEBIDAS",
-    description: "Cerveza rubia en lata"
+    description: "Cerveza rubia en lata",
+    variations: []
   },
   {
     id: 1638,
@@ -194,7 +219,8 @@ export const products: Product[] = [
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/beer_rubia.png",
     category: "CERVEZAS",
     type: "BEBIDAS",
-    description: "Cerveza artesanal local"
+    description: "Cerveza artesanal local",
+    variations: []
   },
   {
     id: 1639,
@@ -203,7 +229,8 @@ export const products: Product[] = [
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/beer_rubia.png",
     category: "CERVEZAS",
     type: "BEBIDAS",
-    description: "Cerveza premium en pinta"
+    description: "Cerveza premium en pinta",
+    variations: []
   },
   {
     id: 1640,
@@ -212,7 +239,8 @@ export const products: Product[] = [
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/beer_rubia.png",
     category: "CERVEZAS",
     type: "BEBIDAS",
-    description: "Chopp de cerveza premium"
+    description: "Chopp de cerveza premium",
+    variations: []
   },
 
   // Sin Alcohol
@@ -223,7 +251,8 @@ export const products: Product[] = [
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/glass-of-water-4087606_1920.jpg",
     category: "SIN ALCOHOL",
     type: "BEBIDAS",
-    description: "Agua mineral sin gas"
+    description: "Agua mineral sin gas",
+    variations: []
   },
   {
     id: 1306,
@@ -232,7 +261,8 @@ export const products: Product[] = [
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/glass-of-water-4087606_1920.jpg",
     category: "SIN ALCOHOL",
     type: "BEBIDAS",
-    description: "Agua mineral con gas"
+    description: "Agua mineral con gas",
+    variations: []
   },
   {
     id: 1307,
@@ -241,7 +271,8 @@ export const products: Product[] = [
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/pngimg.com-sprite_PNG98770.png",
     category: "SIN ALCOHOL",
     type: "BEBIDAS",
-    description: "Gaseosa lima-limón"
+    description: "Gaseosa lima-limón",
+    variations: []
   },
   {
     id: 1308,
@@ -250,7 +281,8 @@ export const products: Product[] = [
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/pexels-photo-4113669.webp",
     category: "SIN ALCOHOL",
     type: "BEBIDAS",
-    description: "Gaseosa cola clásica"
+    description: "Gaseosa cola clásica",
+    variations: []
   },
   {
     id: 1309,
@@ -259,7 +291,8 @@ export const products: Product[] = [
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/pexels-photo-4113669.webp",
     category: "SIN ALCOHOL",
     type: "BEBIDAS",
-    description: "Gaseosa cola sin azúcar"
+    description: "Gaseosa cola sin azúcar",
+    variations: []
   },
   {
     id: 1310,
@@ -268,7 +301,8 @@ export const products: Product[] = [
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/awa-pom-5001-195f3b34e593ea7f5516727707180487-1024-1024.jpg",
     category: "SIN ALCOHOL",
     type: "BEBIDAS",
-    description: "Agua con sabor a frutas"
+    description: "Agua con sabor a frutas",
+    variations: []
   },
 
   // Tragos
@@ -279,7 +313,8 @@ export const products: Product[] = [
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/gin.jpg",
     category: "TRAGOS",
     type: "BEBIDAS",
-    description: "Gin premium inglés"
+    description: "Gin premium inglés",
+    variations: []
   },
   {
     id: 1316,
@@ -288,7 +323,8 @@ export const products: Product[] = [
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/gin.jpg",
     category: "TRAGOS",
     type: "BEBIDAS",
-    description: "Gin premium con notas cítricas"
+    description: "Gin premium con notas cítricas",
+    variations: []
   },
   {
     id: 1317,
@@ -297,7 +333,8 @@ export const products: Product[] = [
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/vodka.jpg",
     category: "TRAGOS",
     type: "BEBIDAS",
-    description: "Vodka premium sueco"
+    description: "Vodka premium sueco",
+    variations: []
   },
   {
     id: 1318,
@@ -306,7 +343,8 @@ export const products: Product[] = [
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/whisky.jpg",
     category: "TRAGOS",
     type: "BEBIDAS",
-    description: "Whisky americano premium"
+    description: "Whisky americano premium",
+    variations: []
   },
   {
     id: 1319,
@@ -315,7 +353,8 @@ export const products: Product[] = [
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/ron.jpg",
     category: "TRAGOS",
     type: "BEBIDAS",
-    description: "Ron cubano tradicional"
+    description: "Ron cubano tradicional",
+    variations: []
   },
   {
     id: 1320,
@@ -323,7 +362,8 @@ export const products: Product[] = [
     price: 4000,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg",
     category: "TRAGOS",
-    type: "BEBIDAS"
+    type: "BEBIDAS",
+    variations: []
   },
   {
     id: 1321,
@@ -331,7 +371,8 @@ export const products: Product[] = [
     price: 5500,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg",
     category: "TRAGOS",
-    type: "BEBIDAS"
+    type: "BEBIDAS",
+    variations: []
   },
   {
     id: 1322,
@@ -339,7 +380,8 @@ export const products: Product[] = [
     price: 4000,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg",
     category: "TRAGOS",
-    type: "BEBIDAS"
+    type: "BEBIDAS",
+    variations: []
   },
   {
     id: 1323,
@@ -347,7 +389,8 @@ export const products: Product[] = [
     price: 5000,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg",
     category: "TRAGOS",
-    type: "BEBIDAS"
+    type: "BEBIDAS",
+    variations: []
   },
   {
     id: 1324,
@@ -355,7 +398,8 @@ export const products: Product[] = [
     price: 5000,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg",
     category: "TRAGOS",
-    type: "BEBIDAS"
+    type: "BEBIDAS",
+    variations: []
   },
   {
     id: 1325,
@@ -363,7 +407,8 @@ export const products: Product[] = [
     price: 4500,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg",
     category: "TRAGOS",
-    type: "BEBIDAS"
+    type: "BEBIDAS",
+    variations: []
   },
   {
     id: 1326,
@@ -371,7 +416,8 @@ export const products: Product[] = [
     price: 5000,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg",
     category: "TRAGOS",
-    type: "BEBIDAS"
+    type: "BEBIDAS",
+    variations: []
   },
   {
     id: 1327,
@@ -379,7 +425,8 @@ export const products: Product[] = [
     price: 6000,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg",
     category: "TRAGOS",
-    type: "BEBIDAS"
+    type: "BEBIDAS",
+    variations: []
   },
   {
     id: 1328,
@@ -387,7 +434,8 @@ export const products: Product[] = [
     price: 4500,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg",
     category: "TRAGOS",
-    type: "BEBIDAS"
+    type: "BEBIDAS",
+    variations: []
   },
   {
     id: 1329,
@@ -395,7 +443,8 @@ export const products: Product[] = [
     price: 7000,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg",
     category: "TRAGOS",
-    type: "BEBIDAS"
+    type: "BEBIDAS",
+    variations: []
   },
   {
     id: 1330,
@@ -403,7 +452,8 @@ export const products: Product[] = [
     price: 4500,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg",
     category: "TRAGOS",
-    type: "BEBIDAS"
+    type: "BEBIDAS",
+    variations: []
   },
   {
     id: 1331,
@@ -411,7 +461,8 @@ export const products: Product[] = [
     price: 3500,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg",
     category: "TRAGOS",
-    type: "BEBIDAS"
+    type: "BEBIDAS",
+    variations: []
   },
   {
     id: 1332,
@@ -419,7 +470,8 @@ export const products: Product[] = [
     price: 4000,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg",
     category: "TRAGOS",
-    type: "BEBIDAS"
+    type: "BEBIDAS",
+    variations: []
   },
   {
     id: 1333,
@@ -427,7 +479,8 @@ export const products: Product[] = [
     price: 4500,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg",
     category: "TRAGOS",
-    type: "BEBIDAS"
+    type: "BEBIDAS",
+    variations: []
   },
   {
     id: 1560,
@@ -435,7 +488,8 @@ export const products: Product[] = [
     price: 5000,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg",
     category: "TRAGOS",
-    type: "BEBIDAS"
+    type: "BEBIDAS",
+    variations: []
   },
   {
     id: 1641,
@@ -443,7 +497,8 @@ export const products: Product[] = [
     price: 12000,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/cocteles_1-scaled-1.jpg",
     category: "TRAGOS",
-    type: "BEBIDAS"
+    type: "BEBIDAS",
+    variations: []
   },
   {
     id: 1642,
@@ -451,7 +506,8 @@ export const products: Product[] = [
     price: 9000,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/cocteles_1-scaled-1.jpg",
     category: "TRAGOS",
-    type: "BEBIDAS"
+    type: "BEBIDAS",
+    variations: []
   },
   {
     id: 1643,
@@ -459,7 +515,8 @@ export const products: Product[] = [
     price: 2500,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/cocteles_1-scaled-1.jpg",
     category: "TRAGOS",
-    type: "BEBIDAS"
+    type: "BEBIDAS",
+    variations: []
   },
   {
     id: 1772,
@@ -467,7 +524,8 @@ export const products: Product[] = [
     price: 7500,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/cocteles_1-scaled-1.jpg",
     category: "TRAGOS",
-    type: "BEBIDAS"
+    type: "BEBIDAS",
+    variations: []
   },
 
   // Comidas
@@ -477,7 +535,8 @@ export const products: Product[] = [
     price: 5500,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/caprese.jpg",
     category: "FRIOS",
-    type: "COMIDAS"
+    type: "COMIDAS",
+    variations: []
   },
   {
     id: 1335,
@@ -485,7 +544,8 @@ export const products: Product[] = [
     price: 4500,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/caprese.jpg",
     category: "FRIOS",
-    type: "COMIDAS"
+    type: "COMIDAS",
+    variations: []
   },
   {
     id: 1339,
@@ -493,7 +553,8 @@ export const products: Product[] = [
     price: 6500,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/BULLANGA-5.jpg",
     category: "PICADAS",
-    type: "COMIDAS"
+    type: "COMIDAS",
+    variations: []
   },
   {
     id: 1340,
@@ -501,7 +562,8 @@ export const products: Product[] = [
     price: 5500,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/BULLANGA-5.jpg",
     category: "PICADAS",
-    type: "COMIDAS"
+    type: "COMIDAS",
+    variations: []
   },
   {
     id: 1341,
@@ -509,7 +571,8 @@ export const products: Product[] = [
     price: 10000,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/sandwich-de-bondiola-braseada-a-la-42Y46YQZZNALLCCUDTRGGLIZ3Y.webp",
     category: "ENTRE PANES CALIENTES",
-    type: "COMIDAS"
+    type: "COMIDAS",
+    variations: []
   },
   {
     id: 1342,
@@ -517,7 +580,8 @@ export const products: Product[] = [
     price: 12000,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/focaccia-de-cebolla-caramelizada-foto-principal.webp",
     category: "ENTRE PANES CALIENTES",
-    type: "COMIDAS"
+    type: "COMIDAS",
+    variations: []
   },
   {
     id: 1343,
@@ -525,7 +589,8 @@ export const products: Product[] = [
     price: 12000,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/lomito.webp",
     category: "ENTRE PANES CALIENTES",
-    type: "COMIDAS"
+    type: "COMIDAS",
+    variations: []
   },
   {
     id: 1344,
@@ -533,7 +598,8 @@ export const products: Product[] = [
     price: 6000,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/sandwiches-vegetales.webp",
     category: "ENTRE PANES CALIENTES",
-    type: "COMIDAS"
+    type: "COMIDAS",
+    variations: []
   },
   {
     id: 1345,
@@ -541,7 +607,8 @@ export const products: Product[] = [
     price: 7000,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/11/hamburger.png",
     category: "BURGERS",
-    type: "COMIDAS"
+    type: "COMIDAS",
+    variations: []
   },
   {
     id: 1346,
@@ -549,7 +616,8 @@ export const products: Product[] = [
     price: 8700,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/11/hamburger.png",
     category: "BURGERS",
-    type: "COMIDAS"
+    type: "COMIDAS",
+    variations: []
   },
   {
     id: 1347,
@@ -557,7 +625,8 @@ export const products: Product[] = [
     price: 8200,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/11/hamburger.png",
     category: "BURGERS",
-    type: "COMIDAS"
+    type: "COMIDAS",
+    variations: []
   },
   {
     id: 1348,
@@ -565,7 +634,8 @@ export const products: Product[] = [
     price: 8700,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/11/hamburger.png",
     category: "BURGERS",
-    type: "COMIDAS"
+    type: "COMIDAS",
+    variations: []
   },
   {
     id: 1349,
@@ -573,7 +643,8 @@ export const products: Product[] = [
     price: 9000,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/11/hamburger.png",
     category: "BURGERS",
-    type: "COMIDAS"
+    type: "COMIDAS",
+    variations: []
   },
   {
     id: 1350,
@@ -581,7 +652,8 @@ export const products: Product[] = [
     price: 7000,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/6d9342cfd301-lomo-saltado-t.webp",
     category: "AL WOK (sin tacc)",
-    type: "COMIDAS"
+    type: "COMIDAS",
+    variations: []
   },
   {
     id: 1351,
@@ -589,7 +661,8 @@ export const products: Product[] = [
     price: 5500,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/saltat-de-verdures-amb-salsa-de-soja-i-mel-alemany.webp",
     category: "AL WOK (sin tacc)",
-    type: "COMIDAS"
+    type: "COMIDAS",
+    variations: []
   },
   {
     id: 1352,
@@ -597,7 +670,8 @@ export const products: Product[] = [
     price: 7000,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/pollo_teriyaki.webp",
     category: "AL WOK (sin tacc)",
-    type: "COMIDAS"
+    type: "COMIDAS",
+    variations: []
   },
   {
     id: 1354,
@@ -605,7 +679,8 @@ export const products: Product[] = [
     price: 7000,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/11/fresh-potatoes-fri-with-souce-scaled.jpg",
     category: "PAPAS",
-    type: "COMIDAS"
+    type: "COMIDAS",
+    variations: []
   },
   {
     id: 1355,
@@ -613,7 +688,8 @@ export const products: Product[] = [
     price: 6500,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/11/fresh-potatoes-fri-with-souce-scaled.jpg",
     category: "PAPAS",
-    type: "COMIDAS"
+    type: "COMIDAS",
+    variations: []
   },
   {
     id: 1356,
@@ -621,7 +697,8 @@ export const products: Product[] = [
     price: 7000,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/11/fresh-potatoes-fri-with-souce-scaled.jpg",
     category: "PAPAS",
-    type: "COMIDAS"
+    type: "COMIDAS",
+    variations: []
   },
   {
     id: 1357,
@@ -629,7 +706,8 @@ export const products: Product[] = [
     price: 6000,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/4e475ddf-2c43-4d47-b69c-990a92e91029-26f258f7fdb6a2b9fb16276674103675-640-0.webp",
     category: "PIZZAS",
-    type: "COMIDAS"
+    type: "COMIDAS",
+    variations: []
   },
   {
     id: 1358,
@@ -637,7 +715,8 @@ export const products: Product[] = [
     price: 6500,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/fugazza-argentina_web.jpg.webp",
     category: "PIZZAS",
-    type: "COMIDAS"
+    type: "COMIDAS",
+    variations: []
   },
   {
     id: 1359,
@@ -645,7 +724,8 @@ export const products: Product[] = [
     price: 7000,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/1515520232039.webp",
     category: "PIZZAS",
-    type: "COMIDAS"
+    type: "COMIDAS",
+    variations: []
   },
   {
     id: 1360,
@@ -653,7 +733,8 @@ export const products: Product[] = [
     price: 7800,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/maxresdefault.webp",
     category: "PIZZAS",
-    type: "COMIDAS"
+    type: "COMIDAS",
+    variations: []
   },
   {
     id: 1366,
@@ -661,7 +742,8 @@ export const products: Product[] = [
     price: 7500,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/cake-921943_1920.jpg",
     category: "DULCES",
-    type: "COMIDAS"
+    type: "COMIDAS",
+    variations: []
   },
   {
     id: 1367,
@@ -669,7 +751,8 @@ export const products: Product[] = [
     price: 5000,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/cake-921943_1920.jpg",
     category: "DULCES",
-    type: "COMIDAS"
+    type: "COMIDAS",
+    variations: []
   },
   {
     id: 1368,
@@ -677,7 +760,8 @@ export const products: Product[] = [
     price: 6500,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/cake-921943_1920.jpg",
     category: "DULCES",
-    type: "COMIDAS"
+    type: "COMIDAS",
+    variations: []
   },
   {
     id: 1369,
@@ -685,7 +769,8 @@ export const products: Product[] = [
     price: 2500,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/cake-921943_1920.jpg",
     category: "DULCES",
-    type: "COMIDAS"
+    type: "COMIDAS",
+    variations: []
   },
   {
     id: 1370,
@@ -693,7 +778,8 @@ export const products: Product[] = [
     price: 2500,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/cake-921943_1920.jpg",
     category: "DULCES",
-    type: "COMIDAS"
+    type: "COMIDAS",
+    variations: []
   },
   {
     id: 1371,
@@ -701,7 +787,8 @@ export const products: Product[] = [
     price: 2500,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/cake-921943_1920.jpg",
     category: "DULCES",
-    type: "COMIDAS"
+    type: "COMIDAS",
+    variations: []
   },
   {
     id: 1841,
@@ -709,7 +796,8 @@ export const products: Product[] = [
     price: 20000,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2025/01/lomito.webp",
     category: "ENTRE PANES CALIENTES",
-    type: "COMIDAS"
+    type: "COMIDAS",
+    variations: []
   },
   {
     id: 1842,
@@ -717,7 +805,8 @@ export const products: Product[] = [
     price: 18500,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2025/01/lomito.webp",
     category: "ENTRE PANES CALIENTES",
-    type: "COMIDAS"
+    type: "COMIDAS",
+    variations: []
   },
   {
     id: 1844,
@@ -725,7 +814,8 @@ export const products: Product[] = [
     price: 14000,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2025/01/lomito.webp",
     category: "ENTRE PANES CALIENTES",
-    type: "COMIDAS"
+    type: "COMIDAS",
+    variations: []
   },
   {
     id: 1845,
@@ -733,7 +823,8 @@ export const products: Product[] = [
     price: 8000,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/BULLANGA-5.jpg",
     category: "PICADAS",
-    type: "COMIDAS"
+    type: "COMIDAS",
+    variations: []
   },
   {
     id: 1846,
@@ -741,7 +832,8 @@ export const products: Product[] = [
     price: 14000,
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2025/01/rabas.webp",
     category: "PICADAS",
-    type: "COMIDAS"
+    type: "COMIDAS",
+    variations: []
   },
 
   // Limonadas
@@ -752,7 +844,8 @@ export const products: Product[] = [
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/limonada.jpg",
     category: "LIMONADAS",
     type: "BEBIDAS",
-    description: "Limonada natural con menta y jengibre"
+    description: "Limonada natural con menta y jengibre",
+    variations: []
   },
   {
     id: 2002,
@@ -761,7 +854,8 @@ export const products: Product[] = [
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/limonada.jpg",
     category: "LIMONADAS",
     type: "BEBIDAS",
-    description: "Limonada con frambuesas, moras y arándanos"
+    description: "Limonada con frambuesas, moras y arándanos",
+    variations: []
   },
   {
     id: 2003,
@@ -770,7 +864,8 @@ export const products: Product[] = [
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/limonada.jpg",
     category: "LIMONADAS",
     type: "BEBIDAS",
-    description: "Limonada con pulpa de maracuyá"
+    description: "Limonada con pulpa de maracuyá",
+    variations: []
   },
   {
     id: 2004,
@@ -779,6 +874,7 @@ export const products: Product[] = [
     image: "https://bunkerhouse.com.ar/wp-content/uploads/2024/12/limonada.jpg",
     category: "LIMONADAS",
     type: "BEBIDAS",
-    description: "Limonada con jengibre fresco y menta"
+    description: "Limonada con jengibre fresco y menta",
+    variations: []
   }
 ]; 

@@ -1,35 +1,32 @@
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { getFirestore, Firestore } from 'firebase/firestore';
+import { getAuth, Auth } from 'firebase/auth';
+import { getStorage, FirebaseStorage } from 'firebase/storage';
 
 // Configuración de Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyA6jSrBZtyIHQ1awz-srvYiZdx-7R20qs0",
-  authDomain: "bunkerhouse-794fd.firebaseapp.com",
-  projectId: "bunkerhouse-794fd",
-  storageBucket: "bunkerhouse-794fd.firebasestorage.app",
-  messagingSenderId: "1056317163273",
-  appId: "1:1056317163273:web:3b08b6c2097d7b25c335d8",
-  measurementId: "G-23M9JJ0HM7"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
 // Inicializar Firebase
 let app: FirebaseApp;
 let db: Firestore;
+let auth: Auth;
+let storage: FirebaseStorage;
 
-try {
-  if (!getApps().length) {
-    app = initializeApp(firebaseConfig);
-    console.log('Firebase inicializado correctamente');
-  } else {
-    app = getApps()[0];
-    console.log('Usando instancia existente de Firebase');
-  }
-  
-  db = getFirestore(app);
-  console.log('Firestore inicializado correctamente');
-} catch (error) {
-  console.error('Error al inicializar Firebase:', error);
-  throw error;
+if (getApps().length === 0) {
+  app = initializeApp(firebaseConfig);
+} else {
+  app = getApps()[0];
 }
 
-export { db }; 
+db = getFirestore(app);
+auth = getAuth(app);
+storage = getStorage(app);
+
+export { app, db, auth, storage }; 

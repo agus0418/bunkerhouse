@@ -1,7 +1,7 @@
 import { Timestamp } from 'firebase/firestore';
 
 export interface FirebaseProduct {
-  id: number;
+  id_firebase: string;
   name: string;
   description: string;
   price: number;
@@ -14,15 +14,22 @@ export interface FirebaseProduct {
 }
 
 export interface FirebaseVariation {
-  id: number;
+  id_firebase: string;
   name: string;
   price: number;
-  tags: string[];
+  tags?: string[];
 }
 
 export interface FirebaseCategories {
   BEBIDAS: string[];
   COMIDAS: string[];
+}
+
+export interface Variation {
+  id: number;
+  name: string;
+  price: number;
+  tags?: string[];
 }
 
 export interface Product {
@@ -33,18 +40,12 @@ export interface Product {
   image: string;
   category: string;
   type: string;
-  variations: ProductVariation[];
-}
-
-export interface ProductVariation {
-  id: string;
-  name: string;
-  price: number;
-  tags?: string[];
+  variations: Variation[];
 }
 
 export interface Category {
   id: string;
   name: string;
-  subcategories: string[];
+  type: 'COMIDAS' | 'BEBIDAS';
+  description?: string;
 } 

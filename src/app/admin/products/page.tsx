@@ -2,492 +2,465 @@
 
 import { useState, useEffect } from 'react';
 import { products as initialProducts } from '@/data/products';
-import { db } from '@/lib/firebase';
-import { collection, doc, getDocs, setDoc, updateDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
+import { db, storage } from '@/lib/firebase';
+import { collection, doc, getDocs, setDoc, updateDoc, deleteDoc, onSnapshot, query as firestoreQuery, where, writeBatch } from 'firebase/firestore';
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { Product, Variation, Category as ProductCategory } from '@/types/firebase';
 
-interface Variation {
-  id: number;
-  name: string;
-  price: number;
-  tags?: string[];
-}
-
-interface Product {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  image: string;
-  category: string;
-  type: string;
-  variations?: Variation[];
+interface FirebaseProduct extends Omit<Product, 'id'> { 
+  // No necesita el id aquí porque Firestore lo maneja por separado
 }
 
 const AVAILABLE_TAGS = [
-  { id: 'vegetariano', label: 'Vegetariano', color: 'bg-green-500' },
-  { id: 'nuevo', label: 'Nuevo', color: 'bg-blue-500' },
-  { id: 'destacado', label: 'Destacado', color: 'bg-yellow-500' },
-  { id: 'solicitado', label: 'Solicitado', color: 'bg-purple-500' },
+  { id: 'vegetarian', label: 'Vegetariano', color: 'bg-green-500' },
+  { id: 'new', label: 'Nuevo', color: 'bg-blue-500' },
+  { id: 'featured', label: 'Destacado', color: 'bg-yellow-500' },
+  { id: 'requested', label: 'Pedido', color: 'bg-purple-500' },
 ];
 
 type TabType = 'COMIDAS' | 'BEBIDAS';
 
 export default function ProductsPage() {
+  const [products, setProductsState] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isVariationsModalOpen, setIsVariationsModalOpen] = useState(false);
   const [isAddVariationModalOpen, setIsAddVariationModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<TabType>('BEBIDAS');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [newVariation, setNewVariation] = useState<Partial<Variation>>({
-    name: '',
-    price: 0,
-    tags: [],
-  });
-  const [productsWithVariations, setProductsWithVariations] = useState<Product[]>([]);
+  
+  // Estado para el formulario de variación (usado para añadir Y editar)
+  const [variationFormData, setVariationFormData] = useState<Partial<Variation>>({ name: '', price: undefined, tags: [] });
+  // Estado para saber si estamos editando una variación existente y cuál es
   const [editingVariation, setEditingVariation] = useState<Variation | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // No necesitamos un modal separado para editar variación, reutilizaremos el de añadir.
 
-  // Cargar productos desde Firebase
+  const [activeTab, setActiveTab] = useState<TabType>('COMIDAS');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string | null>(null);
+  const [allUniqueCategories, setAllUniqueCategories] = useState<string[]>([]);
+  const [imageFile, setImageFile] = useState<File | null>(null); // Nuevo estado para el archivo de imagen
+
   useEffect(() => {
-    const productsRef = collection(db, 'products');
-    
-    // Suscribirse a cambios en tiempo real
-    const unsubscribe = onSnapshot(productsRef, 
-      (snapshot) => {
-        if (snapshot.empty) {
-          // Si no hay productos, cargar los iniciales
-          const initialProductsWithVariations = initialProducts.map((product) => ({
-            ...product,
-            variations: [],
-            description: product.description || '',
-          }));
-          
-          // Guardar productos iniciales en Firebase
-          initialProductsWithVariations.forEach(async (product) => {
-            try {
-              await setDoc(doc(db, 'products', product.id.toString()), product);
-            } catch (error) {
-              console.error('Error al guardar producto inicial:', error);
-              setError('Error al cargar productos iniciales');
-            }
-          });
-          
-          setProductsWithVariations(initialProductsWithVariations);
-        } else {
-          // Cargar productos desde Firebase
-          const products = snapshot.docs.map(doc => ({
-            id: Number(doc.id),
-            ...doc.data()
-          } as Product));
-          setProductsWithVariations(products);
-        }
-        setIsLoading(false);
-      },
-      (error) => {
-        console.error('Error al cargar productos:', error);
-        setError('Error al cargar productos');
-        setIsLoading(false);
-      }
-    );
+    setIsLoading(true);
+    const productsRef = collection(db, "products");
+    const q = firestoreQuery(productsRef);
 
-    // Limpiar suscripción al desmontar
+    const unsubscribe = onSnapshot(q, async (querySnapshot) => {
+      if (querySnapshot.empty) {
+        console.log("No products found in Firestore. Attempting to initialize...");
+        try {
+          const batch = writeBatch(db);
+          initialProducts.forEach(product => {
+            const { id, ...dataToSave } = product; 
+            const productRef = doc(db, "products", String(id)); 
+            batch.set(productRef, dataToSave);
+          });
+          await batch.commit();
+          console.log("Initial products loaded to Firestore.");
+          // Convertir IDs de initialProducts a string para que coincidan con el tipo Product esperado por el estado
+          const productsForState: Product[] = initialProducts.map(p => ({
+            ...p,
+            id: String(p.id), // Convertir id a string
+            // Asegurar que las variaciones tengan el formato correcto, aunque sus IDs ya son number y coinciden
+            variations: (p.variations || []).map((v, index) => ({
+              id: v.id || Date.now() + index, // Variation.id es number, lo cual está bien
+              name: v.name,
+              price: v.price,
+              tags: v.tags || []
+            }))
+          }));
+          setProductsState(productsForState);
+        } catch (e) {
+          console.error("Error initializing products in Firestore: ", e);
+          setError("Error al inicializar productos.");
+        }
+      } else {
+        const prods = querySnapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id, // Firestore ID es string
+            ...data,
+            // Asegurar que variations es un array y que sus IDs son numbers si es necesario internamente
+            variations: (data.variations || []).map((v: any, index: number) => ({ 
+              id: v.id || Date.now() + index, // Si el ID de Firebase es string, o no existe, generar uno numérico
+              name: v.name,
+              price: v.price,
+              tags: v.tags || []
+            })),
+          } as Product;
+        });
+        setProductsState(prods);
+      }
+      setIsLoading(false);
+    }, (err) => {
+      console.error("Error fetching products: ", err);
+      setError("Error al cargar productos de Firebase.");
+      setIsLoading(false);
+    });
     return () => unsubscribe();
   }, []);
 
-  const handleSaveProduct = async (productData: Partial<Product>) => {
-    if (!selectedProduct) return;
+  useEffect(() => {
+    if (products.length > 0) {
+      const uniqueCategories = Array.from(new Set(products.map(p => p.category).filter(Boolean)));
+      setAllUniqueCategories(uniqueCategories);
+    }
+  }, [products]);
+
+  const handleSaveProduct = async (formData: FormData) => {
+    let productData: Partial<Product> = {
+      name: formData.get('name') as string,
+      description: formData.get('description') as string || undefined,
+      price: parseFloat(formData.get('price') as string),
+      image: formData.get('image') as string,
+      category: formData.get('category') as string,
+      type: formData.get('type') as TabType,
+      // variations se manejan por separado
+    };
+
+    if (!productData.name || productData.price === undefined || !productData.category || !productData.type) {
+      setError("Por favor, completa nombre, precio, categoría y tipo del producto.");
+      return;
+    }
+    setIsLoading(true);
+    setError(null);
 
     try {
-      setError(null);
-      const updatedProduct = {
-        ...selectedProduct,
-        ...productData,
-      };
+      let imageUrlToSave = productData.image;
 
-      // Actualizar en Firebase
-      await updateDoc(doc(db, 'products', selectedProduct.id.toString()), {
-        name: updatedProduct.name,
-        description: updatedProduct.description,
-        price: updatedProduct.price,
-        image: updatedProduct.image,
-        category: updatedProduct.category,
-        type: updatedProduct.type,
-        variations: updatedProduct.variations || []
-      });
+      if (imageFile) {
+        const storageRef = ref(storage, `products_images/${Date.now()}_${imageFile.name}`);
+        const uploadTask = uploadBytesResumable(storageRef, imageFile);
 
-      // Actualizar estado local
-      const updatedProducts = productsWithVariations.map(p =>
-        p.id === selectedProduct.id ? updatedProduct : p
-      );
-      setProductsWithVariations(updatedProducts);
-      setSelectedProduct(updatedProduct);
-      setIsEditModalOpen(false);
-    } catch (error) {
-      console.error('Error al guardar producto:', error);
-      setError('Error al guardar el producto');
+        await new Promise<void>((resolve, reject) => {
+          uploadTask.on('state_changed',
+            (snapshot) => {
+              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+              console.log('Upload is ' + progress + '% done');
+            },
+            (error) => {
+              console.error("Error uploading image: ", error);
+              setError("Error al subir la imagen: " + error.message);
+              setIsLoading(false);
+              reject(error);
+            },
+            async () => {
+              try {
+                const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                console.log('File available at', downloadURL);
+                imageUrlToSave = downloadURL;
+                resolve();
+              } catch (downloadError) {
+                console.error("Error getting download URL: ", downloadError);
+                setError("Error al obtener la URL de la imagen: " + (downloadError as Error).message);
+                setIsLoading(false);
+                reject(downloadError);
+              }
+            }
+          );
+        });
+      }
+      
+      if (!isLoading) {
+        // Esto significa que hubo un error en la subida y ya se llamó a setIsLoading(false) y return o reject
+        // No deberíamos llegar aquí si hubo error, pero es una doble verificación.
+        // Si la promesa fue rechazada, el error ya se manejó.
+        // Si setError fue llamado, la carga se detuvo y no se debería continuar.
+        // Esta lógica podría necesitar revisión para asegurar que no se intente guardar si la subida falla.
+        // Por ahora, si la promesa se rechaza, el catch de abajo lo manejará.
+      }
+
+      const finalProductData = { ...productData, image: imageUrlToSave };
+
+      if (selectedProduct && selectedProduct.id) {
+        const productRef = doc(db, "products", String(selectedProduct.id));
+        const { variations, ...productDetailsToUpdate } = finalProductData; 
+        await updateDoc(productRef, productDetailsToUpdate);
+      } else {
+        const newProductRef = doc(collection(db, "products"));
+        await setDoc(newProductRef, { ...finalProductData, variations: [] });
+      }
+      handleCloseModals();
+      setImageFile(null);
+    } catch (e) {
+      if (!error) {
+        console.error("Error saving product (Firestore or other): ", e);
+        setError("Error al guardar el producto en Firestore.");
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleSaveVariation = async () => {
-    if (selectedProduct && newVariation.name && newVariation.price) {
-      try {
-        setError(null);
-        let updatedProduct: Product;
+    if (!selectedProduct) return;
+    if (!variationFormData.name || variationFormData.price === undefined) {
+      setError("El nombre y el precio de la variación son obligatorios.");
+      return;
+    }
+    setIsLoading(true);
+    setError(null);
+
+    let updatedVariations: Variation[];
+    const currentProductVariations = selectedProduct.variations || [];
+
+    if (editingVariation) {
+      // Editando una variación existente
+      updatedVariations = currentProductVariations.map(v => 
+        v.id === editingVariation.id 
+          ? { ...v, name: variationFormData.name!, price: variationFormData.price!, tags: variationFormData.tags || [] } 
+          : v
+      );
+    } else {
+      // Añadiendo una nueva variación
+      const newVarToAdd: Variation = {
+        id: Date.now(), // ID numérico local
+        name: variationFormData.name!,
+        price: variationFormData.price!,
+        tags: variationFormData.tags || [],
+      };
+      updatedVariations = [...currentProductVariations, newVarToAdd];
+    }
+
+    try {
+      // --- BEGIN DEBUG LOGGING ---
+      console.log('[handleSaveVariation] Inside try block. Selected Product:', JSON.stringify(selectedProduct, null, 2));
+      if (selectedProduct && typeof selectedProduct.id !== 'undefined' && selectedProduct.id !== null) {
+        console.log('[handleSaveVariation] selectedProduct.id:', selectedProduct.id);
+        console.log('[handleSaveVariation] typeof selectedProduct.id:', typeof selectedProduct.id);
         
-        if (editingVariation) {
-          // Actualizar variación existente
-          const updatedVariations = selectedProduct.variations?.map(v => 
-            v.id === editingVariation.id 
-              ? { 
-                  id: v.id,
-                  name: newVariation.name as string,
-                  price: newVariation.price as number,
-                  tags: newVariation.tags || []
-                }
-              : v
-          ) || [];
-          
-          updatedProduct = {
-            ...selectedProduct,
-            variations: updatedVariations
-          };
-        } else {
-          // Agregar nueva variación
-          updatedProduct = {
-            ...selectedProduct,
-            variations: [
-              ...(selectedProduct.variations || []),
-              {
-                id: Date.now(),
-                name: newVariation.name,
-                price: newVariation.price,
-                tags: newVariation.tags || [],
-              },
-            ],
-          };
+        const idForDoc = String(selectedProduct.id);
+        console.log('[handleSaveVariation] idForDoc (after String()):', idForDoc);
+
+        if (idForDoc.trim() === "") { // Comprobar si es cadena vacía o solo espacios
+            console.error("[handleSaveVariation] ID for doc is an empty or whitespace string! This will fail.");
+            setError("El ID del producto es una cadena vacía o solo contiene espacios, lo cual no es válido.");
+            setIsLoading(false);
+            return;
         }
-        
-        // Actualizar en Firebase
-        await updateDoc(doc(db, 'products', selectedProduct.id.toString()), {
-          variations: updatedProduct.variations
-        });
-        
-        // Actualizar estado local
-        const updatedProducts = productsWithVariations.map(p => 
-          p.id === selectedProduct.id ? updatedProduct : p
-        );
-        setProductsWithVariations(updatedProducts);
-        setSelectedProduct(updatedProduct);
-        
-        setIsAddVariationModalOpen(false);
-        setNewVariation({ name: '', price: undefined, tags: [] });
-        setEditingVariation(null);
-      } catch (error) {
-        console.error('Error al guardar variación:', error);
-        setError('Error al guardar la variación');
+        // --- END DEBUG LOGGING ---
+        const productRef = doc(db, "products", idForDoc); // Usar el ID procesado
+        await updateDoc(productRef, { variations: updatedVariations });
+        // La actualización local la manejará onSnapshot
+        handleCloseVariationModals(); 
+      } else {
+        console.error("[handleSaveVariation] selectedProduct is null, or its id is null/undefined inside try block. This shouldn't happen if guards are correct.");
+        setError("Error inesperado: producto no seleccionado o ID de producto inválido en el bloque try.");
+        setIsLoading(false);
+        return;
       }
+    } catch (e: any) {
+      console.error("Error saving variation (FULL ERROR OBJECT): ", e);
+      console.error("Error saving variation (MESSAGE): ", e.message);
+      console.error("Error saving variation (STACK): ", e.stack);
+      setError(`Error al guardar la variación: ${e.message}. Revise la consola del navegador para más detalles.`);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleDeleteVariation = async (variationId: number) => {
-    if (selectedProduct) {
-      try {
-        setError(null);
-        const updatedVariations = selectedProduct.variations?.filter(v => v.id !== variationId) || [];
-
-        const updatedProduct = {
-          ...selectedProduct,
-          variations: updatedVariations
-        };
-
-        // Actualizar en Firebase
-        await updateDoc(doc(db, 'products', selectedProduct.id.toString()), {
-          variations: updatedVariations
-        });
-
-        // Actualizar estado local
-        const updatedProducts = productsWithVariations.map(p => 
-          p.id === selectedProduct.id ? updatedProduct : p
-        );
-        setProductsWithVariations(updatedProducts);
-        setSelectedProduct(updatedProduct);
-      } catch (error) {
-        console.error('Error al eliminar variación:', error);
-        setError('Error al eliminar la variación');
-      }
+    if (!selectedProduct) return;
+    if (!confirm("¿Estás seguro de que quieres eliminar esta variación?")) return;
+    setIsLoading(true);
+    try {
+      const productRef = doc(db, "products", String(selectedProduct.id));
+      const updatedVariations = (selectedProduct.variations || []).filter(v => v.id !== variationId);
+      await updateDoc(productRef, { variations: updatedVariations });
+      // onSnapshot actualizará el estado local
+    } catch (e) {
+      console.error("Error deleting variation: ", e);
+      setError("Error al eliminar la variación.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const filteredProducts = productsWithVariations.filter((product) => {
-    const matchesType = product.type === activeTab;
-    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         product.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         product.category.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = !selectedCategory || product.category === selectedCategory;
-    
-    return matchesType && matchesSearch && matchesCategory;
-  });
-
-  const categories = Array.from(new Set(productsWithVariations
-    .filter(p => p.type === activeTab)
-    .map(p => p.category)));
-
-  const getCategoriesByType = (type: TabType) => {
-    const categories = {
-      BEBIDAS: [
-        'VINOS TINTOS',
-        'VINOS BLANCOS',
-        'CHAMPAGNE',
-        'CERVEZAS',
-        'SIN ALCOHOL',
-        'TRAGOS',
-        'LIMONADAS'
-      ],
-      COMIDAS: [
-        'FRIOS',
-        'PICADAS',
-        'ENTRE PANES CALIENTES',
-        'BURGERS',
-        'AL WOK (sin tacc)',
-        'PAPAS',
-        'PIZZAS',
-        'DULCES'
-      ]
-    };
-    return categories[type];
+  const getCategoriesByType = (type: TabType | undefined): string[] => {
+    if (!type) return allUniqueCategories;
+    return Array.from(new Set(products.filter(p => p.type === type).map(p => p.category).filter(Boolean)));
   };
+
+  const currentDisplayCategories = activeTab ? getCategoriesByType(activeTab) : allUniqueCategories;
+
+  const filteredProducts = products.filter(product => {
+    const tabMatch = product.type === activeTab;
+    const categoryMatch = !selectedCategoryFilter || product.category === selectedCategoryFilter;
+    const searchMatch = !searchQuery || 
+                        product.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                        (product.description || '').toLowerCase().includes(searchQuery.toLowerCase());
+    return tabMatch && categoryMatch && searchMatch;
+  });
 
   const handleCloseModals = () => {
     setIsEditModalOpen(false);
     setIsVariationsModalOpen(false);
-    setIsAddVariationModalOpen(false);
+    handleCloseVariationModals();
     setSelectedProduct(null);
-    setNewVariation({ name: '', price: 0, tags: [] });
-    setEditingVariation(null);
+    setImageFile(null); // Reiniciar el archivo de imagen al cerrar modales
+    setError(null);
+  };
+
+  const handleCloseVariationModals = () => {
+    setIsAddVariationModalOpen(false); 
+    setEditingVariation(null); // Limpiar variación en edición
+    setVariationFormData({ name: '', price: undefined, tags: [] }); // Resetear formulario de variación
   };
 
   const handleEditProduct = (product: Product) => {
     setSelectedProduct(product);
     setIsEditModalOpen(true);
     setIsVariationsModalOpen(false);
-    setIsAddVariationModalOpen(false);
+    handleCloseVariationModals(); 
   };
 
   const handleVariations = (product: Product) => {
     setSelectedProduct(product);
     setIsVariationsModalOpen(true);
     setIsEditModalOpen(false);
-    setIsAddVariationModalOpen(false);
+    handleCloseVariationModals();
   };
 
-  const handleAddVariation = () => {
+  const handleOpenAddVariationModal = () => {
+    setEditingVariation(null); 
+    setVariationFormData({ name: '', price: undefined, tags: [] }); 
     setIsAddVariationModalOpen(true);
   };
 
-  const handleEditVariation = (variation: Variation) => {
+  // Esta función ahora prepara el formulario para edición y abre el MISMO modal que "Añadir"
+  const handleOpenEditVariationModal = (variation: Variation) => {
     setEditingVariation(variation);
-    setIsAddVariationModalOpen(true);
+    setVariationFormData({ name: variation.name, price: variation.price, tags: variation.tags || [] });
+    setIsAddVariationModalOpen(true); // Reutiliza el modal de añadir
   };
-
+  
   const handleTagToggle = (tagId: string) => {
-    setNewVariation((prev) => ({
+    setVariationFormData(prev => ({
       ...prev,
       tags: prev.tags?.includes(tagId)
-        ? prev.tags.filter((id) => id !== tagId)
+        ? prev.tags.filter(t => t !== tagId)
         : [...(prev.tags || []), tagId],
     }));
   };
 
+  const handleImageFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      setImageFile(event.target.files[0]);
+    } else {
+      setImageFile(null);
+    }
+  };
+
+  // JSX RENDER
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-4 md:p-6 bg-gray-900 min-h-screen">
       {error && (
-        <div className="bg-red-900/50 text-red-200 p-4 rounded-lg">
-          {error}
+        <div className="bg-red-900/80 backdrop-blur-sm text-red-100 p-4 rounded-lg fixed top-5 right-5 z-[100] shadow-lg max-w-md">
+          <div className="flex justify-between items-center">
+            <p className="font-semibold">Error</p>
+            <button onClick={() => setError(null)} className="text-red-200 hover:text-white text-2xl">&times;</button>
+          </div>
+          <p className="text-sm mt-1">{error}</p>
         </div>
       )}
       
-      {isLoading ? (
-        <div className="flex items-center justify-center h-64">
+      {isLoading && (
+        <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center z-[120]">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-300"></div>
-        </div>
-      ) : (
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold text-white">Productos</h1>
-          <button
-            onClick={() => {
-              setSelectedProduct(null);
-              setIsEditModalOpen(true);
-              setIsVariationsModalOpen(false);
-            }}
-            className="px-4 py-2 text-sm font-medium text-white bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors flex items-center"
-          >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            Nuevo Producto
-          </button>
         </div>
       )}
 
-      {/* Pestañas */}
-      <div className="border-b border-gray-700">
-        <nav className="flex space-x-8" aria-label="Tabs">
-          <button
-            onClick={() => setActiveTab('COMIDAS')}
-            className={`${
-              activeTab === 'COMIDAS'
-                ? 'border-gray-300 text-white'
-                : 'border-transparent text-gray-400 hover:text-gray-300'
-            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center`}
-          >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-            </svg>
-            Comidas
-          </button>
-          <button
-            onClick={() => setActiveTab('BEBIDAS')}
-            className={`${
-              activeTab === 'BEBIDAS'
-                ? 'border-gray-300 text-white'
-                : 'border-transparent text-gray-400 hover:text-gray-300'
-            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center`}
-          >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-            </svg>
-            Bebidas
-          </button>
-        </nav>
-      </div>
-
-      {/* Buscador */}
-      <div className="relative">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </div>
-        <input
-          type="text"
-          className="block w-full pl-10 pr-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
-          placeholder="Buscar productos..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </div>
-
-      {/* Filtro de Categorías */}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+        <h1 className="text-2xl sm:text-3xl font-semibold text-white">Gestión de Productos</h1>
         <button
-          onClick={() => setSelectedCategory(null)}
-          className={`px-3 py-1 text-sm font-medium rounded-full transition-colors ${
-            selectedCategory === null
-              ? 'bg-gray-600 text-white'
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-          }`}
+          onClick={() => {
+            setSelectedProduct(null); 
+            setIsEditModalOpen(true);
+          }}
+          className="w-full sm:w-auto px-4 py-2.5 text-sm font-medium text-white bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors flex items-center justify-center shadow-md"
         >
-          Todas
+          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+          Nuevo Producto
         </button>
-        {categories.map(category => (
-          <button
-            key={category}
-            onClick={() => setSelectedCategory(category)}
-            className={`px-3 py-1 text-sm font-medium rounded-full transition-colors ${
-              selectedCategory === category
-                ? 'bg-gray-600 text-white'
-                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-            }`}
-          >
-            {category}
-          </button>
-        ))}
       </div>
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {filteredProducts.map((product) => (
-          <div
-            key={product.id}
-            className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden hover:border-gray-600 transition-colors"
+      <div className="mb-6 p-4 bg-gray-800 rounded-lg shadow">
+        <div className="border-b border-gray-700 mb-4">
+          <nav className="flex space-x-4 sm:space-x-6 overflow-x-auto pb-px -mb-px" aria-label="Tabs">
+            {[('COMIDAS') as TabType, ('BEBIDAS') as TabType].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`whitespace-nowrap py-3 px-3 sm:px-4 border-b-2 font-medium text-sm flex items-center transition-colors duration-150
+                  ${activeTab === tab ? 'border-gray-300 text-white' : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-500'}`}
+              >
+                {tab === 'COMIDAS' ? 
+                  <svg className="w-5 h-5 mr-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h18M3 7h18M3 11h18M3 15h18M3 19h18"/></svg> :
+                  <svg className="w-5 h-5 mr-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> 
+                }
+                {tab}
+              </button>
+            ))}
+          </nav>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" /></svg>
+            </div>
+            <input
+              type="text"
+              className="w-full pl-10 pr-3 py-2.5 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent shadow-sm"
+              placeholder="Buscar por nombre, descripción..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <select 
+            value={selectedCategoryFilter || ''}
+            onChange={(e) => setSelectedCategoryFilter(e.target.value || null)}
+            className="w-full py-2.5 px-3 border border-gray-600 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent shadow-sm"
           >
-            <div className="relative aspect-w-16 aspect-h-9">
-              <img
-                src={product.image}
-                alt={product.name}
-                className="object-cover w-full h-48"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent" />
+            <option value="">Todas las categorías ({activeTab})</option>
+            {currentDisplayCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+          </select>
+        </div>
+      </div>
+
+      {filteredProducts.length === 0 && !isLoading && (
+        <p className="text-center text-gray-400 py-8">No se encontraron productos que coincidan con los filtros.</p>
+      )}
+      <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {filteredProducts.map((product) => (
+          <div key={product.id} className="bg-gray-800 rounded-lg border border-gray-700 hover:shadow-xl transition-shadow duration-300 flex flex-col">
+            <div className="relative aspect-w-16 aspect-h-9 w-full">
+              <img src={product.image || '/placeholder-image.png'} alt={product.name} className="object-cover w-full h-56 rounded-t-lg" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent rounded-t-lg" />
               <div className="absolute bottom-0 left-0 right-0 p-4">
-                <h3 className="text-lg font-medium text-white">{product.name}</h3>
-                <p className="text-sm text-gray-300">{product.category}</p>
+                <h3 className="text-lg font-semibold text-white truncate" title={product.name}>{product.name}</h3>
+                <p className="text-sm text-gray-300 truncate" title={product.category}>{product.category}</p>
               </div>
             </div>
-            <div className="p-4 space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-400">Precio</span>
-                {product.variations && product.variations.length > 0 ? (
-                  <div className="text-right">
-                    {product.variations.map((variation, index) => (
-                      <div key={variation.id} className="flex items-center justify-end gap-2">
-                        <span className="text-sm text-gray-300">{variation.name}</span>
-                        <span className="text-lg font-semibold text-white">${variation.price}</span>
-                        {variation.tags && variation.tags.length > 0 && (
-                          <div className="flex gap-1">
-                            {variation.tags.map((tagId) => {
-                              const tag = AVAILABLE_TAGS.find((t) => t.id === tagId);
-                              return tag ? (
-                                <span
-                                  key={tag.id}
-                                  className={`px-1.5 py-0.5 text-xs font-medium text-white ${tag.color} rounded-full`}
-                                >
-                                  {tag.label}
-                                </span>
-                              ) : null;
-                            })}
-                          </div>
-                        )}
-                      </div>
-                    ))}
+            <div className="p-4 space-y-3 flex-grow flex flex-col justify-between">
+              <div>
+                <div className="flex items-baseline justify-between">
+                  <span className="text-sm font-medium text-gray-400">Precio Base:</span>
+                  <span className="text-xl font-bold text-white"><span className="font-sans">${product.price.toFixed(2)}</span></span>
+                </div>
+                {product.variations && product.variations.length > 0 && (
+                  <div className="mt-2">
+                    <span className="text-xs font-medium text-gray-400">VARIACIONES: {product.variations.length}</span>
                   </div>
-                ) : (
-                  <span className="text-lg font-semibold text-white">${product.price}</span>
                 )}
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-400">Tipo</span>
-                <span className="px-2 py-1 text-xs font-medium text-white bg-gray-700 rounded-full">
-                  {product.type}
-                </span>
-              </div>
-              {product.description && (
-                <p className="text-sm text-gray-400">{product.description}</p>
-              )}
-              {product.variations && product.variations.length > 0 && (
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-400">Variaciones</span>
-                  <span className="text-sm text-gray-300">{product.variations.length}</span>
-                </div>
-              )}
-              <div className="flex space-x-2 pt-2">
-                <button
-                  onClick={() => handleEditProduct(product)}
-                  className="flex-1 px-3 py-2 text-sm font-medium text-white bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors flex items-center justify-center"
-                >
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                  Editar
+              <div className="flex space-x-2 pt-3 border-t border-gray-700/50 mt-auto">
+                <button onClick={() => handleEditProduct(product)} className="flex-1 py-2 px-3 text-xs sm:text-sm font-medium text-white bg-gray-600 hover:bg-gray-500 rounded-md transition-colors flex items-center justify-center shadow-sm">
+                  <svg className="w-4 h-4 mr-1.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                  Producto
                 </button>
-                <button
-                  onClick={() => handleVariations(product)}
-                  className="flex-1 px-3 py-2 text-sm font-medium text-gray-300 bg-gray-700/50 rounded-lg hover:bg-gray-700 transition-colors flex items-center justify-center"
-                >
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                  </svg>
+                <button onClick={() => handleVariations(product)} className="flex-1 py-2 px-3 text-xs sm:text-sm font-medium text-gray-200 bg-gray-700 hover:bg-gray-600 rounded-md transition-colors flex items-center justify-center shadow-sm">
+                  <svg className="w-4 h-4 mr-1.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
                   Variaciones
                 </button>
               </div>
@@ -496,367 +469,208 @@ export default function ProductsPage() {
         ))}
       </div>
 
-      {/* Modal de Edición */}
+      {/* Modal de Edición de Producto */}
       {isEditModalOpen && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-            <div 
-              className="fixed inset-0 transition-opacity" 
-              aria-hidden="true"
-              onClick={handleCloseModals}
-            >
-              <div className="absolute inset-0 bg-gray-900 opacity-75"></div>
+        <div className="fixed inset-0 z-[80] overflow-y-auto bg-gray-900/80 flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="bg-gray-800 p-5 sm:p-6 rounded-lg shadow-2xl w-full max-w-2xl border border-gray-700 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-5 pb-4 border-b border-gray-700">
+              <h2 className="text-xl font-semibold text-white">
+                {selectedProduct?.id ? 'Editar Producto' : 'Nuevo Producto'} {/* Cambio aquí para chequear id de selectedProduct */}
+              </h2>
+              <button onClick={handleCloseModals} className="text-gray-400 hover:text-white">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
             </div>
-            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div 
-              className="inline-block align-bottom bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full relative z-50"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="px-6 py-5 border-b border-gray-700">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-xl font-semibold text-white">
-                    {selectedProduct ? 'Editar Producto' : 'Nuevo Producto'}
-                  </h3>
-                  <button
-                    onClick={handleCloseModals}
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
+            <form onSubmit={(e) => { e.preventDefault(); handleSaveProduct(new FormData(e.currentTarget)); }} className="space-y-5">
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1.5">Nombre</label>
+                <input type="text" name="name" id="name" defaultValue={selectedProduct?.name || ''} className="w-full bg-gray-700 border border-gray-600 rounded-md p-2.5 text-white focus:ring-2 focus:ring-gray-500 focus:border-gray-500" required />
+              </div>
+              <div>
+                <label htmlFor="description" className="block text-sm font-medium text-gray-300 mb-1.5">Descripción</label>
+                <textarea name="description" id="description" defaultValue={selectedProduct?.description || ''} rows={3} className="w-full bg-gray-700 border border-gray-600 rounded-md p-2.5 text-white focus:ring-2 focus:ring-gray-500 focus:border-gray-500"></textarea>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <label htmlFor="price" className="block text-sm font-medium text-gray-300 mb-1.5">Precio Base</label>
+                  <input type="number" name="price" id="price" defaultValue={selectedProduct?.price || ''} step="0.01" className="w-full bg-gray-700 border border-gray-600 rounded-md p-2.5 text-white focus:ring-2 focus:ring-gray-500 focus:border-gray-500" required placeholder="0.00"/>
+                </div>
+                <div>
+                  <label htmlFor="category" className="block text-sm font-medium text-gray-300 mb-1.5">Categoría</label>
+                  <select name="category" id="category" defaultValue={selectedProduct?.category || ''} className="w-full bg-gray-700 border border-gray-600 rounded-md p-2.5 text-white focus:ring-2 focus:ring-gray-500 focus:border-gray-500" required>
+                    <option value="" disabled>Selecciona</option>
+                    {getCategoriesByType(selectedProduct?.type as TabType | undefined).map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                  </select>
                 </div>
               </div>
-              <div className="px-6 py-4">
-                <form className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Nombre</label>
-                    <input
-                      type="text"
-                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent text-white placeholder-gray-400"
-                      placeholder="Nombre del producto"
-                      defaultValue={selectedProduct?.name}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Tipo</label>
-                    <select
-                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent text-white"
-                      defaultValue={selectedProduct?.type}
-                      onChange={(e) => {
-                        const newType = e.target.value as TabType;
-                        setActiveTab(newType);
-                      }}
-                    >
-                      <option value="COMIDAS">Comidas</option>
-                      <option value="BEBIDAS">Bebidas</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Categoría</label>
-                    <select
-                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent text-white"
-                      defaultValue={selectedProduct?.category}
-                    >
-                      {getCategoriesByType(activeTab).map((category) => (
-                        <option key={category} value={category}>
-                          {category}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Precio</label>
-                    <div className="relative">
-                      <span className="absolute left-4 top-2 text-gray-400">$</span>
-                      <input
-                        type="number"
-                        className="w-full pl-8 pr-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent text-white placeholder-gray-400"
-                        placeholder="0.00"
-                        defaultValue={selectedProduct?.price}
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Descripción</label>
-                    <textarea
-                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent text-white placeholder-gray-400"
-                      rows={3}
-                      placeholder="Descripción del producto"
-                      defaultValue={selectedProduct?.description}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Imagen</label>
-                    <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-600 border-dashed rounded-lg">
-                      <div className="space-y-1 text-center">
-                        <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                          <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                        <div className="flex text-sm text-gray-400">
-                          <label className="relative cursor-pointer bg-gray-700 rounded-md font-medium text-white hover:bg-gray-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-gray-500">
-                            <span>Subir imagen</span>
-                            <input type="file" className="sr-only" />
-                          </label>
-                          <p className="pl-1">o arrastrar y soltar</p>
-                        </div>
-                        <p className="text-xs text-gray-400">PNG, JPG, GIF hasta 10MB</p>
-                      </div>
-                    </div>
-                  </div>
-                </form>
-              </div>
-              <div className="px-6 py-4 bg-gray-700 flex justify-end space-x-3">
-                <button
-                  type="button"
-                  onClick={handleCloseModals}
-                  className="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-600 rounded-lg hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+              <div>
+                <label htmlFor="type" className="block text-sm font-medium text-gray-300 mb-1.5">Tipo</label>
+                <select name="type" id="type" defaultValue={selectedProduct?.type || 'COMIDAS'} className="w-full bg-gray-700 border border-gray-600 rounded-md p-2.5 text-white focus:ring-2 focus:ring-gray-500 focus:border-gray-500" required 
+                  onChange={(e) => {
+                    // Actualizar el selectedProduct temporalmente para que getCategoriesByType funcione en el mismo modal
+                    // Esto no guarda en Firebase, solo afecta la UI del modal
+                    if (selectedProduct) {
+                      setSelectedProduct({ ...selectedProduct, type: e.target.value as TabType });
+                    } else {
+                      // Si es nuevo producto, podríamos tener un estado temporal para el formulario
+                      // o simplemente dejar que el select de categoría se actualice al guardar y reabrir.
+                      // Por simplicidad, para nuevo producto, el cambio de tipo no refrescará categorías dinámicamente aquí.
+                    }
+                  }}
                 >
-                  Cancelar
-                </button>
-                <button
-                  type="button"
-                  className="px-4 py-2 text-sm font-medium text-white bg-gray-600 rounded-lg hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
-                >
-                  Guardar
-                </button>
+                  <option value="COMIDAS">COMIDAS</option>
+                  <option value="BEBIDAS">BEBIDAS</option>
+                </select>
               </div>
-            </div>
+              <div>
+                <label htmlFor="imageUpload" className="block text-sm font-medium text-gray-300 mb-1.5">Subir Nueva Imagen (opcional)</label>
+                <input 
+                  type="file" 
+                  name="imageUpload" 
+                  id="imageUpload" 
+                  accept="image/*" 
+                  onChange={handleImageFileChange} 
+                  className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-gray-600 file:text-gray-200 hover:file:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 bg-gray-700 border border-gray-600 rounded-md p-1.5"
+                />
+                {imageFile && <p className="text-xs text-gray-400 mt-1.5">Archivo seleccionado: {imageFile.name}</p>}
+                 <p className="text-xs text-gray-500 mt-1">Si no subes una nueva, se conservará la imagen actual o la URL de abajo.</p>
+              </div>
+              <div>
+                <label htmlFor="image" className="block text-sm font-medium text-gray-300 mb-1.5">URL de Imagen Actual (o alternativa)</label>
+                <input type="url" name="image" id="image" defaultValue={selectedProduct?.image || ''} placeholder="https://ejemplo.com/imagen.jpg" className="w-full bg-gray-700 border border-gray-600 rounded-md p-2.5 text-white focus:ring-2 focus:ring-gray-500 focus:border-gray-500" />
+              </div>
+              <div className="flex justify-end space-x-3 pt-5">
+                <button type="button" onClick={handleCloseModals} className="px-5 py-2 text-sm font-medium text-gray-300 bg-gray-700/60 hover:bg-gray-700 rounded-lg transition-colors">Cancelar</button>
+                <button type="submit" className="px-5 py-2 text-sm font-medium text-white bg-gray-600 hover:bg-gray-500 rounded-lg transition-colors shadow-md">Guardar Producto</button>
+              </div>
+            </form>
           </div>
         </div>
       )}
 
-      {/* Modal de Variaciones */}
+      {/* Modal de Lista de Variaciones */}
       {isVariationsModalOpen && selectedProduct && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-            <div 
-              className="fixed inset-0 transition-opacity" 
-              aria-hidden="true"
-              onClick={handleCloseModals}
-            >
-              <div className="absolute inset-0 bg-gray-900 opacity-75"></div>
+        <div className="fixed inset-0 z-[90] overflow-y-auto bg-gray-900/80 flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="bg-gray-800 p-5 sm:p-6 rounded-lg shadow-2xl w-full max-w-lg border border-gray-700 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-5 pb-4 border-b border-gray-700">
+              <h2 className="text-xl font-semibold text-white truncate" title={`Variaciones de: ${selectedProduct.name}`}>Variaciones de: {selectedProduct.name}</h2>
+              <button onClick={handleCloseModals} className="text-gray-400 hover:text-white">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
             </div>
-            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div 
-              className="inline-block align-bottom bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full relative z-50"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="px-6 py-5 border-b border-gray-700">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-xl font-semibold text-white">
-                    Variaciones de {selectedProduct.name}
-                  </h3>
-                  <button
-                    onClick={handleCloseModals}
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-              <div className="px-6 py-4">
-                <div className="space-y-4">
-                  {selectedProduct.variations && selectedProduct.variations.length > 0 ? (
-                    selectedProduct.variations.map((variation) => (
-                      <div
-                        key={variation.id}
-                        className="flex items-center justify-between p-4 bg-gray-700 rounded-lg"
-                      >
-                        <div>
-                          <h4 className="text-white font-medium">{variation.name}</h4>
-                          <p className="text-gray-300">${variation.price}</p>
-                          {variation.tags && variation.tags.length > 0 && (
-                            <div className="flex gap-2 mt-2">
-                              {variation.tags.map((tagId) => {
-                                const tag = AVAILABLE_TAGS.find((t) => t.id === tagId);
-                                return tag ? (
-                                  <span
-                                    key={tag.id}
-                                    className={`px-2 py-1 text-xs font-medium text-white ${tag.color} rounded-full`}
-                                  >
-                                    {tag.label}
-                                  </span>
-                                ) : null;
-                              })}
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex space-x-2">
-                          <button 
-                            className="p-2 text-gray-400 hover:text-white transition-colors"
-                            onClick={() => {
-                              const newName = prompt('Nuevo nombre:', variation.name);
-                              if (newName) {
-                                handleEditVariation(variation);
-                              }
-                            }}
-                          >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                          </button>
-                          <button 
-                            className="p-2 text-gray-400 hover:text-white transition-colors"
-                            onClick={() => {
-                              if (confirm('¿Estás seguro de que quieres eliminar esta variación?')) {
-                                handleDeleteVariation(variation.id);
-                              }
-                            }}
-                          >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
-                        </div>
+            <div className="space-y-3.5 mb-6">
+              {(selectedProduct.variations || []).map((variation) => (
+                <div key={variation.id} className="p-3.5 bg-gray-700/70 rounded-md border border-gray-600/80 flex justify-between items-start gap-3">
+                  <div className="flex-grow">
+                    <p className="font-medium text-white">{variation.name} - <span className="text-gray-200 font-semibold"><span className="font-sans">${variation.price.toFixed(2)}</span></span></p>
+                    {variation.tags && variation.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mt-1.5">
+                        {variation.tags.map(tagId => {
+                          const tag = AVAILABLE_TAGS.find(t => t.id === tagId);
+                          return tag ? (
+                            <span key={tag.id} className={`px-2 py-0.5 text-[11px] font-semibold text-white ${tag.color} rounded-full shadow-sm`}>{tag.label}</span>
+                          ) : null;
+                        })}
                       </div>
-                    ))
-                  ) : (
-                    <p className="text-gray-400 text-center py-4">No hay variaciones para este producto</p>
-                  )}
+                    )}
+                  </div>
+                  <div className="flex space-x-2 shrink-0">
+                    <button 
+                      onClick={() => handleOpenEditVariationModal(variation)} 
+                      className="p-2 text-gray-300 hover:text-white bg-gray-600 hover:bg-gray-500 rounded-md transition-colors shadow-sm"
+                      title="Editar Variación"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                    </button>
+                    <button 
+                      onClick={() => handleDeleteVariation(variation.id)} 
+                      className="p-2 text-red-400 hover:text-red-300 bg-red-900/40 hover:bg-red-800/60 rounded-md transition-colors shadow-sm"
+                      title="Eliminar Variación"
+                    >
+                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    </button>
+                  </div>
                 </div>
-              </div>
-              <div className="px-6 py-4 bg-gray-700 flex justify-end space-x-3">
-                <button
-                  type="button"
-                  onClick={handleCloseModals}
-                  className="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-600 rounded-lg hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
-                >
-                  Cerrar
-                </button>
-                <button
-                  type="button"
-                  onClick={handleAddVariation}
-                  className="px-4 py-2 text-sm font-medium text-white bg-gray-600 rounded-lg hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
-                >
-                  Agregar Variación
-                </button>
-              </div>
+              ))}
+              {(!selectedProduct.variations || selectedProduct.variations.length === 0) && (
+                <p className="text-sm text-gray-400 text-center py-4">No hay variaciones para este producto.</p>
+              )}
+            </div>
+            <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3">
+              <button type="button" onClick={handleCloseModals} className="w-full sm:w-auto px-4 py-2.5 text-sm font-medium text-gray-300 bg-gray-700/60 hover:bg-gray-700 rounded-lg transition-colors">Cerrar Lista</button>
+              <button onClick={handleOpenAddVariationModal} className="w-full sm:w-auto px-4 py-2.5 text-sm font-medium text-white bg-gray-600 hover:bg-gray-500 rounded-lg transition-colors flex items-center justify-center shadow-md">
+                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                Añadir Variación
+              </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Modal de Agregar/Editar Variación */}
-      {isAddVariationModalOpen && selectedProduct && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-            <div 
-              className="fixed inset-0 transition-opacity" 
-              aria-hidden="true"
-              onClick={handleCloseModals}
-            >
-              <div className="absolute inset-0 bg-gray-900 opacity-75"></div>
+      {/* Modal para Añadir/Editar Variación (Reutilizado) */}
+      {isAddVariationModalOpen && selectedProduct && ( // Se controla solo con isAddVariationModalOpen
+        <div className="fixed inset-0 z-[100] overflow-y-auto bg-gray-900/80 flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="bg-gray-800 p-5 sm:p-6 rounded-lg shadow-2xl w-full max-w-md border border-gray-700 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-5 pb-4 border-b border-gray-700">
+              <h2 className="text-xl font-semibold text-white">
+                {editingVariation ? 'Editar Variación' : 'Añadir Nueva Variación'} {/* Título dinámico */}
+              </h2>
+              <button onClick={handleCloseVariationModals} className="text-gray-400 hover:text-white">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
             </div>
-            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div 
-              className="inline-block align-bottom bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full relative z-50"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="px-6 py-5 border-b border-gray-700">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-xl font-semibold text-white">
-                    {editingVariation ? 'Editar Variación' : 'Nueva Variación'} para {selectedProduct.name}
-                  </h3>
-                  <button
-                    onClick={handleCloseModals}
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
+            <form onSubmit={(e) => { e.preventDefault(); handleSaveVariation(); }} className="space-y-5">
+              <div>
+                <label htmlFor="variationName" className="block text-sm font-medium text-gray-300 mb-1.5">Nombre de la Variación</label>
+                <input 
+                  type="text" 
+                  name="variationName" 
+                  id="variationName" 
+                  value={variationFormData.name || ''} 
+                  onChange={(e) => setVariationFormData({...variationFormData, name: e.target.value})} 
+                  className="w-full bg-gray-700 border border-gray-600 rounded-md p-2.5 text-white focus:ring-2 focus:ring-gray-500 focus:border-gray-500" 
+                  required 
+                />
+              </div>
+              <div>
+                <label htmlFor="variationPrice" className="block text-sm font-medium text-gray-300 mb-1.5">Precio</label>
+                <input 
+                  type="number" 
+                  name="variationPrice" 
+                  id="variationPrice" 
+                  value={variationFormData.price === undefined ? '' : variationFormData.price} 
+                  onChange={(e) => setVariationFormData({...variationFormData, price: e.target.value === '' ? undefined : parseFloat(e.target.value)})} 
+                  step="0.01" 
+                  placeholder="0.00" 
+                  className="w-full bg-gray-700 border border-gray-600 rounded-md p-2.5 text-white focus:ring-2 focus:ring-gray-500 focus:border-gray-500" 
+                  required 
+                />
+              </div>
+              <div>
+                <p className="block text-sm font-medium text-gray-300 mb-2">Tags (opcional)</p>
+                <div className="flex flex-wrap gap-2">
+                  {AVAILABLE_TAGS.map(tag => (
+                    <button 
+                      type="button" 
+                      key={tag.id} 
+                      onClick={() => handleTagToggle(tag.id)}
+                      className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all duration-200 ease-in-out shadow-sm 
+                        ${(variationFormData.tags || []).includes(tag.id) 
+                          ? `${tag.color} text-white ring-2 ring-offset-2 ring-offset-gray-800 ${tag.color.replace('bg-', 'ring-')}` 
+                          : 'bg-gray-600 text-gray-300 hover:bg-gray-500'}`}
+                    >
+                      {tag.label}
+                    </button>
+                  ))}
                 </div>
               </div>
-              <div className="px-6 py-4">
-                <form className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Nombre</label>
-                    <input
-                      type="text"
-                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent text-white placeholder-gray-400"
-                      placeholder="Nombre de la variación"
-                      value={editingVariation ? editingVariation.name : newVariation.name}
-                      onChange={(e) => {
-                        if (editingVariation) {
-                          setEditingVariation({ ...editingVariation, name: e.target.value });
-                        } else {
-                          setNewVariation({ ...newVariation, name: e.target.value });
-                        }
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Precio</label>
-                    <div className="relative">
-                      <span className="absolute left-4 top-2 text-gray-400">$</span>
-                      <input
-                        type="number"
-                        className="w-full pl-8 pr-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent text-white placeholder-gray-400"
-                        placeholder="0.00"
-                        value={editingVariation ? editingVariation.price : (newVariation.price || '')}
-                        onChange={(e) => {
-                          const value = e.target.value ? Number(e.target.value) : undefined;
-                          if (editingVariation) {
-                            setEditingVariation({ ...editingVariation, price: value || 0 });
-                          } else {
-                            setNewVariation({ ...newVariation, price: value });
-                          }
-                        }}
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Etiquetas</label>
-                    <div className="flex flex-wrap gap-2">
-                      {AVAILABLE_TAGS.map((tag) => (
-                        <button
-                          key={tag.id}
-                          type="button"
-                          onClick={() => {
-                            const currentTags = editingVariation ? editingVariation.tags || [] : (newVariation.tags || []);
-                            const newTags = currentTags.includes(tag.id)
-                              ? currentTags.filter(id => id !== tag.id)
-                              : [...currentTags, tag.id];
-                            
-                            if (editingVariation) {
-                              setEditingVariation({ ...editingVariation, tags: newTags });
-                            } else {
-                              setNewVariation({ ...newVariation, tags: newTags });
-                            }
-                          }}
-                          className={`px-3 py-1 text-sm font-medium text-white rounded-full transition-colors ${
-                            (editingVariation ? (editingVariation.tags || []) : (newVariation.tags || [])).includes(tag.id)
-                              ? tag.color
-                              : 'bg-gray-600 hover:bg-gray-500'
-                          }`}
-                        >
-                          {tag.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </form>
-              </div>
-              <div className="px-6 py-4 bg-gray-700 flex justify-end space-x-3">
-                <button
-                  type="button"
-                  onClick={handleCloseModals}
-                  className="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-600 rounded-lg hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSaveVariation}
-                  className="px-4 py-2 text-sm font-medium text-white bg-gray-600 rounded-lg hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
-                >
-                  {editingVariation ? 'Guardar Cambios' : 'Guardar'}
+              <div className="flex justify-end space-x-3 pt-5">
+                <button type="button" onClick={handleCloseVariationModals} className="px-5 py-2 text-sm font-medium text-gray-300 bg-gray-700/60 hover:bg-gray-700 rounded-lg transition-colors">Cancelar</button>
+                <button type="submit" className="px-5 py-2 text-sm font-medium text-white bg-gray-600 hover:bg-gray-500 rounded-lg transition-colors shadow-md">
+                  {editingVariation ? 'Guardar Cambios' : 'Añadir Variación'} {/* Botón dinámico */}
                 </button>
               </div>
-            </div>
+            </form>
           </div>
         </div>
       )}
