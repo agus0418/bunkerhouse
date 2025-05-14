@@ -42,6 +42,7 @@ export default function ProductsPage() {
   const [allUniqueCategories, setAllUniqueCategories] = useState<string[]>([]);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [allCategoriesFromDb, setAllCategoriesFromDb] = useState<{ id: string; name: string; type: 'COMIDAS' | 'BEBIDAS' }[]>([]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -106,6 +107,25 @@ export default function ProductsPage() {
       setAllUniqueCategories(uniqueCategories);
     }
   }, [products]);
+
+  useEffect(() => {
+    const categoriesRef = doc(db, "categories", "main");
+    const unsubscribeCategories = onSnapshot(categoriesRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        const foodCats = (data.foodCategories || []).map((cat: any) => ({ id: cat.id || cat.name, name: cat.name, type: 'COMIDAS' as 'COMIDAS' | 'BEBIDAS' }));
+        const drinkCats = (data.drinkCategories || []).map((cat: any) => ({ id: cat.id || cat.name, name: cat.name, type: 'BEBIDAS' as 'COMIDAS' | 'BEBIDAS' }));
+        setAllCategoriesFromDb([...foodCats, ...drinkCats]);
+      } else {
+        console.log("Categories document 'main' not found!");
+        setAllCategoriesFromDb([]);
+      }
+    }, (error) => {
+      console.error("Error fetching categories from DB: ", error);
+      setError("Error al cargar categorías de Firebase.");
+    });
+    return () => unsubscribeCategories();
+  }, []);
 
   const handleSaveProduct = async (formData: FormData) => {
     const productData: Partial<Product> = {
@@ -423,8 +443,19 @@ export default function ProductsPage() {
         <h1 className="text-2xl sm:text-3xl font-semibold text-white">Gestión de Productos</h1>
         <button
           onClick={() => {
-            setSelectedProduct(null); 
+            setSelectedProduct({
+              id: '', // Indicar que es nuevo
+              name: '',
+              price: 0,
+              category: '',
+              type: 'COMIDAS',
+              variations: [],
+              image: '',
+              description: ''
+            }); 
             setIsEditModalOpen(true);
+            setIsVariationsModalOpen(false);
+            handleCloseVariationModals();
           }}
           className="w-full sm:w-auto px-4 py-2.5 text-sm font-medium text-white bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors flex items-center justify-center shadow-md"
         >
@@ -551,19 +582,33 @@ export default function ProductsPage() {
                 </div>
                 <div>
                   <label htmlFor="category" className="block text-sm font-medium text-gray-300 mb-1.5">Categoría</label>
-                  <select name="category" id="category" defaultValue={selectedProduct?.category || ''} className="w-full bg-gray-700 border border-gray-600 rounded-md p-2.5 text-white focus:ring-2 focus:ring-gray-500 focus:border-gray-500" required>
-                    <option value="" disabled>Selecciona</option>
-                    {getCategoriesByType(selectedProduct?.type as TabType | undefined).map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                  <select 
+                    name="category" 
+                    id="category" 
+                    value={selectedProduct?.category || ''} 
+                    onChange={(e) => setSelectedProduct(sp => sp ? {...sp, category: e.target.value} : null)}
+                    className="w-full bg-gray-700 border border-gray-600 rounded-md p-2.5 text-white focus:ring-2 focus:ring-gray-500 focus:border-gray-500" 
+                    required
+                  >
+                    <option value="" disabled>Selecciona una categoría</option>
+                    {allCategoriesFromDb
+                      .filter(cat => cat.type === (selectedProduct?.type || 'COMIDAS'))
+                      .map(cat => <option key={cat.id || cat.name} value={cat.name}>{cat.name}</option>)
+                    }
                   </select>
                 </div>
               </div>
               <div>
                 <label htmlFor="type" className="block text-sm font-medium text-gray-300 mb-1.5">Tipo</label>
-                <select name="type" id="type" defaultValue={selectedProduct?.type || 'COMIDAS'} className="w-full bg-gray-700 border border-gray-600 rounded-md p-2.5 text-white focus:ring-2 focus:ring-gray-500 focus:border-gray-500" required 
+                <select 
+                  name="type" 
+                  id="type" 
+                  value={selectedProduct?.type || 'COMIDAS'} 
+                  className="w-full bg-gray-700 border border-gray-600 rounded-md p-2.5 text-white focus:ring-2 focus:ring-gray-500 focus:border-gray-500" 
+                  required 
                   onChange={(e) => {
-                    if (selectedProduct) {
-                      setSelectedProduct({ ...selectedProduct, type: e.target.value as TabType });
-                    }
+                    // No es necesario 'if (selectedProduct)' porque ahora siempre es un objeto si el modal está abierto
+                    setSelectedProduct(sp => sp ? { ...sp, type: e.target.value as TabType, category: '' } : null); // Resetea categoría
                   }}
                 >
                   <option value="COMIDAS">COMIDAS</option>
