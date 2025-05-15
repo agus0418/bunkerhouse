@@ -135,7 +135,7 @@ export default function ProductsPage() {
   const handleSaveProduct = async (formData: FormData) => {
     const productData: Partial<Product> = {
       name: formData.get('name') as string,
-      description: formData.get('description') as string || undefined,
+      description: formData.get('description') as string || "",
       price: parseFloat(formData.get('price') as string),
       image: formData.get('image') as string,
       category: formData.get('category') as string,
@@ -206,19 +206,14 @@ export default function ProductsPage() {
           isActive: selectedProduct.isActive // Asegurarse de conservar el estado isActive
         };
 
-        // Si la descripción es undefined, no la incluimos en la actualización para evitar el error de Firestore.
-        // Si es una cadena (incluso vacía, aunque nuestra lógica la convierte a undefined si está vacía), se incluye.
-        if (productDetailsToUpdate.description === undefined) {
-          delete updatePayload.description; // Elimina la clave si el valor es undefined
-        } else {
-          updatePayload.description = productDetailsToUpdate.description; // Asegura que se incluya si es una cadena
-        }
+        // Ya no es necesario eliminar `description` del payload si es undefined,
+        // porque ahora siempre será un string (vacío o con contenido).
+        // Firestore manejará correctamente un string vacío para actualizar el campo.
 
         await updateDoc(productRef, updatePayload);
         setSuccessMessage("Producto actualizado con éxito.");
       } else {
         const newProductRef = doc(collection(db, "products"));
-        // Para setDoc, undefined simplemente omite el campo, lo cual está bien.
         await setDoc(newProductRef, { ...finalProductData, id: newProductRef.id, variations: [], isActive: true });
         setSuccessMessage("Producto añadido con éxito.");
       }
