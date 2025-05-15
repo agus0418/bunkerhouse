@@ -7,6 +7,12 @@ import { auth, db } from '@/lib/firebase'; // Importar auth y db
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 
+// Definir un tipo para los errores de autenticación de Firebase que esperamos
+interface FirebaseAuthError {
+  code: string;
+  message: string;
+}
+
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -48,7 +54,8 @@ export default function LoginPage() {
         // Esto no debería ocurrir si signInWithEmailAndPassword fue exitoso sin errores
         setError('Error inesperado durante el inicio de sesión.');
       }
-    } catch (authError: any) {
+    } catch (e) {
+      const authError = e as FirebaseAuthError; // Asignar el tipo a la variable
       console.error("Error de autenticación:", authError);
       if (authError.code === 'auth/user-not-found' || authError.code === 'auth/wrong-password' || authError.code === 'auth/invalid-credential') {
         setError('Credenciales inválidas. Verifica tu email y contraseña.');

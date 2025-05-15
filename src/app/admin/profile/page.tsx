@@ -7,6 +7,12 @@ import { signOut, EmailAuthProvider, reauthenticateWithCredential, updatePasswor
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import Cookies from 'js-cookie';
 
+// Definir un tipo para los errores de Firebase que esperamos
+interface FirebaseErrorType {
+  code: string;
+  message: string;
+}
+
 interface AdminProfile {
   name: string;
   email: string;
@@ -134,7 +140,8 @@ export default function ProfilePage() {
           newPassword: '',
           confirmPassword: '',
         });
-      } catch (error: any) {
+      } catch (e: unknown) {
+        const error = e as FirebaseErrorType;
         console.error("Error al cambiar contraseña: ", error);
         if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
           setPasswordChangeStatus({ type: 'error', message: 'La contraseña actual es incorrecta.' });
