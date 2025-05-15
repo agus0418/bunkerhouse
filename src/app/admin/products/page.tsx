@@ -200,11 +200,25 @@ export default function ProductsPage() {
         const productRef = doc(db, "products", String(selectedProduct.id));
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { variations: _removedVariations, ...productDetailsToUpdate } = finalProductData;
-        const updateData = { ...productDetailsToUpdate, isActive: selectedProduct.isActive };
-        await updateDoc(productRef, updateData);
+        
+        const updatePayload: Partial<Product> = { 
+          ...productDetailsToUpdate,
+          isActive: selectedProduct.isActive // Asegurarse de conservar el estado isActive
+        };
+
+        // Si la descripción es undefined, no la incluimos en la actualización para evitar el error de Firestore.
+        // Si es una cadena (incluso vacía, aunque nuestra lógica la convierte a undefined si está vacía), se incluye.
+        if (productDetailsToUpdate.description === undefined) {
+          delete updatePayload.description; // Elimina la clave si el valor es undefined
+        } else {
+          updatePayload.description = productDetailsToUpdate.description; // Asegura que se incluya si es una cadena
+        }
+
+        await updateDoc(productRef, updatePayload);
         setSuccessMessage("Producto actualizado con éxito.");
       } else {
         const newProductRef = doc(collection(db, "products"));
+        // Para setDoc, undefined simplemente omite el campo, lo cual está bien.
         await setDoc(newProductRef, { ...finalProductData, id: newProductRef.id, variations: [], isActive: true });
         setSuccessMessage("Producto añadido con éxito.");
       }
