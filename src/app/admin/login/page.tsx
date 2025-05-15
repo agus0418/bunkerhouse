@@ -3,21 +3,60 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
+import { auth, db } from '@/lib/firebase'; // Importar auth y db
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false); // Estado para feedback de carga
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email === 'admin@bunkerhouse.com' && password === 'admin123') {
-      // Establecer la cookie con una duración de 24 horas
-      Cookies.set('adminToken', 'dummy-token', { expires: 1 });
-      router.push('/admin');
-    } else {
-      setError('Credenciales inválidas');
+    setError(''); // Limpiar errores previos
+    setIsLoading(true);
+
+    try {
+      // 1. Autenticar con Firebase
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      if (user) {
+        // 2. Obtener el documento del usuario de Firestore
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (userDocSnap.exists()) {
+          const userData = userDocSnap.data();
+          // 3. Verificar el rol
+          if (userData.role === 'admin') {
+            // 4. Establecer la cookie y redirigir
+            Cookies.set('adminToken', 'dummy-firebase-token', { expires: 1 }); // Podrías usar user.getIdToken() para un token real
+            router.push('/admin');
+          } else {
+            setError('Acceso denegado. No tienes permisos de administrador.');
+            await auth.signOut(); // Cerrar sesión si no es admin
+          }
+        } else {
+          setError('No se encontró el registro de usuario en la base de datos.');
+          await auth.signOut(); // Cerrar sesión si no hay registro
+        }
+      } else {
+        // Esto no debería ocurrir si signInWithEmailAndPassword fue exitoso sin errores
+        setError('Error inesperado durante el inicio de sesión.');
+      }
+    } catch (authError: any) {
+      console.error("Error de autenticación:", authError);
+      if (authError.code === 'auth/user-not-found' || authError.code === 'auth/wrong-password' || authError.code === 'auth/invalid-credential') {
+        setError('Credenciales inválidas. Verifica tu email y contraseña.');
+      } else {
+        setError('Ocurrió un error durante el inicio de sesión. Inténtalo de nuevo.');
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -66,8 +105,9 @@ export default function LoginPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  disabled={isLoading} // Deshabilitar input mientras carga
                   className="appearance-none block w-full pl-10 px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent sm:text-sm text-white"
-                  placeholder="admin@bunkerhouse.com"
+                  placeholder="admin@example.com"
                 />
               </div>
             </div>
@@ -89,6 +129,7 @@ export default function LoginPage() {
                   autoComplete="current-password"
                   required
                   value={password}
+                  disabled={isLoading} // Deshabilitar input mientras carga
                   onChange={(e) => setPassword(e.target.value)}
                   className="appearance-none block w-full pl-10 px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent sm:text-sm text-white"
                   placeholder="••••••••"
@@ -99,12 +140,20 @@ export default function LoginPage() {
             <div>
               <button
                 type="submit"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 focus:ring-offset-gray-800 transition-colors duration-200"
+                disabled={isLoading} // Deshabilitar botón mientras carga
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 focus:ring-offset-gray-800 transition-colors duration-200 disabled:opacity-50"
               >
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                </svg>
-                Iniciar Sesión
+                {isLoading ? (
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                  </svg>
+                )}
+                {isLoading ? 'Verificando...' : 'Iniciar Sesión'}
               </button>
             </div>
           </form>
