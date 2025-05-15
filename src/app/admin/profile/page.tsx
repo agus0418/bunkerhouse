@@ -310,7 +310,7 @@ export default function ProfilePage() {
                   value={formData.currentPassword}
                   onChange={(e) => setFormData({ ...formData, currentPassword: e.target.value })}
                   disabled={isSubmittingPasswordChange}
-                  className="w-full bg-gray-700 border border-gray-600 rounded-lg p-2.5 text-white placeholder-gray-400 focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
+                  className="w-full bg-gray-700 border border-gray-600 rounded-lg p-2.5 text-white placeholder-gray-400 focus:ring-2 focus:ring-gray-500 focus:border-gray-500 font-sans"
                   required
                 />
               </div>
@@ -322,7 +322,7 @@ export default function ProfilePage() {
                   value={formData.newPassword}
                   onChange={(e) => setFormData({ ...formData, newPassword: e.target.value })}
                   disabled={isSubmittingPasswordChange}
-                  className="w-full bg-gray-700 border border-gray-600 rounded-lg p-2.5 text-white placeholder-gray-400 focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
+                  className="w-full bg-gray-700 border border-gray-600 rounded-lg p-2.5 text-white placeholder-gray-400 focus:ring-2 focus:ring-gray-500 focus:border-gray-500 font-sans"
                   required
                 />
               </div>
@@ -334,7 +334,7 @@ export default function ProfilePage() {
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                   disabled={isSubmittingPasswordChange}
-                  className="w-full bg-gray-700 border border-gray-600 rounded-lg p-2.5 text-white placeholder-gray-400 focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
+                  className="w-full bg-gray-700 border border-gray-600 rounded-lg p-2.5 text-white placeholder-gray-400 focus:ring-2 focus:ring-gray-500 focus:border-gray-500 font-sans"
                   required
                 />
               </div>
