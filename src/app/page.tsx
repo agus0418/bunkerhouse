@@ -32,7 +32,11 @@ export default function Home() {
         id: doc.id,
         ...doc.data()
       })) as Product[];
-      setProducts(productsData);
+      
+      // Filtrar productos para mostrar solo los activos (isActive: true o undefined)
+      const activeProducts = productsData.filter(product => product.isActive === true || product.isActive === undefined);
+      
+      setProducts(activeProducts);
       setIsLoading(false);
     }, (error) => {
       console.error('Error loading products:', error);

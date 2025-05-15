@@ -41,6 +41,7 @@ export interface Product {
   category: string;
   type: string;
   variations: Variation[];
+  isActive?: boolean;
 }
 
 export interface Category {

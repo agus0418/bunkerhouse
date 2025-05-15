@@ -57,13 +57,14 @@ export default function ProductsPage() {
           initialProducts.forEach(product => {
             const { id, ...dataToSave } = product; 
             const productRef = doc(db, "products", String(id)); 
-            batch.set(productRef, dataToSave);
+            batch.set(productRef, { ...dataToSave, isActive: true });
           });
           await batch.commit();
           console.log("Initial products loaded to Firestore.");
           const productsForState: Product[] = initialProducts.map(p => ({
             ...p,
-            id: String(p.id), 
+            id: String(p.id),
+            isActive: true,
             variations: (p.variations || []).map((v, index) => ({
               id: v.id || Date.now() + index, 
               name: v.name,
@@ -82,6 +83,7 @@ export default function ProductsPage() {
           return {
             id: doc.id, 
             ...data,
+            isActive: typeof data.isActive === 'boolean' ? data.isActive : true,
             variations: (data.variations || []).map((v: RawVariation, index: number) => ({
               id: typeof v.id === 'number' ? v.id : (typeof v.id === 'string' && !isNaN(Number(v.id)) ? Number(v.id) : Date.now() + index),
               name: v.name || 'Nombre no disponible',
@@ -197,11 +199,14 @@ export default function ProductsPage() {
       if (selectedProduct && selectedProduct.id) {
         const productRef = doc(db, "products", String(selectedProduct.id));
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { variations: _removedVariations, ...productDetailsToUpdate } = finalProductData; 
-        await updateDoc(productRef, productDetailsToUpdate);
+        const { variations: _removedVariations, ...productDetailsToUpdate } = finalProductData;
+        const updateData = { ...productDetailsToUpdate, isActive: selectedProduct.isActive };
+        await updateDoc(productRef, updateData);
+        setSuccessMessage("Producto actualizado con éxito.");
       } else {
         const newProductRef = doc(collection(db, "products"));
-        await setDoc(newProductRef, { ...finalProductData, variations: [] });
+        await setDoc(newProductRef, { ...finalProductData, id: newProductRef.id, variations: [], isActive: true });
+        setSuccessMessage("Producto añadido con éxito.");
       }
       handleCloseModals();
       setImageFile(null);
@@ -451,6 +456,39 @@ export default function ProductsPage() {
     }
   };
 
+  const handleToggleProductStatus = async (productId: string | number, currentStatus: boolean | undefined) => {
+    // Convertir productId a string y asegurar que no sea vacío después de la conversión
+    const idAsString = String(productId).trim();
+
+    console.log('[handleToggleProductStatus] Called with productId (original):', productId, '(type:', typeof productId, ')');
+    console.log('[handleToggleProductStatus] productId converted to string:', idAsString, '(type:', typeof idAsString, ')');
+
+    if (!idAsString) { // Verifica si el string es vacío después del trim
+      console.error('[handleToggleProductStatus] Invalid or empty productId after conversion:', idAsString);
+      setError("ID de producto no válido o vacío. No se puede cambiar el estado.");
+      return;
+    }
+
+    const newStatus = currentStatus === undefined ? false : !currentStatus;
+    try {
+      const productRef = doc(db, "products", idAsString); // Usar idAsString
+      await updateDoc(productRef, { isActive: newStatus });
+      setProductsState(prevProducts =>
+        prevProducts.map(p => (String(p.id) === idAsString ? { ...p, isActive: newStatus } : p))
+      );
+      setSuccessMessage(`Producto ${newStatus ? 'habilitado' : 'deshabilitado'} con éxito.`);
+      
+      if (selectedProduct && String(selectedProduct.id) === idAsString) {
+        setSelectedProduct(prev => prev ? { ...prev, isActive: newStatus } : null);
+      }
+
+    } catch (e) {
+      console.error("Error toggling product status: ", e);
+      const firebaseError = e as { message?: string };
+      setError(`Error al cambiar estado del producto: ${firebaseError.message || 'Error desconocido'}`);
+    }
+  };
+
   return (
     <div className="space-y-6 p-4 md:p-6 bg-gray-900 min-h-screen">
       {error && (
@@ -551,45 +589,54 @@ export default function ProductsPage() {
       )}
       <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {filteredProducts.map((product) => (
-          <div key={product.id} className="bg-gray-800 rounded-lg border border-gray-700 hover:shadow-xl transition-shadow duration-300 flex flex-col">
-            <div className="relative aspect-w-16 aspect-h-9 w-full h-56">
+          <div key={product.id} className="bg-gray-800 shadow-lg rounded-lg overflow-hidden flex flex-col justify-between">
+            <div className="w-full h-48 relative">
               <Image 
                 src={product.image || '/placeholder-image.png'} 
-                alt={product.name} 
-                fill 
-                style={{ objectFit: 'cover' }}
-                className="rounded-t-lg" 
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                alt={product.name || 'Imagen del producto'} 
+                layout="fill" 
+                objectFit="cover" 
+                onError={(e) => (e.currentTarget.src = 'https://via.placeholder.com/300x200?text=No+Image')}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent rounded-t-lg" />
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <h3 className="text-lg font-semibold text-white truncate" title={product.name}>{product.name}</h3>
-                <p className="text-sm text-gray-300 truncate" title={product.category}>{product.category}</p>
+            </div>
+            <div className="p-4 flex-grow">
+              <h3 className="text-xl font-semibold mb-2 text-white">{product.name}</h3>
+              <p className="text-gray-400 text-sm mb-1">Categoría: {product.category}</p>
+              <p className="text-gray-400 text-sm mb-1">Tipo: {product.type}</p>
+              <p className="text-gray-300 text-lg font-bold mb-2">${product.price.toFixed(2)}</p>
+              {product.description && <p className="text-gray-400 text-sm mb-3 h-10 overflow-y-auto">{product.description}</p>}
+
+              <div className="mb-2">
+                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${product.isActive ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`}>
+                  {product.isActive ? 'Habilitado' : 'Deshabilitado'}
+                </span>
               </div>
             </div>
-            <div className="p-4 space-y-3 flex-grow flex flex-col justify-between">
-              <div>
-                <div className="flex items-baseline justify-between">
-                  <span className="text-sm font-medium text-gray-400">Precio Base:</span>
-                  <span className="text-xl font-bold text-white"><span className="font-sans">${product.price.toFixed(2)}</span></span>
-                </div>
-                {product.variations && product.variations.length > 0 && (
-                  <div className="mt-2">
-                    <span className="text-xs font-medium text-gray-400">VARIACIONES: {product.variations.length}</span>
-                  </div>
+
+            <div className="p-4 bg-gray-750 border-t border-gray-700">
+              <div className="flex flex-col space-y-2">
+                <button
+                  onClick={() => handleEditProduct(product)}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition duration-150 ease-in-out"
+                >
+                  Editar
+                </button>
+                {product.variations && (
+                   <button
+                      onClick={() => handleVariations(product)}
+                      className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded transition duration-150 ease-in-out"
+                    >
+                      {product.variations.length > 0 ? `Ver/Editar Variaciones (${product.variations.length})` : 'Añadir Variaciones'}
+                  </button>
                 )}
-              </div>
-              <div className="flex items-center space-x-2 pt-3 border-t border-gray-700/50 mt-auto">
-                <div className="flex flex-1 space-x-2">
-                  <button onClick={() => handleEditProduct(product)} className="flex-1 py-2 px-3 text-xs sm:text-sm font-medium text-white bg-gray-600 hover:bg-gray-500 rounded-md transition-colors flex items-center justify-center shadow-sm">
-                    <svg className="w-4 h-4 mr-1.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                    Producto
-                  </button>
-                  <button onClick={() => handleVariations(product)} className="flex-1 py-2 px-3 text-xs sm:text-sm font-medium text-gray-200 bg-gray-700 hover:bg-gray-600 rounded-md transition-colors flex items-center justify-center shadow-sm">
-                    <svg className="w-4 h-4 mr-1.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
-                    Variaciones
-                  </button>
-                </div>
+                 <button
+                  onClick={() => handleToggleProductStatus(product.id, product.isActive)}
+                  className={`w-full font-semibold py-2 px-4 rounded transition duration-150 ease-in-out ${
+                    product.isActive ? 'bg-yellow-500 hover:bg-yellow-600 text-black' : 'bg-green-600 hover:bg-green-700 text-white'
+                  }`}
+                >
+                  {product.isActive ? 'Deshabilitar' : 'Habilitar'}
+                </button>
               </div>
             </div>
           </div>
