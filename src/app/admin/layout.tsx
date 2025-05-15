@@ -17,7 +17,13 @@ export default function AdminLayout({
   const pathname = usePathname();
   const router = useRouter();
 
+  // Determinar si estamos en la página de login
+  const isLoginPage = pathname === '/admin/login';
+
   const handleLogout = () => {
+    // Esta función ya no se usará desde el header en la página de login,
+    // pero la dejamos por si se usa en otros lugares o si el botón se reactiva.
+    // La lógica de logout real (incluyendo Firebase signOut) está en ProfilePage.
     Cookies.remove('adminToken');
     router.push('/admin/login');
   };
@@ -67,6 +73,12 @@ export default function AdminLayout({
     },
   ];
 
+  // Si es la página de login, solo renderizar children
+  if (isLoginPage) {
+    return <main className="min-h-screen bg-gray-900">{children}</main>;
+  }
+
+  // Si no es la página de login, renderizar el layout completo con Sidebar y Header
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 flex">
       {/* Sidebar */}
@@ -136,7 +148,7 @@ export default function AdminLayout({
             
             <div className="flex items-center space-x-4">
               <button
-                onClick={handleLogout}
+                onClick={handleLogout} // La función de logout aquí ahora solo borra cookie y redirige.
                 className="flex items-center px-3 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
               >
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
