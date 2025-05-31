@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { collection, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc, setDoc, getDoc } from 'firebase/firestore';
 import { db, auth } from '@/lib/firebase';
-import { createUserWithEmailAndPassword, updatePassword, signInWithEmailAndPassword, sendPasswordResetEmail, deleteUser } from 'firebase/auth';
+import { createUserWithEmailAndPassword, updatePassword, signInWithEmailAndPassword, sendPasswordResetEmail, deleteUser, AuthError } from 'firebase/auth';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaEdit, FaTrash, FaUserPlus, FaUserShield, FaUser, FaCrown, FaEye, FaKey } from 'react-icons/fa';
 import { User } from '@/types/firebase';
@@ -62,13 +62,6 @@ export default function UserManagement() {
     return () => unsubscribe();
   }, []);
 
-  const canViewUser = (targetUser: User) => {
-    if (!currentUser) return false;
-    
-    // Todos pueden ver usuarios
-    return true;
-  };
-
   const canManageUser = (targetUser: User) => {
     if (!currentUser) return false;
     
@@ -118,7 +111,7 @@ export default function UserManagement() {
       });
       setEditingUser(null);
       toast.success('Usuario actualizado exitosamente');
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error al actualizar usuario:', error);
       toast.error('Error al actualizar usuario');
     }
@@ -146,9 +139,9 @@ export default function UserManagement() {
           } else {
             // Si estamos eliminando otro usuario, necesitamos usar el Admin SDK
             // Por ahora, solo mostraremos un mensaje informativo
-            toast.info('El usuario ha sido eliminado de la base de datos. Para eliminar completamente la cuenta, contacta al superadmin.');
+            toast('El usuario ha sido eliminado de la base de datos. Para eliminar completamente la cuenta, contacta al superadmin.');
           }
-        } catch (authError: any) {
+        } catch (authError: unknown) {
           console.error('Error al eliminar usuario de Authentication:', authError);
           // Continuamos aunque falle la eliminación en Auth, ya que al menos se eliminó de Firestore
         }
@@ -189,11 +182,11 @@ export default function UserManagement() {
       const userRef = doc(db, 'users', newId);
       
       // Crear objeto de usuario sin campos undefined y sin la contraseña
-      const { password, ...userDataWithoutPassword } = newUser;
+      const { password: _, ...userDataWithoutPassword } = newUser;
       const userData = {
         ...userDataWithoutPassword,
         id: newId,
-        createdBy: currentUser.id || null,
+        createdBy: currentUser?.id || null,
         lastLogin: new Date().toISOString()
       };
 
@@ -216,12 +209,17 @@ export default function UserManagement() {
       });
       setShowAddForm(false);
       toast.success('Usuario creado exitosamente');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error al agregar usuario:', error);
-      if (error.code === 'auth/email-already-in-use') {
-        toast.error('El email ya está en uso');
-      } else if (error.code === 'auth/invalid-email') {
-        toast.error('El email no es válido');
+      // Attempt to narrow the type if it's a Firebase AuthError
+      if (error && typeof error === 'object' && 'code' in error && typeof error.code === 'string') {
+        if (error.code === 'auth/email-already-in-use') {
+          toast.error('El email ya está en uso');
+        } else if (error.code === 'auth/invalid-email') {
+          toast.error('El email no es válido');
+        } else {
+          toast.error('Error al crear usuario');
+        }
       } else {
         toast.error('Error al crear usuario');
       }
@@ -330,12 +328,17 @@ export default function UserManagement() {
       setChangingPassword(null);
       setNewPassword('');
       toast.success('Contraseña actualizada exitosamente');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error al cambiar contraseña:', error);
-      if (error.code === 'auth/requires-recent-login') {
-        toast.error('Por favor, vuelve a iniciar sesión para cambiar la contraseña');
+      // Attempt to narrow the type if it's a Firebase AuthError
+      if (error && typeof error === 'object' && 'code' in error && typeof error.code === 'string') {
+        if (error.code === 'auth/requires-recent-login') {
+          toast.error('Por favor, inicia sesión nuevamente para cambiar la contraseña.');
+        } else {
+           toast.error('Error al cambiar contraseña.');
+        }
       } else {
-        toast.error('Error al cambiar la contraseña');
+        toast.error('Error al cambiar contraseña.');
       }
     }
   };
@@ -363,15 +366,18 @@ export default function UserManagement() {
 
       await sendPasswordResetEmail(auth, user.email);
       toast.success(`Se ha enviado un correo de restablecimiento a ${user.email}`);
-    } catch (error: any) {
-      console.error('Error al enviar correo de restablecimiento:', error);
-      if (error.code === 'auth/user-not-found') {
-        toast.error('No se encontró el usuario');
-      } else if (error.code === 'auth/invalid-email') {
-        toast.error('El correo electrónico no es válido');
-      } else {
-        toast.error('Error al enviar el correo de restablecimiento');
-      }
+    } catch (error: unknown) {
+      console.error('Error al resetear contraseña:', error);
+       // Attempt to narrow the type if it's a Firebase AuthError
+       if (error && typeof error === 'object' && 'code' in error && typeof error.code === 'string') {
+          if (error.code === 'auth/user-not-found') {
+            toast.error('Usuario no encontrado.');
+          } else {
+            toast.error('Error al resetear contraseña.');
+          }
+       } else {
+         toast.error('Error al resetear contraseña.');
+       }
     }
   };
 

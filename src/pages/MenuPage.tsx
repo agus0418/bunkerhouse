@@ -2,12 +2,14 @@ import React from 'react';
 import ProductCard from '../components/ProductCard';
 import { products } from '../data/products';
 import { motion } from 'framer-motion';
+import { ProductRating } from '@/types/firebase';
 
 export const MenuPage: React.FC = () => {
-  const handleRatingSubmit = (productId: number, rating: any) => {
-    const product = products.find(p => p.id === productId);
+  const handleRatingSubmit = async (productId: string, rating: any): Promise<void> => {
+    const product = products.find(p => p.id === parseInt(productId, 10));
+
     if (product) {
-      product.ratings.push(rating);
+      product.ratings.push(rating as ProductRating);
       const total = product.ratings.reduce((sum, r) => sum + r.rating, 0);
       product.averageRating = total / product.ratings.length;
     }
@@ -26,19 +28,26 @@ export const MenuPage: React.FC = () => {
         </h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {products.map((product, index) => (
-            <motion.div
-              key={product.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-            >
-              <ProductCard
-                product={product}
-                onRatingSubmit={(rating) => handleRatingSubmit(product.id, rating)}
-              />
-            </motion.div>
-          ))}
+          {products.map((product) => {
+            const productWithCorrectedId = { 
+              ...product,
+              id: product.id.toString()
+            };
+
+            return (
+              <motion.div
+                key={productWithCorrectedId.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: products.indexOf(product) * 0.1 }}
+              >
+                <ProductCard
+                  product={productWithCorrectedId}
+                  onRatingSubmit={(rating) => handleRatingSubmit(productWithCorrectedId.id, rating)}
+                />
+              </motion.div>
+            );
+          })}
         </div>
       </motion.div>
     </div>

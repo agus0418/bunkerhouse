@@ -3,7 +3,7 @@ import { collection, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc, setD
 import { db } from '@/lib/firebase';
 import { Waiter, WaiterShift, WaiterTable, WaiterNote } from '@/types/firebase';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaEdit, FaTrash, FaUserPlus, FaStar, FaCheck, FaTimes, FaClock, FaTable, FaStickyNote, FaChartLine, FaUserTie, FaFilter, FaSearch, FaUsers, FaMoneyBillWave, FaChartBar, FaQrcode, FaDownload, FaExclamationTriangle, FaTrophy, FaGraduationCap } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaUserPlus, FaStar, FaCheck, FaTimes, FaClock, FaTable, FaStickyNote, FaChartLine, FaUserTie, FaSearch, FaUsers, FaMoneyBillWave, FaChartBar, FaQrcode, FaDownload, FaExclamationTriangle, FaTrophy } from 'react-icons/fa';
 import { QRCodeSVG } from 'qrcode.react';
 import Image from 'next/image';
 import { toast } from 'react-hot-toast';
