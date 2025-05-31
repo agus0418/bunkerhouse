@@ -37,14 +37,14 @@ export default function LoginPage() {
 
         if (userDocSnap.exists()) {
           const userData = userDocSnap.data();
-          // 3. Verificar el rol
-          if (userData.role === 'admin') {
+          // 3. Verificar el rol (admin o superadmin)
+          if (userData.role === 'admin' || userData.role === 'superadmin') {
             // 4. Establecer la cookie y redirigir
-            Cookies.set('adminToken', 'dummy-firebase-token', { expires: 1 }); // Podrías usar user.getIdToken() para un token real
+            Cookies.set('adminToken', 'dummy-firebase-token', { expires: 1 });
             router.push('/admin');
           } else {
             setError('Acceso denegado. No tienes permisos de administrador.');
-            await auth.signOut(); // Cerrar sesión si no es admin
+            await auth.signOut(); // Cerrar sesión si no es admin o superadmin
           }
         } else {
           setError('No se encontró el registro de usuario en la base de datos.');

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { collection, onSnapshot, query, orderBy, doc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Product } from '@/types/firebase';
 import ProductCard from '@/components/ProductCard';
@@ -13,6 +13,8 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('COMIDAS');
   const [isMobileView, setIsMobileView] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>('TODOS');
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     const checkMobileView = () => {
@@ -83,6 +85,44 @@ export default function Home() {
     }
   };
 
+  const handleRatingSubmit = async (productId: string | number, rating: any) => {
+    try {
+      // Convertir el ID a string para Firestore
+      const productIdString = String(productId);
+      
+      // Actualizar en Firestore
+      const productRef = doc(db, 'products', productIdString);
+      await updateDoc(productRef, {
+        ratings: arrayUnion(rating),
+        averageRating: (() => {
+          const updatedRatings = [...(products.find(p => String(p.id) === productIdString)?.ratings || []), rating];
+          return updatedRatings.reduce((acc, curr) => acc + curr.rating, 0) / updatedRatings.length;
+        })()
+      });
+
+      // Actualizar el estado local
+      setProducts(prevProducts => {
+        return prevProducts.map(product => {
+          if (String(product.id) === productIdString) {
+            const updatedRatings = [...(product.ratings || []), rating];
+            const newAverageRating = updatedRatings.reduce((acc, curr) => acc + curr.rating, 0) / updatedRatings.length;
+            
+            return {
+              ...product,
+              ratings: updatedRatings,
+              averageRating: newAverageRating
+            };
+          }
+          return product;
+        });
+      });
+
+    } catch (error) {
+      console.error('Error al guardar la valoración:', error);
+      throw error;
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-black">
@@ -146,7 +186,11 @@ export default function Home() {
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
                       {productsInSubCategory.map((product) => (
-                        <ProductCard key={product.id} product={product} />
+                        <ProductCard
+                          key={product.id}
+                          product={product}
+                          onRatingSubmit={handleRatingSubmit}
+                        />
                       ))}
                     </div>
                   </div>
