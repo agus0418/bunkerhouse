@@ -142,10 +142,9 @@ export interface WaiterTable {
 
 export interface WaiterNote {
   id: string;
-  waiterId: string;
-  date: string;
-  type: 'performance' | 'incident' | 'general';
+  type: 'performance' | 'incident' | 'achievement' | 'training' | 'general' | 'punctuality';
   content: string;
+  date: string;
   createdBy: string;
 }
 

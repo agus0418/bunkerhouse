@@ -5,11 +5,13 @@ import { doc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Waiter } from '@/types/firebase';
 import { motion } from 'framer-motion';
-import { FaStar } from 'react-icons/fa';
+import { FaStar, FaCheck } from 'react-icons/fa';
 import { useParams } from 'next/navigation';
+import Image from 'next/image';
 
 const RateWaiterPage = () => {
-  const { id } = useParams();
+  const params = useParams();
+  const waiterId = params?.id as string;
   const [waiter, setWaiter] = useState<Waiter | null>(null);
   const [loading, setLoading] = useState(true);
   const [rating, setRating] = useState(0);
@@ -21,8 +23,14 @@ const RateWaiterPage = () => {
 
   useEffect(() => {
     const fetchWaiter = async () => {
+      if (!waiterId) {
+        setError('ID de mozo no válido');
+        setLoading(false);
+        return;
+      }
+
       try {
-        const waiterDoc = await getDoc(doc(db, 'waiters', id as string));
+        const waiterDoc = await getDoc(doc(db, 'waiters', waiterId));
         if (waiterDoc.exists()) {
           setWaiter({ id: waiterDoc.id, ...waiterDoc.data() } as Waiter);
         } else {
@@ -37,7 +45,7 @@ const RateWaiterPage = () => {
     };
 
     fetchWaiter();
-  }, [id]);
+  }, [waiterId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,13 +53,15 @@ const RateWaiterPage = () => {
 
     try {
       const newRating = {
+        id: Date.now().toString(),
         rating,
         comment,
         tableNumber,
         tip: tip ? parseFloat(tip) : 0,
         date: new Date().toISOString(),
         userId: 'anonymous',
-        userName: 'Cliente'
+        userName: 'Cliente',
+        categories: ['general']
       };
 
       const waiterRef = doc(db, 'waiters', waiter.id);
@@ -98,6 +108,9 @@ const RateWaiterPage = () => {
           animate={{ opacity: 1, scale: 1 }}
           className="bg-black/40 backdrop-blur-sm rounded-xl p-8 border border-gray-800 text-center"
         >
+          <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <FaCheck className="text-2xl text-white" />
+          </div>
           <h1 className="text-2xl font-bold text-white mb-4">¡Gracias por tu valoración!</h1>
           <p className="text-gray-300">Tu opinión es muy importante para nosotros.</p>
         </motion.div>
@@ -115,11 +128,14 @@ const RateWaiterPage = () => {
         >
           <div className="flex items-center gap-4 mb-6">
             {waiter?.photo ? (
-              <img
-                src={waiter.photo}
-                alt={waiter.name}
-                className="w-16 h-16 rounded-full object-cover border-2 border-gray-700"
-              />
+              <div className="relative w-16 h-16">
+                <Image
+                  src={waiter.photo}
+                  alt={waiter.name}
+                  fill
+                  className="rounded-full object-cover border-2 border-gray-700"
+                />
+              </div>
             ) : (
               <div className="w-16 h-16 rounded-full bg-gray-700 flex items-center justify-center">
                 <span className="text-2xl text-gray-400">{waiter?.name[0]}</span>
