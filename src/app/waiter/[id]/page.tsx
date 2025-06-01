@@ -4,14 +4,13 @@ import React, { useState, useEffect } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Waiter } from '@/types/firebase';
-import WaiterRatingComponent from '@/components/WaiterRating';
+import { WaiterRatingComponent } from '@/components/WaiterRating';
 import { motion } from 'framer-motion';
 import { FaStar, FaTrophy, FaMedal, FaAward } from 'react-icons/fa';
 
 interface WaiterProfilePageProps {
-  params: {
-    id: string;
-  };
+  params: Promise<{ id: string }>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 const WaiterProfilePage: React.FC<WaiterProfilePageProps> = ({ params }) => {
@@ -21,7 +20,7 @@ const WaiterProfilePage: React.FC<WaiterProfilePageProps> = ({ params }) => {
   useEffect(() => {
     const fetchWaiter = async () => {
       try {
-        const waiterDoc = await getDoc(doc(db, 'waiters', params.id));
+        const waiterDoc = await getDoc(doc(db, 'waiters', await params.then(p => p.id)));
         if (waiterDoc.exists()) {
           setWaiter({ id: waiterDoc.id, ...waiterDoc.data() } as Waiter);
         }
@@ -33,7 +32,7 @@ const WaiterProfilePage: React.FC<WaiterProfilePageProps> = ({ params }) => {
     };
 
     fetchWaiter();
-  }, [params.id]);
+  }, [params]);
 
   if (loading) {
     return (

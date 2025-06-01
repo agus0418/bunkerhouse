@@ -537,7 +537,9 @@ export default function ProductsPage() {
               type: 'COMIDAS',
               variations: [],
               image: '',
-              description: ''
+              description: '',
+              ratings: [],
+              averageRating: 0
             }); 
             setIsEditModalOpen(true);
             setIsVariationsModalOpen(false);

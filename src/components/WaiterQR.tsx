@@ -1,5 +1,5 @@
 import React from 'react';
-import QRCode from 'qrcode.react';
+import { QRCodeSVG } from 'qrcode.react';
 import { FaDownload } from 'react-icons/fa';
 
 interface WaiterQRProps {
@@ -8,44 +8,41 @@ interface WaiterQRProps {
 }
 
 const WaiterQR: React.FC<WaiterQRProps> = ({ waiterId, waiterName }) => {
-  const qrValue = `${window.location.origin}/waiter/${waiterId}`;
+  const qrValue = `${process.env.NEXT_PUBLIC_BASE_URL}/waiter/${waiterId}`;
 
   const handleDownload = () => {
-    const canvas = document.getElementById('waiter-qr') as HTMLCanvasElement;
-    if (canvas) {
-      const pngUrl = canvas.toDataURL('image/png');
-      const downloadLink = document.createElement('a');
-      downloadLink.href = pngUrl;
-      downloadLink.download = `qr-${waiterName.toLowerCase().replace(/\s+/g, '-')}.png`;
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      document.body.removeChild(downloadLink);
+    const canvas = document.createElement('canvas');
+    const svg = document.querySelector('svg');
+    if (svg) {
+      const svgData = new XMLSerializer().serializeToString(svg);
+      const img = new Image();
+      img.onload = () => {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0);
+          const link = document.createElement('a');
+          link.download = `qr-${waiterName}.png`;
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+        }
+      };
+      img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
     }
   };
 
   return (
-    <div className="bg-black/40 backdrop-blur-sm rounded-xl p-6 border border-gray-800">
-      <div className="flex flex-col items-center">
-        <div className="bg-white p-4 rounded-lg mb-4">
-          <QRCode
-            id="waiter-qr"
-            value={qrValue}
-            size={200}
-            level="H"
-            includeMargin={true}
-          />
-        </div>
-        <p className="text-white text-center mb-4">
-          Escanea este código QR para valorar a {waiterName}
-        </p>
-        <button
-          onClick={handleDownload}
-          className="flex items-center gap-2 px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-100 transition-colors"
-        >
-          <FaDownload />
-          <span>Descargar QR</span>
-        </button>
-      </div>
+    <div className="flex flex-col items-center p-4 bg-white rounded-lg shadow-lg">
+      <QRCodeSVG value={qrValue} size={200} />
+      <p className="mt-4 text-lg font-semibold">{waiterName}</p>
+      <button
+        onClick={handleDownload}
+        className="mt-4 flex items-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+      >
+        <FaDownload className="mr-2" />
+        Descargar QR
+      </button>
     </div>
   );
 };
