@@ -84,45 +84,47 @@ export default function Home() {
   };
 
   const handleRatingSubmit = async (productId: string, rating: ProductRating) => {
-    try {
-      // productId is already a string here
-      const productIdString = productId;
+    if (!productId) {
+      console.error('ID de producto no válido');
+      return;
+    }
 
-      // Actualizar en Firestore
-      const productRef = doc(db, 'products', productIdString);
+    try {
+      const productRef = doc(db, 'products', productId);
+      const currentProduct = products.find(p => p.id === productId);
+      
+      if (!currentProduct) {
+        console.error('Producto no encontrado');
+        return;
+      }
+
+      const updatedRatings = [...(currentProduct.ratings || []), rating];
+      const newAverageRating = updatedRatings.length > 0 
+        ? updatedRatings.reduce((acc, curr) => acc + curr.rating, 0) / updatedRatings.length 
+        : 0;
+
       await updateDoc(productRef, {
         ratings: arrayUnion(rating),
-        averageRating: (() => {
-          // Find the product in the current state to calculate the new average
-          const currentProduct = products.find(p => p.id === productIdString);
-          const updatedRatings = [...(currentProduct?.ratings || []), rating];
-          // Ensure ratings is an array before reducing
-          return updatedRatings.length > 0 ? updatedRatings.reduce((acc, curr) => acc + curr.rating, 0) / updatedRatings.length : 0;
-        })()
+        averageRating: newAverageRating
       });
 
       // Actualizar el estado local
-      setProducts(prevProducts => {
-        return prevProducts.map(product => {
-          if (product.id === productIdString) { // Compare string IDs
-            const updatedRatings = [...(product.ratings || []), rating];
-            // Ensure ratings is an array before calculating average
-            const newAverageRating = updatedRatings.length > 0 ? updatedRatings.reduce((acc, curr) => acc + curr.rating, 0) / updatedRatings.length : 0;
-            
-            return {
-              ...product,
-              ratings: updatedRatings,
-              averageRating: newAverageRating
-            };
-          }
-          return product;
-        });
-      });
+      setProducts(prevProducts => 
+        prevProducts.map(product => 
+          product.id === productId
+            ? {
+                ...product,
+                ratings: updatedRatings,
+                averageRating: newAverageRating
+              }
+            : product
+        )
+      );
 
     } catch (error) {
       console.error('Error al guardar la valoración:', error);
-      // Re-throwing the error might not be necessary unless handled by the caller
-      // throw error; // Consider if this is needed
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      throw new Error(`Error al guardar la valoración: ${errorMessage}`);
     }
   };
 

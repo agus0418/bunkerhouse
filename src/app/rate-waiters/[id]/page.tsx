@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import { FaStar, FaCheck } from 'react-icons/fa';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
+import { WaiterRatingComponent } from '@/components/WaiterRating';
 
 const RateWaiterPage = () => {
   const params = useParams();
@@ -49,7 +50,21 @@ const RateWaiterPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!waiter) return;
+    if (!waiter) {
+      setError('No se encontró el mozo para valorar');
+      return;
+    }
+
+    // Validaciones
+    if (!tableNumber || parseInt(tableNumber) <= 0) {
+      setError('Por favor, ingresa un número de mesa válido');
+      return;
+    }
+
+    if (rating === 0) {
+      setError('Por favor, selecciona una calificación');
+      return;
+    }
 
     try {
       const newRating = {
@@ -61,7 +76,12 @@ const RateWaiterPage = () => {
         date: new Date().toISOString(),
         userId: 'anonymous',
         userName: 'Cliente',
-        categories: ['general']
+        categories: {
+          attention: 0,
+          friendliness: 0,
+          speed: 0,
+          knowledge: 0
+        }
       };
 
       const waiterRef = doc(db, 'waiters', waiter.id);
@@ -77,7 +97,8 @@ const RateWaiterPage = () => {
       setSubmitted(true);
     } catch (error) {
       console.error('Error submitting rating:', error);
-      setError('Error al enviar la valoración');
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      setError(`Error al enviar la valoración: ${errorMessage}`);
     }
   };
 

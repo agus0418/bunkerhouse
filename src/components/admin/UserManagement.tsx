@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { collection, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc, setDoc, getDoc } from 'firebase/firestore';
 import { db, auth } from '@/lib/firebase';
-import { createUserWithEmailAndPassword, updatePassword, signInWithEmailAndPassword, sendPasswordResetEmail, deleteUser, AuthError } from 'firebase/auth';
+import { createUserWithEmailAndPassword, updatePassword, signInWithEmailAndPassword, sendPasswordResetEmail, deleteUser } from 'firebase/auth';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaEdit, FaTrash, FaUserPlus, FaUserShield, FaUser, FaCrown, FaEye, FaKey } from 'react-icons/fa';
 import { User } from '@/types/firebase';
@@ -182,7 +182,7 @@ export default function UserManagement() {
       const userRef = doc(db, 'users', newId);
       
       // Crear objeto de usuario sin campos undefined y sin la contraseña
-      const { password: _, ...userDataWithoutPassword } = newUser;
+      const userDataWithoutPassword = newUser;
       const userData = {
         ...userDataWithoutPassword,
         id: newId,

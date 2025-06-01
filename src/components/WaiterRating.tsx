@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaStar, FaCalendarAlt, FaHistory, FaThumbsUp, FaCamera, FaTrophy, FaMedal, FaAward } from 'react-icons/fa';
 import RatingStars from './RatingStars';
-import { Waiter, WaiterRating, WaiterAchievement } from '@/types/firebase';
+import { Waiter, WaiterRating } from '@/types/firebase';
 import { toast } from 'react-hot-toast';
 
 interface WaiterRatingProps {
@@ -32,8 +32,20 @@ export const WaiterRatingComponent: React.FC<WaiterRatingProps> = ({ waiter, onR
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (parseInt(tableNumber) <= 0 || rating === 0) {
-      toast.error('Por favor, ingresa un número de mesa válido y una calificación general.');
+    
+    // Validaciones mejoradas
+    if (!tableNumber || parseInt(tableNumber) <= 0) {
+      toast.error('Por favor, ingresa un número de mesa válido.');
+      return;
+    }
+    
+    if (rating === 0) {
+      toast.error('Por favor, selecciona una calificación general.');
+      return;
+    }
+
+    if (categoryRatings.attention === 0 || categoryRatings.friendliness === 0 || categoryRatings.speed === 0) {
+      toast.error('Por favor, completa todas las calificaciones por categoría.');
       return;
     }
 
@@ -60,6 +72,8 @@ export const WaiterRatingComponent: React.FC<WaiterRatingProps> = ({ waiter, onR
       };
 
       await onRatingSubmit(waiter.id.toString(), newRating);
+      
+      // Limpiar el formulario solo después de un envío exitoso
       setRating(0);
       setCategoryRatings({
         attention: 0,
@@ -73,7 +87,8 @@ export const WaiterRatingComponent: React.FC<WaiterRatingProps> = ({ waiter, onR
       toast.success('¡Valoración enviada con éxito!');
     } catch (error) {
       console.error('Error al enviar la valoración:', error);
-      toast.error('Error al enviar la valoración. Por favor, inténtelo de nuevo.');
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      toast.error(`Error al enviar la valoración: ${errorMessage}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -81,11 +96,27 @@ export const WaiterRatingComponent: React.FC<WaiterRatingProps> = ({ waiter, onR
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (files) {
-      // Aquí implementarías la lógica para subir las fotos a Firebase Storage
-      // y obtener las URLs
-      const newPhotos = Array.from(files).map(file => URL.createObjectURL(file));
-      setSelectedPhotos([...selectedPhotos, ...newPhotos]);
+    if (!files) return;
+
+    // Validar el tamaño y tipo de archivo
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+
+    const validFiles = Array.from(files).filter(file => {
+      if (!allowedTypes.includes(file.type)) {
+        toast.error(`El archivo ${file.name} no es un tipo de imagen válido.`);
+        return false;
+      }
+      if (file.size > maxSize) {
+        toast.error(`El archivo ${file.name} excede el tamaño máximo permitido (5MB).`);
+        return false;
+      }
+      return true;
+    });
+
+    if (validFiles.length > 0) {
+      const newPhotos = validFiles.map(file => URL.createObjectURL(file));
+      setSelectedPhotos(prev => [...prev, ...newPhotos]);
     }
   };
 
