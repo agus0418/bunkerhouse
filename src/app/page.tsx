@@ -46,7 +46,7 @@ export default function Home() {
     return () => unsubscribe();
   }, []);
 
-  const groupedProducts = products.reduce((groups: { [key: string]: { [key: string]: Product[] } }, product) => {
+  const groupedProducts: { [key: string]: { [key: string]: Product[] } } = products.reduce((groups: { [key: string]: { [key: string]: Product[] } }, product) => {
     const mainCategory = product.type;
     const subCategory = product.category;
     
@@ -60,7 +60,7 @@ export default function Home() {
     return groups;
   }, {});
 
-  const filteredProducts = {
+  const filteredProducts: { COMIDAS: { [key: string]: Product[] }; BEBIDAS: { [key: string]: Product[] } } = {
     COMIDAS: groupedProducts['COMIDAS'] || {},
     BEBIDAS: groupedProducts['BEBIDAS'] || {}
   };

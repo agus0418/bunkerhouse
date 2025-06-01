@@ -3,7 +3,7 @@ import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Product, Waiter } from '@/types/firebase';
 import { motion } from 'framer-motion';
-import { FaUtensils, FaGlassMartiniAlt, FaUserTie, FaStar } from 'react-icons/fa';
+import { FaUtensils, FaUserTie, FaStar } from 'react-icons/fa';
 
 export default function Statistics() {
   const [products, setProducts] = useState<Product[]>([]);

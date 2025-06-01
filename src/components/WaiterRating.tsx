@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaStar, FaCalendarAlt, FaHistory, FaThumbsUp, FaCamera, FaTrophy, FaMedal, FaAward } from 'react-icons/fa';
 import RatingStars from './RatingStars';
 import { Waiter, WaiterRating, WaiterAchievement } from '@/types/firebase';
-import Image from 'next/image';
 import { toast } from 'react-hot-toast';
 
 interface WaiterRatingProps {

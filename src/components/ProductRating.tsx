@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Product } from '@/types/firebase';
+import { Product, ProductRating } from '@/types/firebase';
 import RatingStars from './RatingStars';
 
 interface ProductRatingProps {
   product: Product;
-  onRatingSubmit: (rating: any) => Promise<void>;
+  onRatingSubmit: (rating: ProductRating) => Promise<void>;
 }
 
 const ProductRatingComponent: React.FC<ProductRatingProps> = ({ product, onRatingSubmit }) => {

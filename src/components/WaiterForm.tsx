@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { doc, setDoc, collection } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
 import { Waiter } from '@/types/firebase';
 import { motion } from 'framer-motion';
 
@@ -32,7 +30,6 @@ export default function WaiterForm({ waiter, onClose }: WaiterFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Aquí iría la lógica para guardar el mozo
     onClose();
   };
 
