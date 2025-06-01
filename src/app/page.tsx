@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { collection, onSnapshot, query, orderBy, doc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { Product } from '@/types/firebase';
+import { Product, ProductRating } from '@/types/firebase';
 import ProductCard from '@/components/ProductCard';
 import ImageCarousel from '@/components/ImageCarousel';
 import { FaUtensils, FaGlassMartiniAlt } from 'react-icons/fa';
@@ -13,8 +13,6 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('COMIDAS');
   const [isMobileView, setIsMobileView] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string>('TODOS');
-  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     const checkMobileView = () => {
@@ -85,27 +83,31 @@ export default function Home() {
     }
   };
 
-  const handleRatingSubmit = async (productId: string | number, rating: any) => {
+  const handleRatingSubmit = async (productId: string, rating: ProductRating) => {
     try {
-      // Convertir el ID a string para Firestore
-      const productIdString = String(productId);
-      
+      // productId is already a string here
+      const productIdString = productId;
+
       // Actualizar en Firestore
       const productRef = doc(db, 'products', productIdString);
       await updateDoc(productRef, {
         ratings: arrayUnion(rating),
         averageRating: (() => {
-          const updatedRatings = [...(products.find(p => String(p.id) === productIdString)?.ratings || []), rating];
-          return updatedRatings.reduce((acc, curr) => acc + curr.rating, 0) / updatedRatings.length;
+          // Find the product in the current state to calculate the new average
+          const currentProduct = products.find(p => p.id === productIdString);
+          const updatedRatings = [...(currentProduct?.ratings || []), rating];
+          // Ensure ratings is an array before reducing
+          return updatedRatings.length > 0 ? updatedRatings.reduce((acc, curr) => acc + curr.rating, 0) / updatedRatings.length : 0;
         })()
       });
 
       // Actualizar el estado local
       setProducts(prevProducts => {
         return prevProducts.map(product => {
-          if (String(product.id) === productIdString) {
+          if (product.id === productIdString) { // Compare string IDs
             const updatedRatings = [...(product.ratings || []), rating];
-            const newAverageRating = updatedRatings.reduce((acc, curr) => acc + curr.rating, 0) / updatedRatings.length;
+            // Ensure ratings is an array before calculating average
+            const newAverageRating = updatedRatings.length > 0 ? updatedRatings.reduce((acc, curr) => acc + curr.rating, 0) / updatedRatings.length : 0;
             
             return {
               ...product,
@@ -119,7 +121,8 @@ export default function Home() {
 
     } catch (error) {
       console.error('Error al guardar la valoración:', error);
-      throw error;
+      // Re-throwing the error might not be necessary unless handled by the caller
+      // throw error; // Consider if this is needed
     }
   };
 

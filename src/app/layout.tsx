@@ -3,7 +3,7 @@ import "./globals.css";
 import localFont from "next/font/local";
 import ClientLayout from "./client-layout";
 import Link from 'next/link';
-import { FaUtensils, FaGlassMartiniAlt, FaUserTie } from 'react-icons/fa';
+import { FaUtensils, FaUserTie } from 'react-icons/fa';
 import { Toaster } from 'react-hot-toast';
 
 const burgerFont = localFont({

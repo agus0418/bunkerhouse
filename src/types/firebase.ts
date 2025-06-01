@@ -98,15 +98,23 @@ export interface Waiter {
 }
 
 export interface WaiterRating {
-  id: string;
+  id: number;
   userId: string;
   rating: number;
-  comment: string;
+  comment?: string;
   date: string;
   userName: string;
-  tableNumber: string;
-  categories: string[];
+  tableNumber: number;
+  categories: {
+    attention: number;
+    friendliness: number;
+    speed: number;
+    knowledge: number;
+  };
   tip: number;
+  isHighlighted: boolean;
+  likes: number;
+  photos: string[];
 }
 
 export interface WaiterAchievement {

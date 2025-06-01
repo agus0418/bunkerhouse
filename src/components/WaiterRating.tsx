@@ -4,13 +4,14 @@ import { FaStar, FaCalendarAlt, FaHistory, FaThumbsUp, FaCamera, FaTrophy, FaMed
 import RatingStars from './RatingStars';
 import { Waiter, WaiterRating, WaiterAchievement } from '@/types/firebase';
 import Image from 'next/image';
+import { toast } from 'react-hot-toast';
 
 interface WaiterRatingProps {
   waiter: Waiter;
   onRatingSubmit: (waiterId: string, rating: WaiterRating) => Promise<void>;
 }
 
-const WaiterRatingComponent: React.FC<WaiterRatingProps> = ({ waiter, onRatingSubmit }) => {
+export const WaiterRatingComponent: React.FC<WaiterRatingProps> = ({ waiter, onRatingSubmit }) => {
   const [rating, setRating] = useState(0);
   const [categoryRatings, setCategoryRatings] = useState<{
     attention: number;
@@ -32,7 +33,10 @@ const WaiterRatingComponent: React.FC<WaiterRatingProps> = ({ waiter, onRatingSu
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!tableNumber || rating === 0) return;
+    if (parseInt(tableNumber) <= 0 || rating === 0) {
+      toast.error('Por favor, ingresa un número de mesa válido y una calificación general.');
+      return;
+    }
 
     setIsSubmitting(true);
     try {
@@ -50,9 +54,10 @@ const WaiterRatingComponent: React.FC<WaiterRatingProps> = ({ waiter, onRatingSu
           speed: categoryRatings.speed,
           knowledge: categoryRatings.knowledge
         },
-        photos: selectedPhotos,
+        tip: 0,
+        isHighlighted: false,
         likes: 0,
-        isHighlighted: false
+        photos: selectedPhotos || [],
       };
 
       await onRatingSubmit(waiter.id.toString(), newRating);
@@ -66,8 +71,10 @@ const WaiterRatingComponent: React.FC<WaiterRatingProps> = ({ waiter, onRatingSu
       setComment('');
       setTableNumber('');
       setSelectedPhotos([]);
+      toast.success('¡Valoración enviada con éxito!');
     } catch (error) {
       console.error('Error al enviar la valoración:', error);
+      toast.error('Error al enviar la valoración. Por favor, inténtelo de nuevo.');
     } finally {
       setIsSubmitting(false);
     }
@@ -355,6 +362,4 @@ const WaiterRatingComponent: React.FC<WaiterRatingProps> = ({ waiter, onRatingSu
       </form>
     </div>
   );
-};
-
-export default WaiterRatingComponent; 
+}; 
