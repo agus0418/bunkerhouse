@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { collection, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc, setDoc, addDoc, getDocs, writeBatch } from 'firebase/firestore';
+import { collection, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc, setDoc, addDoc, getDocs, writeBatch, arrayUnion } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Waiter, WaiterShift, WaiterTable, WaiterNote } from '@/types/firebase';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -68,7 +68,7 @@ export default function WaiterManagement() {
       // Ensure notes array exists and is sorted by date descending for unique waiters
       const processedWaiters = uniqueWaiters.map(waiter => ({
         ...waiter,
-        notes: waiter.notes ? waiter.notes.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) : []
+        notes: waiter.notes ? [...waiter.notes].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) : []
       }));
 
       // Sort unique waiters by name (or another preferred field if necessary)
@@ -135,13 +135,7 @@ export default function WaiterManagement() {
           batch.delete(doc.ref);
         });
 
-        // Eliminar notas
-        const notesRef = collection(db, 'waiters', waiterId, 'notes');
-        const notesSnapshot = await getDocs(notesRef);
-        notesSnapshot.forEach((doc) => {
-          batch.delete(doc.ref);
-        });
-
+        // Notas ahora están en el documento principal, no se necesita eliminar subcolección
         // Eliminar mesas asignadas
         const tablesRef = collection(db, 'waiters', waiterId, 'tables');
         const tablesSnapshot = await getDocs(tablesRef);
@@ -175,6 +169,7 @@ export default function WaiterManagement() {
       await setDoc(waiterRef, {
         ...newWaiter,
         ratings: [],
+        notes: [], // Inicializar array de notas
         averageRating: 0,
         totalTips: 0,
         performance: {
@@ -255,30 +250,25 @@ export default function WaiterManagement() {
         return;
       }
       
-      const noteRef = collection(db, 'waiters', currentWaiterId, 'notes');
       const newNoteData = {
+        id: Date.now().toString(), // ID único
         type: newNote.type || 'general',
         content: newNote.content || '',
         date: new Date().toISOString(),
-        createdBy: 'admin' // TODO: Usar el ID del usuario actual
+        createdBy: 'admin'
       };
+
+      const waiterRef = doc(db, 'waiters', currentWaiterId);
+      await updateDoc(waiterRef, {
+        notes: arrayUnion(newNoteData)
+      });
       
-      // Agregar la nota a Firestore y obtener el ID generado
-      const docRef = await addDoc(noteRef, newNoteData);
-      const noteWithId = { ...newNoteData, id: docRef.id };
-      
-      // Actualizar el estado local con la nueva nota
-      setWaiters(prevWaiters =>
-        prevWaiters.map(waiter => {
-          if (waiter.id === currentWaiterId) {
-            return {
-              ...waiter,
-              notes: [noteWithId, ...(waiter.notes || [])]
-            };
-          }
-          return waiter;
-        })
-      );
+      // Actualizar estado local
+      setWaiters(prev => prev.map(w =>
+        w.id === currentWaiterId
+          ? { ...w, notes: [newNoteData, ...(w.notes || [])] }
+          : w
+      ));
       
       setNewNote({ type: 'general', content: '', date: new Date().toISOString() });
       setShowAddNoteForm(false);
@@ -292,11 +282,13 @@ export default function WaiterManagement() {
 
   const handleEditNote = async (waiterId: string, note: WaiterNote) => {
     try {
-      const noteRef = doc(db, 'waiters', waiterId, 'notes', note.id);
-      await updateDoc(noteRef, {
-        content: note.content,
-        type: note.type
-      });
+      const waiterRef = doc(db, 'waiters', waiterId);
+      const currentNotes = [...(waiters.find(w => w.id === waiterId)?.notes || [])];
+      const updatedNotes = currentNotes.map(n =>
+        n.id === note.id ? { ...n, content: note.content, type: note.type } : n
+      );
+      
+      await updateDoc(waiterRef, { notes: updatedNotes });
       setEditingNote(null);
       toast.success('Nota actualizada exitosamente');
     } catch (error) {
@@ -308,7 +300,10 @@ export default function WaiterManagement() {
   const handleDeleteNote = async (waiterId: string, noteId: string) => {
     if (window.confirm('¿Estás seguro de que deseas eliminar esta nota?')) {
       try {
-        await deleteDoc(doc(db, 'waiters', waiterId, 'notes', noteId));
+        const waiterRef = doc(db, 'waiters', waiterId);
+        const currentNotes = [...(waiters.find(w => w.id === waiterId)?.notes || [])];
+        const updatedNotes = currentNotes.filter(n => n.id !== noteId);
+        await updateDoc(waiterRef, { notes: updatedNotes });
         toast.success('Nota eliminada exitosamente');
       } catch (error) {
         console.error('Error al eliminar nota:', error);
