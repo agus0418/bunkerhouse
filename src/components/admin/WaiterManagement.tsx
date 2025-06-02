@@ -263,12 +263,7 @@ export default function WaiterManagement() {
         notes: arrayUnion(newNoteData)
       });
       
-      // Actualizar estado local
-      setWaiters(prev => prev.map(w =>
-        w.id === currentWaiterId
-          ? { ...w, notes: [newNoteData, ...(w.notes || [])] }
-          : w
-      ));
+      // Firestore actualizará el estado automáticamente a través de onSnapshot
       
       setNewNote({ type: 'general', content: '', date: new Date().toISOString() });
       setShowAddNoteForm(false);
