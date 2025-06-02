@@ -25,6 +25,7 @@ export const WaiterRatingComponent: React.FC<WaiterRatingProps> = ({ waiter, onR
   });
   const [comment, setComment] = useState('');
   const [tableNumber, setTableNumber] = useState('');
+  const [customerName, setCustomerName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -58,6 +59,7 @@ export const WaiterRatingComponent: React.FC<WaiterRatingProps> = ({ waiter, onR
         comment,
         date: new Date().toISOString(),
         userName: 'Anónimo',
+        customerName: customerName || 'Anónimo',
         tableNumber: parseInt(tableNumber),
         categories: {
           attention: categoryRatings.attention,
@@ -83,6 +85,7 @@ export const WaiterRatingComponent: React.FC<WaiterRatingProps> = ({ waiter, onR
       });
       setComment('');
       setTableNumber('');
+      setCustomerName('');
       setSelectedPhotos([]);
       toast.success('¡Valoración enviada con éxito!');
     } catch (error) {
@@ -313,6 +316,17 @@ export const WaiterRatingComponent: React.FC<WaiterRatingProps> = ({ waiter, onR
       </AnimatePresence>
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-gray-400 mb-2">Tu Nombre (opcional)</label>
+          <input
+            type="text"
+            value={customerName}
+            onChange={(e) => setCustomerName(e.target.value)}
+            className="w-full bg-gray-800 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-gray-700"
+            placeholder="Ingresa tu nombre"
+          />
+        </div>
+
         <div>
           <label className="block text-gray-400 mb-2">Número de Mesa</label>
           <input
