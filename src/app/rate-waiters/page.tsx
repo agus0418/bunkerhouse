@@ -15,7 +15,7 @@ export default function RateWaitersPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [expandedWaiterId, setExpandedWaiterId] = useState<string | null>(null);
   // Estado para el formulario de valoración dentro de cada tarjeta
-  const [ratingsData, setRatingsData] = useState<Record<string, { rating: number; categoryRatings: { attention: number; friendliness: number; speed: number; knowledge: number }; comment: string; tableNumber: string; tip: string; selectedPhotos: string[]; isSubmitting: boolean; submitted: boolean; error: string }>>({});
+  const [ratingsData, setRatingsData] = useState<Record<string, { rating: number; categoryRatings: { attention: number; friendliness: number; speed: number; knowledge: number }; comment: string; tableNumber: string; tip: string; customerName: string; selectedPhotos: string[]; isSubmitting: boolean; submitted: boolean; error: string }>>({});
 
   useEffect(() => {
     const waitersRef = collection(db, 'waiters');
@@ -41,6 +41,7 @@ export default function RateWaitersPage() {
             comment: '',
             tableNumber: '',
             tip: '',
+            customerName: '',
             selectedPhotos: [],
             isSubmitting: false,
             submitted: false,
@@ -152,6 +153,7 @@ export default function RateWaitersPage() {
         comment: ratingData.comment,
         date: new Date().toISOString(),
         userName: 'Anónimo',
+        customerName: ratingData.customerName || 'Anónimo',
         tableNumber: parseInt(ratingData.tableNumber),
         categories: ratingData.categoryRatings,
         tip: ratingData.tip ? parseFloat(ratingData.tip) : 0,
@@ -430,6 +432,19 @@ export default function RateWaitersPage() {
                       </motion.div>
                     ) : (
                       <form onSubmit={(e) => { e.preventDefault(); handleSubmitRating(waiter.id); }} className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-300 mb-2">
+                            Tu Nombre (opcional)
+                          </label>
+                          <input
+                            type="text"
+                            value={ratingsData[waiter.id].customerName}
+                            onChange={(e) => handleInputChange(waiter.id, 'customerName', e.target.value)}
+                            className="w-full px-4 py-2 bg-black/40 text-white rounded-lg border border-gray-700 focus:outline-none focus:border-gray-500 text-sm"
+                            placeholder="Ingresa tu nombre"
+                          />
+                        </div>
+
                         <div>
                           <label className="block text-sm font-medium text-gray-300 mb-2">
                             Número de Mesa
