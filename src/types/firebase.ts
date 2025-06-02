@@ -150,7 +150,7 @@ export interface WaiterTable {
 
 export interface WaiterNote {
   id: string;
-  type: 'performance' | 'incident' | 'achievement' | 'training' | 'general' | 'punctuality';
+  type: 'desempeño' | 'incidente' | 'logro' | 'entrenamiento' | 'general' | 'puntualidad';
   content: string;
   date: string;
   createdBy: string;
