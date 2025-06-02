@@ -104,6 +104,7 @@ export interface WaiterRating {
   comment?: string;
   date: string;
   userName: string;
+  customerName: string; // Nuevo campo
   tableNumber: number;
   categories: {
     attention: number;

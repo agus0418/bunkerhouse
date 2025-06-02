@@ -752,8 +752,10 @@ export default function WaiterManagement() {
                                                     Mesa {rating.tableNumber}
                                                 </span>
                                                 <span>{new Date(rating.date).toLocaleDateString()}</span>
-                                                 {/* Display user name */}
-                                                <span className="text-gray-300 text-xs font-semibold">por {rating.userName}</span>
+                                                {/* Display customer name if available */}
+                                                <span className="text-gray-300 text-xs font-semibold">
+                                                   {rating.customerName ? `Cliente: ${rating.customerName}` : `por ${rating.userName}`}
+                                                </span>
                                             </div>
                                             <div className="flex items-center gap-2">
                                                 <RatingStars rating={Number(rating.rating)} size={16} />

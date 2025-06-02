@@ -19,6 +19,7 @@ const RateWaiterPage = () => {
   const [comment, setComment] = useState('');
   const [tableNumber, setTableNumber] = useState('');
   const [tip, setTip] = useState('');
+  const [customerName, setCustomerName] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
 
@@ -76,6 +77,7 @@ const RateWaiterPage = () => {
         date: new Date().toISOString(),
         userId: 'anonymous',
         userName: 'Cliente',
+        customerName: customerName || 'Anónimo',
         categories: {
           attention: 0,
           friendliness: 0,
@@ -172,6 +174,19 @@ const RateWaiterPage = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Tu Nombre
+              </label>
+              <input
+                type="text"
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+                className="w-full px-4 py-2 bg-black/40 text-white rounded-lg border border-gray-700 focus:outline-none focus:border-gray-500"
+                placeholder="Opcional"
+              />
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Número de Mesa
