@@ -14,7 +14,7 @@ export default function WaiterManagement() {
   const [isLoading, setIsLoading] = useState(true);
   const [editingWaiter, setEditingWaiter] = useState<Waiter | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [activeTabs, setActiveTabs] = useState<{[key: string]: 'info' | 'shifts' | 'tables' | 'notes' | 'performance'}>({});
+  const [activeTabs, setActiveTabs] = useState<{[key: string]: 'info' | 'shifts' | 'tables' | 'notes' | 'desempeño'}>({});
   const [activeNotesTab, setActiveNotesTab] = useState<'admin' | 'ratings'>('admin');
   const [ratingSort, setRatingSort] = useState<'date-desc' | 'date-asc' | 'rating-desc' | 'rating-asc'>('date-desc');
   const [currentPage, setCurrentPage] = useState(1);
@@ -38,7 +38,7 @@ export default function WaiterManagement() {
   });
   const [showAddNoteForm, setShowAddNoteForm] = useState(false);
   const [currentWaiterId, setCurrentWaiterId] = useState<string | null>(null);
-  const [noteFilter, setNoteFilter] = useState<'all' | 'performance' | 'incident' | 'achievement' | 'training' | 'general' | 'punctuality'>('all');
+  const [noteFilter, setNoteFilter] = useState<'all' | 'desempeño' | 'incidente' | 'logro' | 'entrenamiento' | 'general' | 'puntualidad'>('all');
   const [noteSearch, setNoteSearch] = useState('');
   const [editingNote, setEditingNote] = useState<WaiterNote | null>(null);
   const [newTable, setNewTable] = useState<Partial<WaiterTable>>({
@@ -172,7 +172,7 @@ export default function WaiterManagement() {
         notes: [], // Inicializar array de notas
         averageRating: 0,
         totalTips: 0,
-        performance: {
+        desempeño: {
           averageServiceTime: 0,
           totalTablesServed: 0,
           totalTips: 0,
@@ -381,11 +381,11 @@ export default function WaiterManagement() {
     }
   };
 
-  const handleTabChange = (waiterId: string, tab: 'info' | 'shifts' | 'tables' | 'notes' | 'performance') => {
+  const handleTabChange = (waiterId: string, tab: 'info' | 'shifts' | 'tables' | 'notes' | 'desempeño') => {
     setActiveTabs(prev => ({ ...prev, [waiterId]: tab }));
   };
 
-  const renderWaiterDetails = (waiter: Waiter, tab: 'info' | 'shifts' | 'tables' | 'notes' | 'performance') => {
+  const renderWaiterDetails = (waiter: Waiter, tab: 'info' | 'shifts' | 'tables' | 'notes' | 'desempeño') => {
     switch (tab) {
       case 'info':
         return (
@@ -408,21 +408,21 @@ export default function WaiterManagement() {
                   <FaChartLine className="text-blue-400 w-5 h-5 mb-1" />
                   <h5 className="text-gray-400 text-xs font-semibold uppercase">Desempeño</h5>
                   <p className="text-white text-lg font-bold">
-                    {waiter.notes?.filter(n => n.type === 'performance').length || 0}
+                    {waiter.notes?.filter(n => n.type === 'desempeño').length || 0}
                   </p>
                 </div>
                 <div className="bg-gray-800/50 rounded-lg p-2 border-l-4 border-red-400 hover:bg-gray-800 transition-colors cursor-pointer flex flex-col items-center text-center" onClick={() => { handleTabChange(waiter.id, 'notes'); setActiveNotesTab('admin'); }}>
                   <FaExclamationTriangle className="text-red-400 w-5 h-5 mb-1" />
                   <h5 className="text-gray-400 text-xs font-semibold uppercase">Incidencias</h5>
                   <p className="text-white text-lg font-bold">
-                    {waiter.notes?.filter(n => n.type === 'incident').length || 0}
+                    {waiter.notes?.filter(n => n.type === 'incidente').length || 0}
                   </p>
                 </div>
                 <div className="bg-gray-800/50 rounded-lg p-2 border-l-4 border-green-400 hover:bg-gray-800 transition-colors cursor-pointer flex flex-col items-center text-center" onClick={() => { handleTabChange(waiter.id, 'notes'); setActiveNotesTab('admin'); }}>
                   <FaClock className="text-green-400 w-5 h-5 mb-1" />
                   <h5 className="text-gray-400 text-xs font-semibold uppercase">Puntualidad</h5>
                   <p className="text-white text-lg font-bold">
-                    {waiter.notes?.filter(n => n.type === 'punctuality').length || 0}
+                    {waiter.notes?.filter(n => n.type === 'puntualidad').length || 0}
                   </p>
                 </div>
                 <div className="bg-gray-800/50 rounded-lg p-2 border-l-4 border-purple-400 hover:bg-gray-800 transition-colors cursor-pointer flex flex-col items-center text-center" onClick={() => { handleTabChange(waiter.id, 'notes'); setActiveNotesTab('ratings'); }}>
@@ -497,22 +497,22 @@ export default function WaiterManagement() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.3 }}
                         className={`bg-gray-800/50 rounded-lg p-3 hover:bg-gray-800 transition-colors ${
-                          note.type === 'achievement' ? 'border-l-4 border-yellow-400' :
-                          note.type === 'incident' ? 'border-l-4 border-red-400' :
-                          note.type === 'performance' ? 'border-l-4 border-blue-400' :
-                          note.type === 'training' ? 'border-l-4 border-green-400' :
-                          note.type === 'punctuality' ? 'border-l-4 border-green-400' :
+                          note.type === 'logro' ? 'border-l-4 border-yellow-400' :
+                          note.type === 'incidente' ? 'border-l-4 border-red-400' :
+                          note.type === 'desempeño' ? 'border-l-4 border-blue-400' :
+                          note.type === 'entrenamiento' ? 'border-l-4 border-green-400' :
+                          note.type === 'puntualidad' ? 'border-l-4 border-green-400' :
                           'border-l-4 border-gray-400'
                         }`}
                       >
                         <div className="flex justify-between items-start mb-1">
                           <span className="text-sm font-semibold text-gray-300">{new Date(note.date).toLocaleDateString()}</span>
                           <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${
-                            note.type === 'achievement' ? 'bg-yellow-600' :
-                            note.type === 'incident' ? 'bg-red-600' :
-                            note.type === 'performance' ? 'bg-blue-600' :
-                            note.type === 'training' ? 'bg-green-600' :
-                            note.type === 'punctuality' ? 'bg-green-600' :
+                            note.type === 'logro' ? 'bg-yellow-600' :
+                            note.type === 'incidente' ? 'bg-red-600' :
+                            note.type === 'desempeño' ? 'bg-blue-600' :
+                            note.type === 'entrenamiento' ? 'bg-green-600' :
+                            note.type === 'puntualidad' ? 'bg-green-600' :
                             'bg-gray-600'
                           }`}>
                             {note.type.charAt(0).toUpperCase() + note.type.slice(1)}
@@ -692,21 +692,21 @@ export default function WaiterManagement() {
                                             animate={{ opacity: 1, y: 0 }}
                                             transition={{ duration: 0.3 }}
                                             className={`bg-gray-800/50 rounded-md p-2 hover:bg-gray-800 transition-colors text-sm ${
-                                                note.type === 'achievement' ? 'border-l-4 border-yellow-400' :
-                                                note.type === 'incident' ? 'border-l-4 border-red-400' :
-                                                note.type === 'performance' ? 'border-l-4 border-blue-400' :
-                                                note.type === 'training' ? 'border-l-4 border-green-400' :
-                                                note.type === 'punctuality' ? 'border-l-4 border-green-400' :
+                                                note.type === 'logro' ? 'border-l-4 border-yellow-400' :
+                                                note.type === 'incidente' ? 'border-l-4 border-red-400' :
+                                                note.type === 'desempeño' ? 'border-l-4 border-blue-400' :
+                                                note.type === 'entrenamiento' ? 'border-l-4 border-green-400' :
+                                                note.type === 'puntualidad' ? 'border-l-4 border-green-400' :
                                                 'border-l-4 border-gray-400'
                                             }`}
                                         >
                                             <div className="flex justify-between items-start mb-1">
                                               <span className="text-xs font-semibold text-gray-300">{new Date(note.date).toLocaleDateString()}</span>
-                                              <span className={`inline-block px-1 py-0.5 rounded text-xs font-semibold ${note.type === 'achievement' ? 'bg-yellow-600' :
-                                                note.type === 'incident' ? 'bg-red-600' :
-                                                note.type === 'performance' ? 'bg-blue-600' :
-                                                note.type === 'training' ? 'bg-green-600' :
-                                                note.type === 'punctuality' ? 'bg-green-600' :
+                                              <span className={`inline-block px-1 py-0.5 rounded text-xs font-semibold ${note.type === 'logro' ? 'bg-yellow-600' :
+                                                note.type === 'incidente' ? 'bg-red-600' :
+                                                note.type === 'desempeño' ? 'bg-blue-600' :
+                                                note.type === 'entrenamiento' ? 'bg-green-600' :
+                                                note.type === 'puntualidad' ? 'bg-green-600' :
                                                 'bg-gray-600'
                                               }`}>
                                                 {note.type.charAt(0).toUpperCase() + note.type.slice(1)}
@@ -772,7 +772,7 @@ export default function WaiterManagement() {
             </div>
         );
 
-      case 'performance':
+      case 'desempeño':
         return (
           <div className="space-y-4">
             <h4 className="text-lg font-semibold text-white">Rendimiento</h4>
@@ -1121,9 +1121,9 @@ export default function WaiterManagement() {
                           <span>Notas</span>
                         </button>
                         <button
-                          onClick={() => handleTabChange(waiter.id, 'performance')}
+                          onClick={() => handleTabChange(waiter.id, 'desempeño')}
                           className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                            activeTabs[waiter.id] === 'performance' ? 'bg-blue-600' : 'bg-gray-700 hover:bg-gray-600'
+                            activeTabs[waiter.id] === 'desempeño' ? 'bg-blue-600' : 'bg-gray-700 hover:bg-gray-600'
                           }`}
                         >
                           <FaChartLine />
@@ -1276,11 +1276,11 @@ export default function WaiterManagement() {
                     onChange={(e) => setNewNote({ ...newNote, type: e.target.value as any })}
                     className="w-full bg-gray-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="performance">Desempeño</option>
-                    <option value="incident">Incidencia</option>
-                    <option value="punctuality">Puntualidad</option>
-                    <option value="achievement">Logro</option>
-                    <option value="training">Capacitación</option>
+                    <option value="desempeño">Desempeño</option>
+                    <option value="incidente">Incidencia</option>
+                    <option value="puntualidad">Puntualidad</option>
+                    <option value="logro">Logro</option>
+                    <option value="entrenamiento">Capacitación</option>
                     <option value="general">General</option>
                   </select>
                 </div>
