@@ -68,12 +68,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#1a1a1a] flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
-          <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-          </svg>
+          <svg className="w-12 h-12 text-gray-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.538 2.639C17.932 2.094 18 1 18 1H2s.068 1.094.462 1.639L9 11v6H7c-2 0-2 2-2 2h10s0-2-2-2h-2v-6l6.538-8.361zM9.4 6a1.599 1.599 0 1 1 3.2 0 1.6 1.6 0 0 1-3.2 0z"/></svg>
         </div>
         <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
           BunkerHouse
@@ -84,7 +82,7 @@ export default function LoginPage() {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-gray-800 py-8 px-4 shadow-xl sm:rounded-lg sm:px-10 border border-gray-700">
+        <div className="bg-[#2a2a2a] py-8 px-4 shadow-xl sm:rounded-lg sm:px-10 border border-[#3a3a3a]">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
               <div className="bg-red-900/50 border border-red-800 text-red-200 px-4 py-3 rounded-lg flex items-center" role="alert">
@@ -113,7 +111,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={isLoading} // Deshabilitar input mientras carga
-                  className="appearance-none block w-full pl-10 px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent sm:text-sm text-white"
+                  className="appearance-none block w-full pl-10 px-3 py-2 bg-[#3a3a3a] border border-[#4a4a4a] rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5a5a5a] focus:border-transparent sm:text-sm text-white"
                   placeholder="admin@example.com"
                 />
               </div>
@@ -138,7 +136,7 @@ export default function LoginPage() {
                   value={password}
                   disabled={isLoading} // Deshabilitar input mientras carga
                   onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none block w-full pl-10 px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent sm:text-sm text-white"
+                  className="appearance-none block w-full pl-10 px-3 py-2 bg-[#3a3a3a] border border-[#4a4a4a] rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5a5a5a] focus:border-transparent sm:text-sm text-white"
                   placeholder="••••••••"
                 />
               </div>
@@ -148,7 +146,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isLoading} // Deshabilitar botón mientras carga
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 focus:ring-offset-gray-800 transition-colors duration-200 disabled:opacity-50"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-[#3a3a3a] hover:bg-[#4a4a4a] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5a5a5a] focus:ring-offset-[#1a1a1a] transition-colors duration-200 disabled:opacity-50"
               >
                 {isLoading ? (
                   <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

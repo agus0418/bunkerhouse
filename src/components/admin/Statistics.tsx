@@ -51,13 +51,23 @@ export default function Statistics() {
         bebidas: [...new Set(products.filter(p => p.type === 'BEBIDAS').map(p => p.category))].length
       },
       totalRatings: products.reduce((sum, p) => sum + (p.ratings?.length || 0), 0),
-      averageRating: products.reduce((sum, p) => sum + (p.averageRating || 0), 0) / products.length || 0
+      averageRating: (() => {
+        const productsWithRatings = products.filter(p => p.ratings && p.ratings.length > 0);
+        return productsWithRatings.length > 0
+          ? productsWithRatings.reduce((sum, p) => sum + (p.averageRating || 0), 0) / productsWithRatings.length
+          : 0;
+      })()
     },
     waiters: {
       total: waiters.length,
       active: waiters.filter(w => w.isActive).length,
       totalRatings: waiters.reduce((sum, w) => sum + (w.ratings?.length || 0), 0),
-      averageRating: waiters.reduce((sum, w) => sum + (w.averageRating || 0), 0) / waiters.length || 0
+      averageRating: (() => {
+        const waitersWithRatings = waiters.filter(w => w.ratings && w.ratings.length > 0);
+        return waitersWithRatings.length > 0
+          ? waitersWithRatings.reduce((sum, w) => sum + (w.averageRating || 0), 0) / waitersWithRatings.length
+          : 0;
+      })()
     }
   };
 

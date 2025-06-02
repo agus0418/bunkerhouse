@@ -8,6 +8,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Lato', 'sans-serif'],
+      },
       keyframes: {
         'ken-burns': {
           '0%': { transform: 'scale(1)' },
