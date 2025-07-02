@@ -137,24 +137,24 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-black text-white">
+    <main className="min-h-screen elegant-menu-bg text-white">
       <header className="relative z-10">
         <ImageCarousel heightClass="h-[200px] sm:h-[250px] md:h-[300px] lg:h-[350px]" />
         <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-center p-4">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight uppercase">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight uppercase drop-shadow-2xl">
             Bunkerhouse
           </h1>
           <div className="mt-8 flex flex-row items-center justify-center space-x-4 sm:space-x-6">
             <button
               onClick={() => handleTabClick('COMIDAS')}
-              className={`px-8 py-3 rounded-md text-lg font-medium transition-colors duration-300 flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black ${activeTab === 'COMIDAS' ? 'bg-white text-black focus:ring-white' : 'bg-white/20 hover:bg-white/30 text-white focus:ring-white/50'}`}
+              className={`elegant-button px-8 py-3 rounded-md text-lg font-medium flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-transparent ${activeTab === 'COMIDAS' ? 'bg-white text-black focus:ring-white' : 'text-white focus:ring-white/50'}`}
             >
               <FaUtensils />
               <span>Comidas</span>
             </button>
             <button
               onClick={() => handleTabClick('BEBIDAS')}
-              className={`px-8 py-3 rounded-md text-lg font-medium transition-colors duration-300 flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black ${activeTab === 'BEBIDAS' ? 'bg-white text-black focus:ring-white' : 'bg-white/20 hover:bg-white/30 text-white focus:ring-white/50'}`}
+              className={`elegant-button px-8 py-3 rounded-md text-lg font-medium flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-transparent ${activeTab === 'BEBIDAS' ? 'bg-white text-black focus:ring-white' : 'text-white focus:ring-white/50'}`}
             >
               <FaGlassMartiniAlt />
               <span>Bebidas</span>
@@ -163,16 +163,16 @@ export default function Home() {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 menu-content">
         {Object.entries(filteredProducts).map(([mainCategoryKey, subCategoriesObject]) => (
           (isMobileView || activeTab === mainCategoryKey) && (
             <section key={mainCategoryKey} id={mainCategoryKey.toLowerCase()} className="mb-16">
               <div className="relative mb-10">
                 <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                  <div className="w-full border-t border-gray-700"></div>
+                  <div className="w-full elegant-divider"></div>
                 </div>
                 <div className="relative flex justify-center">
-                  <span className="px-6 py-3 bg-black text-3xl font-bold border-2 border-gray-700 rounded-lg shadow-xl flex items-center space-x-3">
+                  <span className="elegant-category-title px-6 py-3 text-3xl font-bold rounded-lg shadow-xl flex items-center space-x-3">
                     {mainCategoryKey === 'COMIDAS' ? <FaUtensils className="text-2xl" /> : <FaGlassMartiniAlt className="text-2xl" />}
                     <span>{mainCategoryKey}</span>
                   </span>
@@ -185,9 +185,11 @@ export default function Home() {
                 }
 
                 return (
-                  <div key={subCategoryKey} className="mb-12">
-                    <h3 className="text-2xl font-semibold text-gray-200 mb-6 pb-2 ml-1 capitalize border-b-2 border-gray-800 inline-block">
+                  <div key={subCategoryKey} className="mb-12 elegant-section-bg p-6">
+                    <h3 className="text-2xl font-semibold text-gray-200 mb-6 pb-3 ml-1 capitalize relative">
                       {subCategoryKey}
+                      <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gray-400 to-transparent"></div>
+                      <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-400 rounded-full -mb-1"></div>
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
                       {productsInSubCategory.map((product) => (

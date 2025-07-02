@@ -54,7 +54,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onRatingSubmit }) =>
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-black/40 backdrop-blur-sm rounded-xl overflow-hidden hover:bg-black/60 transition-all duration-300 group border border-gray-900 hover:border-gray-800 hover:shadow-xl hover:shadow-black/20 hover:-translate-y-1"
+      className="elegant-product-card rounded-xl overflow-hidden group"
     >
       <div className="relative">
         <div className="flex items-start p-4 gap-4">
