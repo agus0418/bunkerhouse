@@ -233,7 +233,7 @@ export default function Home() {
         
         <div className="relative z-10 h-full flex flex-col items-center justify-center text-center p-4">
           <div className="mb-8 animate-fade-in-up">
-            <div className="inline-block p-4 rounded-full bg-white/15 backdrop-blur-sm mb-6 border border-white/20">
+            <div className="inline-block p-4 rounded-full bg-white/15 backdrop-blur-sm mb-6">
               <FaUtensils className="text-4xl text-white" />
             </div>
             
@@ -263,7 +263,7 @@ export default function Home() {
               className={`modern-button group px-10 py-4 rounded-2xl text-lg font-semibold flex items-center space-x-3 focus:outline-none transition-all duration-500 transform hover:scale-105 active:scale-95 ${
                 activeTab === 'COMIDAS' 
                   ? 'bg-white text-black shadow-2xl shadow-black/30' 
-                  : 'bg-white/10 backdrop-blur-sm text-white border border-white/30 hover:bg-white/20 hover:border-white/50'
+                  : 'bg-white/10 backdrop-blur-sm text-white hover:bg-white/20'
               }`}
               aria-label="Ir a sección de comidas"
             >
@@ -276,7 +276,7 @@ export default function Home() {
               className={`modern-button group px-10 py-4 rounded-2xl text-lg font-semibold flex items-center space-x-3 focus:outline-none transition-all duration-500 transform hover:scale-105 active:scale-95 ${
                 activeTab === 'BEBIDAS' 
                   ? 'bg-white text-black shadow-2xl shadow-black/30' 
-                  : 'bg-white/10 backdrop-blur-sm text-white border border-white/30 hover:bg-white/20 hover:border-white/50'
+                  : 'bg-white/10 backdrop-blur-sm text-white hover:bg-white/20'
               }`}
               aria-label="Ir a sección de bebidas"
             >
@@ -304,7 +304,7 @@ export default function Home() {
                   <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-400/50 to-transparent"></div>
                 </div>
                 <div className="relative flex justify-center">
-                  <div className="elegant-category-title px-8 py-4 bg-gradient-to-r from-black/90 to-gray-900/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-700/50 flex items-center space-x-4 group hover:scale-105 transition-all duration-500">
+                  <div className="elegant-category-title px-8 py-4 bg-gradient-to-r from-black/90 to-gray-900/90 backdrop-blur-xl rounded-2xl shadow-2xl flex items-center space-x-4 group hover:scale-105 transition-all duration-500">
                     <div className="p-2 rounded-full bg-gradient-to-r from-gray-600 to-gray-800 group-hover:from-white group-hover:to-gray-200 transition-all duration-300">
                       {mainCategoryKey === 'COMIDAS' ? 
                         <FaUtensils className="text-2xl text-white group-hover:text-black transition-colors duration-300" /> : 
@@ -325,9 +325,9 @@ export default function Home() {
                 }
 
                 return (
-                  <div key={subCategoryKey} className="mb-16 p-8 rounded-3xl bg-gradient-to-br from-black/40 via-gray-900/50 to-black/40 backdrop-blur-xl border border-gray-700/30 shadow-2xl">
+                  <div key={subCategoryKey} className="mb-16 p-8 rounded-3xl bg-gradient-to-br from-black/40 via-gray-900/50 to-black/40 backdrop-blur-xl shadow-2xl">
                     <div className="flex items-center justify-center mb-8">
-                      <div className="flex items-center space-x-4 px-6 py-3 bg-gradient-to-r from-gray-800/80 to-gray-900/80 rounded-full border border-gray-600/50">
+                      <div className="flex items-center space-x-4 px-6 py-3 bg-gradient-to-r from-gray-800/80 to-gray-900/80 rounded-full">
                         <div className="w-3 h-3 rounded-full bg-gradient-to-r from-gray-400 to-white animate-pulse"></div>
                         <h3 className="subcategory-title text-lg font-bold text-white capitalize tracking-wide">
                           {subCategoryKey}

@@ -195,8 +195,7 @@ body {
   transform: translateY(-12px) scale(1.015);
   box-shadow: 
     0 35px 60px rgba(0, 0, 0, 0.9),
-    0 0 40px rgba(255, 255, 255, 0.08),
-    inset 0 2px 0 rgba(255, 255, 255, 0.1);
+    0 0 40px rgba(255, 255, 255, 0.08);
 }
 
 /* Tarjetas de productos premium (fallback) */
@@ -302,15 +301,8 @@ body {
   line-height: 1.3;
 }
 
-.product-description {
-  font-family: 'Maxwell Regular', 'Lato', sans-serif;
-  font-size: 0.95rem;
-  line-height: 1.6;
-  font-weight: 400;
-}
-
 .product-price {
-  font-family: 'Maxwell Regular', 'Bonaro Clean', 'Newry Demo', serif;
+  font-family: 'Maxwell Regular', 'Lato', 'sans-serif', serif;
   font-weight: 700;
   font-size: 1.8rem;
   letter-spacing: 0.05em;
@@ -318,7 +310,7 @@ body {
 
 .subcategory-title {
   font-family: 'Maxwell Regular', 'Bonaro Clean', 'Newry Demo', serif;
-  font-size: 1.5rem;
+  font-size: 1.65rem;
   font-weight: 400;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -391,18 +383,9 @@ body {
     transform: translateY(-6px) scale(1.01);
   }
 
-  .magazine-product-card .flex {
-    flex-direction: column;
-    min-height: auto;
-  }
-
-  .magazine-product-card .w-48 {
-    width: 100%;
-    height: 200px;
-  }
-
-  .magazine-product-card .flex-1 {
-    padding: 20px;
+  /* Mejoras para el contenido en móvil */
+  .magazine-product-card {
+    margin: 0 8px 16px 8px;
   }
 
   .modern-button {
@@ -443,6 +426,10 @@ body {
     margin-bottom: 1rem;
   }
 
+  .magazine-product-card {
+    margin: 0 4px 12px 4px;
+  }
+
   .elegant-category-title {
     padding: 12px 20px;
     font-size: 1.1rem;
@@ -454,6 +441,15 @@ body {
 
   .hero-section {
     height: 70vh !important;
+  }
+
+  /* Mejoras de espaciado para secciones */
+  .mb-16 {
+    margin-bottom: 2rem !important;
+  }
+
+  .p-8 {
+    padding: 1rem !important;
   }
 }
 
@@ -527,10 +523,11 @@ body {
 }
 
 .product-description {
-  font-family: 'Bonaro Clean', 'Newry Demo', serif;
-  font-size: 0.8rem;
+  font-family: 'Maxwell Regular', 'Lato', sans-serif;
+  font-size: 0.95rem;
   letter-spacing: 0.01em;
   font-weight: 400;
+  line-height: 1.6;
 }
 
 /* Hero Section Styles */
