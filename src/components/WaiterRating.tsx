@@ -205,7 +205,7 @@ export const WaiterRatingComponent: React.FC<WaiterRatingProps> = ({ waiter, onR
             </div>
           )}
           <div>
-            <h3 className="text-xl font-semibold text-white">{waiter.name}</h3>
+            <h3 className="waiter-name text-xl font-semibold text-white">{waiter.name}</h3>
             <div className="flex items-center gap-2 text-gray-400">
               <FaStar className="text-yellow-400" />
               <span>{waiter.averageRating?.toFixed(1) || '0.0'}</span>
@@ -406,4 +406,4 @@ export const WaiterRatingComponent: React.FC<WaiterRatingProps> = ({ waiter, onR
       </form>
     </div>
   );
-}; 
+};

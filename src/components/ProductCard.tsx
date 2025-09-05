@@ -52,77 +52,122 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onRatingSubmit }) =>
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
-      className="elegant-product-card rounded-xl overflow-hidden group"
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className="magazine-product-card group relative"
     >
-      <div className="relative">
-        <div className="flex items-start p-4 gap-4">
-          <div className="relative h-20 w-20 flex-shrink-0 rounded-lg overflow-hidden group-hover:ring-2 group-hover:ring-gray-800 transition-all duration-300 bg-gray-800">
+      {/* Efecto de brillo en hover */}
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/3 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1200"></div>
+      </div>
+
+      <div className="relative backdrop-blur-xl bg-gradient-to-br from-black/85 via-gray-900/95 to-black/85 border border-gray-600/30 group-hover:border-gray-500/50 transition-all duration-700 rounded-3xl overflow-hidden shadow-2xl">
+        
+        <div className="flex items-stretch min-h-[180px]">
+          {/* Imagen del producto - Estilo revista */}
+          <div className="relative w-48 flex-shrink-0 bg-gradient-to-br from-gray-800 to-gray-900">
             {!imageError && localProduct.image ? (
               <Image
                 src={localProduct.image}
                 alt={localProduct.name}
                 fill
-                className="object-cover transition-transform duration-500 group-hover:scale-110"
-                sizes="80px"
+                className="object-cover transition-all duration-700 group-hover:scale-105 group-hover:brightness-110"
+                sizes="192px"
                 onError={() => setImageError(true)}
               />
             ) : (
-              <div className="absolute inset-0 flex items-center justify-center text-gray-600">
-                <FaImage size={24} />
+              <div className="absolute inset-0 flex items-center justify-center text-gray-500">
+                <FaImage size={40} />
               </div>
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            
+            {/* Overlay elegante */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/20 group-hover:to-black/10 transition-all duration-700" />
+            
+            {/* Número decorativo */}
+            <div className="absolute top-4 left-4 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center">
+              <span className="text-xs font-bold text-gray-800">#{Math.floor(Math.random() * 99) + 1}</span>
+            </div>
           </div>
-          <div className="flex-grow min-w-0">
-            <h3 className="text-lg font-semibold text-white mb-1 tracking-wide group-hover:text-gray-200 transition-colors duration-300">
-              {localProduct.name}
-            </h3>
-            {localProduct.description && (
-              <div className="flex items-start gap-2 mb-2">
-                <FaInfoCircle className="text-gray-400 mt-1 flex-shrink-0" />
-                <p className="text-sm text-gray-400 line-clamp-2">
-                  {localProduct.description}
-                </p>
+
+          {/* Contenido del producto - Estilo revista premium */}
+          <div className="flex-1 p-8 flex flex-col justify-between">
+            
+            {/* Header del producto */}
+            <div className="mb-6">
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex-1">
+                  <h3 className="product-name text-xl font-bold text-white leading-tight tracking-wide group-hover:text-gray-100 transition-colors duration-500">
+                    {localProduct.name}
+                  </h3>
+                  
+                  {/* Línea decorativa */}
+                  <div className="w-16 h-0.5 bg-gradient-to-r from-gray-400 to-transparent mt-2 group-hover:w-24 transition-all duration-500"></div>
+                </div>
+                
+                {/* Rating badge elegante */}
+                <div 
+                  className="bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-2 cursor-pointer hover:bg-white hover:shadow-lg transition-all duration-300 ml-4"
+                  onClick={() => setShowRating(true)}
+                >
+                  <FaStar className="text-yellow-500" size={14} />
+                  <span className="text-sm font-bold text-gray-800">
+                    {localProduct.averageRating?.toFixed(1) || '0.0'}
+                  </span>
+                  <span className="text-xs text-gray-600">
+                    ({localProduct.ratings?.length || 0})
+                  </span>
+                </div>
               </div>
-            )}
-            {localProduct.variations && localProduct.variations.length > 0 ? (
-              <div className="space-y-1">
-                {localProduct.variations.map((variation) => (
-                  <div key={variation.id} className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <FaTag className="text-gray-400 text-sm" />
-                      <span className="text-sm text-gray-300">{variation.name}</span>
+              
+              {/* Descripción elegante */}
+              {localProduct.description && (
+                <div className="mb-4">
+                  <p className="product-description text-gray-300 text-base leading-relaxed group-hover:text-gray-200 transition-colors duration-500 font-light">
+                    {localProduct.description}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Sección de precios premium */}
+            <div className="space-y-3">
+              {localProduct.variations && localProduct.variations.length > 0 ? (
+                <div className="space-y-3">
+                  <div className="text-xs uppercase tracking-widest text-gray-400 font-medium mb-3">Opciones Disponibles</div>
+                  {localProduct.variations.map((variation, index) => (
+                    <div key={variation.id} className="flex justify-between items-center py-2 border-b border-gray-700/50 last:border-b-0">
+                      <div className="flex items-center gap-3">
+                        <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-gray-400 to-white"></div>
+                        <span className="text-gray-300 font-medium tracking-wide">{variation.name}</span>
+                      </div>
+                                          <span className="product-price text-lg font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent tracking-wider">
+                      ${variation.price}
+                    </span>
                     </div>
-                    <span className="text-sm font-semibold text-white">${variation.price}</span>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex justify-between items-end">
+                  <div>
+                    <div className="text-xs uppercase tracking-widest text-gray-400 font-medium mb-1">Precio</div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-gradient-to-r from-gray-400 to-white"></div>
+                      <span className="text-gray-400 text-sm">Precio único</span>
+                    </div>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-xl font-bold text-white tracking-wider group-hover:text-gray-200 transition-colors duration-300">
-                ${localProduct.price}
-              </p>
-            )}
+                  <p className="product-price text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent tracking-wider">
+                    ${localProduct.price}
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Rating overlay */}
-        <div 
-          className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-2 cursor-pointer hover:bg-white transition-colors duration-300"
-          onClick={() => setShowRating(true)}
-        >
-          <div className="flex items-center gap-1">
-            <FaStar className="text-yellow-400" size={14} />
-            <span className="text-sm font-medium text-gray-700">
-              {localProduct.averageRating?.toFixed(1) || '0.0'}
-            </span>
-          </div>
-          <div className="h-4 w-px bg-gray-300" />
-          <span className="text-xs text-gray-500">
-            {localProduct.ratings?.length || 0}
-          </span>
-        </div>
+        {/* Indicador de hover elegante */}
+        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-white to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-center"></div>
       </div>
 
       <AnimatePresence>
@@ -137,6 +182,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onRatingSubmit }) =>
               <ProductRatingComponent
                 product={localProduct}
                 onRatingSubmit={handleRatingSubmit}
+                onClose={() => setShowRating(false)}
               />
             </div>
           </motion.div>
@@ -146,4 +192,4 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onRatingSubmit }) =>
   );
 };
 
-export default ProductCard; 
+export default ProductCard;
