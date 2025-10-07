@@ -186,9 +186,23 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen elegant-menu-bg text-white">
+    <main className="min-h-screen bg-black w-full relative text-white">
+      {/* Midnight Radial Glow Background */}
+      <div 
+        className="absolute inset-0 z-0" 
+        style={{ 
+          background: ` 
+            radial-gradient(circle at 50% 50%, 
+              rgba(226, 232, 240, 0.2) 0%, 
+              rgba(226, 232, 240, 0.1) 25%, 
+              rgba(226, 232, 240, 0.05) 35%, 
+              transparent 50% 
+            ) 
+          `, 
+        }} 
+      />
       {/* Hero Section Mejorado */}
-      <section className="hero-section relative h-[100vh] overflow-hidden">
+      <section className="hero-section relative z-10 h-[100vh] overflow-hidden">
         <div className="absolute inset-0">
           {/* Fondo con gradiente elegante neutro */}
           <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black"></div>
@@ -254,9 +268,7 @@ export default function Home() {
             </div>
             
             <div className="h-1 w-32 bg-gradient-to-r from-gray-400 via-white to-gray-400 mx-auto rounded-full mb-6"></div>
-            <p className="text-xl sm:text-2xl md:text-3xl text-gray-300 mb-12 max-w-3xl font-light tracking-wide">
-              Experiencia Gastronomica Unica
-            </p>
+      
           </div>
           
           <div className="flex flex-col sm:flex-row items-center justify-center space-y-6 sm:space-y-0 sm:space-x-8">
@@ -270,7 +282,7 @@ export default function Home() {
               aria-label="Ir a sección de comidas"
             >
               <FaUtensils className="text-xl group-hover:rotate-12 transition-transform duration-300" />
-              <span>Comidas</span>
+              <span style={{ fontFamily: "'Mileast', serif" }}>Comidas</span>
               <div className="absolute inset-0 rounded-2xl bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </button>
             <button
@@ -283,7 +295,7 @@ export default function Home() {
               aria-label="Ir a sección de bebidas"
             >
               <FaGlassMartiniAlt className="text-xl group-hover:rotate-12 transition-transform duration-300" />
-              <span>Bebidas</span>
+              <span style={{ fontFamily: "'Mileast', serif" }}>Bebidas</span>
               <div className="absolute inset-0 rounded-2xl bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </button>
           </div>
@@ -297,7 +309,7 @@ export default function Home() {
         </div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 menu-content">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 menu-content">
         {Object.entries(filteredProducts).map(([mainCategoryKey, subCategoriesObject]) => (
           (isMobileView || activeTab === mainCategoryKey) && (
             <section key={mainCategoryKey} id={mainCategoryKey.toLowerCase()} className="mb-16">
