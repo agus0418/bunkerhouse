@@ -9,7 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Lato', 'sans-serif'],
+        sans: ['Montserrat', 'sans-serif'],
       },
       keyframes: {
         'ken-burns': {
@@ -24,4 +24,4 @@ const config: Config = {
   },
   plugins: [],
 }
-export default config 
+export default config

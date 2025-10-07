@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
 
 @font-face {
   font-family: 'Newry Demo';
@@ -33,6 +33,22 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'Mileast';
+  src: url('/fonts/Mileast.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Mileast';
+  src: url('/fonts/Mileast Italic.otf') format('opentype');
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -58,10 +74,9 @@ body {
   font-family: 'Maxwell Regular', 'Lato', sans-serif;
 }
 
-/* Fondo elegante para la carta */
+/* Fondo elegante para la carta - OPTIMIZADO */
 .elegant-menu-bg {
-  background: linear-gradient(135deg, #000000 0%, #1a1a1a 25%, #2d2d2d 50%, #1a1a1a 75%, #000000 100%);
-  background-attachment: fixed;
+  background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
   position: relative;
 }
 
@@ -72,6 +87,12 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.008) 1px, transparent 1px),
+    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.012) 1px, transparent 1px);
+  background-size: 60px 60px, 100px 100px;
+  background-position: 0 0, 50px 50px;
+  opacity: 0.6;
   pointer-events: none;
   z-index: 0;
 }
@@ -83,6 +104,7 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
+  animation: subtleFloat 15s ease-in-out infinite;
   pointer-events: none;
   z-index: 0;
 }
@@ -93,36 +115,36 @@ body {
   z-index: 1;
 }
 
-/* Sección elegante para categorías */
+/* Sección elegante para categorías - OPTIMIZADA */
 .elegant-section-bg {
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
   box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: all 0.3s ease;
 }
 
-/* Título de categoría elegante */
+/* Título de categoría elegante - OPTIMIZADO */
 .elegant-category-title {
   background: 
-    linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(17, 24, 39, 0.9) 100%);
-  border: 2px solid;
-  border-image: linear-gradient(135deg, rgba(156, 163, 175, 0.3), rgba(75, 85, 99, 0.5)) 1;
+    linear-gradient(135deg, rgba(0, 0, 0, 0.85) 0%, rgba(17, 24, 39, 0.9) 100%);
+  border: 2px solid rgba(156, 163, 175, 0.2);
   box-shadow: 
-    0 4px 20px rgba(0, 0, 0, 0.4),
+    0 4px 20px rgba(0, 0, 0, 0.5),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
 }
 
-/* Separador elegante */
+/* Separador elegante - SIMPLIFICADO */
 .elegant-divider {
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(156, 163, 175, 0.3) 20%,
-    rgba(156, 163, 175, 0.6) 50%,
-    rgba(156, 163, 175, 0.3) 80%,
+    rgba(156, 163, 175, 0.4) 50%,
     transparent 100%
   );
   height: 1px;
@@ -132,85 +154,67 @@ body {
 .elegant-divider::before {
   content: '';
   position: absolute;
-  top: -1px;
+  top: -2px;
   left: 50%;
   transform: translateX(-50%);
   width: 4px;
   height: 4px;
-  background: rgba(156, 163, 175, 0.8);
+  background: rgba(156, 163, 175, 0.6);
   border-radius: 50%;
-  box-shadow: 
-    -20px 0 0 rgba(156, 163, 175, 0.4),
-    20px 0 0 rgba(156, 163, 175, 0.4);
 }
 
-/* Botones elegantes */
+/* Botones elegantes - OPTIMIZADOS */
 .elegant-button {
   background: 
-    linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+    linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.06) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  overflow: hidden;
-}
-
-.elegant-button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.1) 50%,
-    transparent 100%
-  );
-  transition: left 0.5s ease;
-}
-
-.elegant-button:hover::before {
-  left: 100%;
 }
 
 .elegant-button:hover {
   background: 
-    linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%);
-  border-color: rgba(255, 255, 255, 0.2);
+    linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.1) 100%);
+  border-color: rgba(255, 255, 255, 0.25);
   box-shadow: 
-    0 8px 25px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    0 8px 25px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
 }
 
-/* Tarjetas de productos estilo revista */
+/* Tarjetas de productos estilo revista - OPTIMIZADAS */
 .magazine-product-card {
-  transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: 'Mileast', 'Montserrat', 'Maxwell Regular', 'Bonaro Clean', 'Newry Demo', serif;
+  transition: none;
   position: relative;
   overflow: hidden;
+  will-change: transform;
+  transform-origin: center;
 }
 
 .magazine-product-card:hover {
-  transform: translateY(-12px) scale(1.015);
-  box-shadow: 
-    0 35px 60px rgba(0, 0, 0, 0.9),
-    0 0 40px rgba(255, 255, 255, 0.08);
+  transform: none;
+  box-shadow: none;
+}
+
+/* Efecto de escala sutil para imágenes */
+.group:hover .group-hover\:scale-103 {
+  transform: scale(1.03);
 }
 
 /* Tarjetas de productos premium (fallback) */
 .premium-product-card {
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: none;
   position: relative;
   overflow: hidden;
+  will-change: transform;
+  transform-origin: center;
 }
 
 .premium-product-card:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: 
-    0 25px 50px rgba(0, 0, 0, 0.8),
-    0 0 30px rgba(255, 255, 255, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transform: none;
+  box-shadow: none;
 }
 
 /* Tarjetas de productos elegantes (fallback) */
@@ -294,16 +298,17 @@ body {
 }
 
 .product-name {
-  font-family: 'Maxwell Regular', 'Bonaro Clean', 'Newry Demo', serif;
-  font-weight: 600;
+  font-family: 'Mileast', 'Montserrat', 'Maxwell Regular', 'Bonaro Clean', 'Newry Demo', serif;
+  font-weight: 700;
   font-size: 1.75rem;
   letter-spacing: 0.02em;
   line-height: 1.3;
+  text-transform: uppercase;
 }
 
 .product-price {
-  font-family: 'Maxwell Regular', 'Lato', 'sans-serif', serif;
-  font-weight: 700;
+  font-family: 'Mileast', 'Montserrat', 'Maxwell Regular', 'Lato', 'sans-serif', serif;
+  font-weight: 600;
   font-size: 1.8rem;
   letter-spacing: 0.05em;
 }
@@ -373,14 +378,6 @@ body {
   .main-title {
     font-size: 2.5rem;
     letter-spacing: 0.04em;
-  }
-
-  .premium-product-card:hover {
-    transform: translateY(-4px) scale(1.01);
-  }
-
-  .magazine-product-card:hover {
-    transform: translateY(-6px) scale(1.01);
   }
 
   /* Mejoras para el contenido en móvil */
@@ -476,14 +473,14 @@ body {
 }
 
 .subcategory-title {
-  font-family: 'Bonaro Stamp', 'Newry Demo', serif;
+  font-family: 'Mileast', 'Bonaro Stamp', 'Newry Demo', serif;
   font-size: 1.8rem;
   letter-spacing: 0.03em;
   font-weight: 400;
 }
 
 .elegant-category-title {
-  font-family: 'Bonaro Stamp', 'Newry Demo', serif;
+  font-family: 'Mileast', 'Bonaro Stamp', 'Newry Demo', serif;
   font-size: 2.5rem;
   letter-spacing: 0.03em;
   font-weight: 400;
@@ -491,22 +488,24 @@ body {
 
 /* Elementos con fuente Maxwell para precios */
 .product-price {
-  font-family: 'Maxwell Regular', 'Bonaro Clean', 'Newry Demo', serif;
-  font-size: 1.5rem;
-  letter-spacing: 0.02em;
+  font-family: 'Mileast', 'Montserrat', 'Maxwell Regular', 'Bonaro Clean', 'Newry Demo', serif;
+  font-size: 2rem;
+  letter-spacing: 0.05em;
   font-weight: 700;
+  line-height: 1.3;
 }
 
 .menu-accent {
-  font-family: 'Bonaro Stamp', 'Newry Demo', serif;
+  font-family: 'Mileast', 'Bonaro Stamp', 'Newry Demo', serif;
   letter-spacing: 0.02em;
   font-weight: 400;
 }
 
 .decorative-text {
-  font-family: 'Maxwell Regular', 'Bonaro Clean', 'Newry Demo', serif;
+  font-family: 'Mileast', 'Maxwell Regular', 'Bonaro Clean', 'Newry Demo', serif;
   letter-spacing: 0.02em;
   font-weight: 400;
+  font-style: italic;
 }
 
 .waiter-name {
@@ -523,11 +522,18 @@ body {
 }
 
 .product-description {
-  font-family: 'Maxwell Regular', 'Lato', sans-serif;
-  font-size: 0.95rem;
-  letter-spacing: 0.01em;
-  font-weight: 400;
-  line-height: 1.6;
+  font-family: 'Mileast', 'Montserrat', 'Maxwell Regular', 'Lato', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.015em;
+  font-weight: 500;
+  font-style: italic;
+  line-height: 1.75;
+}
+
+.product-variation {
+  font-family: 'Mileast', 'Montserrat', 'Maxwell Regular', 'Lato', sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.02em;
 }
 
 /* Hero Section Styles */
@@ -567,14 +573,21 @@ body {
   
   .product-name {
     font-size: 1.5rem;
+    font-weight: 700;
   }
   
   .product-description {
-    font-size: 0.9rem;
+    font-size: 1.05rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    line-height: 1.7;
   }
   
   .product-price {
-    font-size: 1.3rem;
+    font-size: 1.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 1.25;
   }
   
   .subcategory-title {
@@ -587,11 +600,7 @@ body {
   }
 }
 
-/* Efecto sutil de brillo en el título */
-.elegant-category-title {
-  position: relative;
-}
-
+/* Efecto sutil de brillo en el título - OPTIMIZADO */
 .elegant-category-title::after {
   content: '';
   position: absolute;
@@ -602,11 +611,11 @@ body {
   background: linear-gradient(
     45deg,
     transparent 30%,
-    rgba(255, 255, 255, 0.05) 50%,
+    rgba(255, 255, 255, 0.08) 50%,
     transparent 70%
   );
   transform: translateX(-100%);
-  transition: transform 0.6s ease;
+  transition: transform 0.8s ease;
 }
 
 .elegant-category-title:hover::after {
@@ -627,15 +636,10 @@ body {
   }
 }
 
-/* Animación sutil para el fondo */
-@keyframes floating {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  33% { transform: translateY(-10px) rotate(1deg); }
-  66% { transform: translateY(5px) rotate(-1deg); }
-}
-
-.elegant-menu-bg::after {
-  animation: floating 20s ease-in-out infinite;
+/* Animación sutil para el fondo - OPTIMIZADA */
+@keyframes subtleFloat {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
 }
 
 /* Efecto de partículas decorativas */
@@ -656,9 +660,17 @@ body {
   z-index: -1;
 }
 
-/* Efecto de brillo sutil en hover para las secciones */
+/* Efecto de brillo sutil en hover para las secciones - OPTIMIZADO */
 .elegant-section-bg:hover {
-  background: rgba(0, 0, 0, 0.35);
-  border-color: rgba(255, 255, 255, 0.08);
-  transition: all 0.3s ease;
+  background: rgba(0, 0, 0, 0.45);
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px);
+}
+
+/* Clase para texto secundario con Mileast Italic */
+.mileast-italic-text {
+  font-family: 'Mileast', 'Montserrat', 'Maxwell Regular', serif;
+  font-style: italic;
+  letter-spacing: 0.015em;
+  font-weight: 400;
 }

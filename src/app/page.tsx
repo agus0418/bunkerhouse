@@ -199,12 +199,14 @@ export default function Home() {
               className="bg-cover bg-center bg-no-repeat transform hover:scale-105 transition-transform duration-700"
               style={{
                 backgroundImage: 'url("/images/6A4A2169.jpg")',
+                filter: 'blur(3px)',
               }}
             ></div>
             <div 
               className="bg-cover bg-center bg-no-repeat transform hover:scale-105 transition-transform duration-700"
               style={{
                 backgroundImage: 'url("/images/6A4A2176.jpg")',
+                filter: 'blur(3px)',
               }}
             ></div>
             <div 
@@ -224,10 +226,10 @@ export default function Home() {
           {/* Overlay con gradiente elegante */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/70 to-black/90"></div>
           
-          {/* Efectos de luz sutiles */}
-          <div className="absolute top-0 left-0 w-full h-full">
-            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-white/5 rounded-full blur-3xl animate-pulse"></div>
-            <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gray-500/8 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          {/* Efectos de luz sutiles y optimizados */}
+          <div className="absolute inset-0">
+            <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-white/3 rounded-full blur-3xl opacity-60"></div>
+            <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-amber-500/5 rounded-full blur-3xl opacity-40"></div>
           </div>
         </div>
         

@@ -1,13 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import localFont from "next/font/local";
 import ClientLayout from "./client-layout";
 import { Toaster } from 'react-hot-toast';
-
-const burgerFont = localFont({
-  src: "../../public/fonts/burger_free/Burger Free.ttf",
-  variable: "--font-burger"
-});
 
 export const metadata: Metadata = {
   title: "BunkerHouse - Menú Digital",
@@ -21,7 +15,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" suppressHydrationWarning>
-      <body className={burgerFont.className} suppressHydrationWarning>
+      <body className="font-sans" suppressHydrationWarning>
         <ClientLayout>
           {children}
         </ClientLayout>

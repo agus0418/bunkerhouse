@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { Product } from '@/types/firebase';
-import { FaTag, FaInfoCircle, FaStar, FaImage } from 'react-icons/fa';
-import RatingStars from './RatingStars';
+import { FaStar, FaImage } from 'react-icons/fa';
 import ProductRatingComponent from './ProductRating';
-import { motion, AnimatePresence } from 'framer-motion';
 
 interface ProductCardProps {
   product: Product;
@@ -51,19 +49,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onRatingSubmit }) =>
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-      className="magazine-product-card group relative"
-    >
-      {/* Efecto de brillo en hover */}
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/3 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1200"></div>
-      </div>
-
-      <div className="relative backdrop-blur-xl bg-gradient-to-br from-black/85 via-gray-900/95 to-black/85 transition-all duration-700 rounded-3xl overflow-hidden shadow-2xl">
-        
+    <div className="magazine-product-card group relative" style={{ fontFamily: "'Mileast', 'Montserrat', 'Maxwell Regular', 'Bonaro Clean', 'Newry Demo', serif" }}>
+      <div className="relative backdrop-blur-xl bg-gradient-to-br from-black/85 via-gray-900/95 to-black/85 rounded-3xl overflow-hidden shadow-2xl">
         <div className="flex items-stretch min-h-[180px] md:flex-row flex-col">
           {/* Imagen del producto - Estilo revista */}
           <div className="relative w-full md:w-48 h-48 md:h-auto md:flex-shrink-0 bg-gradient-to-br from-gray-800 to-gray-900">
@@ -72,7 +59,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onRatingSubmit }) =>
                 src={localProduct.image}
                 alt={localProduct.name}
                 fill
-                className="object-cover transition-all duration-700 group-hover:scale-105 group-hover:brightness-110"
+                className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                 sizes="192px"
                 onError={() => setImageError(true)}
               />
@@ -81,14 +68,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onRatingSubmit }) =>
                 <FaImage size={40} />
               </div>
             )}
-            
-            {/* Overlay elegante */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/20 group-hover:to-black/10 transition-all duration-700" />
-            
-            {/* Número decorativo */}
-            <div className="absolute top-4 left-4 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center">
-              <span className="text-xs font-bold text-gray-800">#{Math.floor(Math.random() * 99) + 1}</span>
-            </div>
           </div>
 
           {/* Contenido del producto - Estilo revista premium */}
@@ -98,17 +77,17 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onRatingSubmit }) =>
             <div className="mb-3 md:mb-6">
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
-                  <h3 className="product-name text-xl font-bold text-white leading-tight tracking-wide group-hover:text-gray-100 transition-colors duration-500">
+                  <h3 className="product-name text-xl font-bold text-white leading-tight tracking-wide">
                     {localProduct.name}
                   </h3>
                   
                   {/* Línea decorativa */}
-                  <div className="w-16 h-0.5 bg-gradient-to-r from-gray-400 to-transparent mt-2 group-hover:w-24 transition-all duration-500"></div>
+                  <div className="w-16 h-0.5 bg-gradient-to-r from-gray-400 to-transparent mt-2"></div>
                 </div>
                 
                 {/* Rating badge elegante */}
                 <div 
-                  className="bg-white/95 backdrop-blur-sm px-2 md:px-3 py-1 md:py-1.5 rounded-full flex items-center gap-1 md:gap-2 cursor-pointer hover:bg-white hover:shadow-lg transition-all duration-300 ml-2 md:ml-4 flex-shrink-0"
+                  className="bg-white/95 backdrop-blur-sm px-2 md:px-3 py-1 md:py-1.5 rounded-full flex items-center gap-1 md:gap-2 cursor-pointer ml-2 md:ml-4 flex-shrink-0"
                   onClick={() => setShowRating(true)}
                 >
                   <FaStar className="text-yellow-500" size={12} />
@@ -124,7 +103,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onRatingSubmit }) =>
               {/* Descripción elegante */}
               {localProduct.description && (
                 <div className="mb-4">
-                  <p className="product-description text-gray-300 text-base leading-relaxed group-hover:text-gray-200 transition-colors duration-500 font-light">
+                  <p className="product-description text-gray-300 text-base leading-relaxed font-light">
                     {localProduct.description}
                   </p>
                 </div>
@@ -140,7 +119,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onRatingSubmit }) =>
                     <div key={variation.id} className="flex justify-between items-center py-2">
                       <div className="flex items-center gap-3">
                         <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-gray-400 to-white"></div>
-                        <span className="text-gray-300 font-medium tracking-wide">{variation.name}</span>
+                        <span className="product-variation text-gray-300">{variation.name}</span>
                       </div>
                                           <span className="product-price text-lg font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent tracking-wider">
                       ${variation.price}
@@ -168,25 +147,16 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onRatingSubmit }) =>
 
       </div>
 
-      <AnimatePresence>
-        {showRating && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className=""
-          >
-            <div className="p-4">
-              <ProductRatingComponent
-                product={localProduct}
-                onRatingSubmit={handleRatingSubmit}
-                onClose={() => setShowRating(false)}
-              />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
+      {showRating && (
+        <div className="p-4">
+          <ProductRatingComponent
+            product={localProduct}
+            onRatingSubmit={handleRatingSubmit}
+            onClose={() => setShowRating(false)}
+          />
+        </div>
+      )}
+    </div>
   );
 };
 
