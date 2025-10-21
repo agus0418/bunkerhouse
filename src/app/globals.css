@@ -382,16 +382,16 @@ body {
 
   /* Mejoras para el contenido en móvil */
   .magazine-product-card {
-    margin: 0 8px 16px 8px;
+    margin: 0 4px 12px 4px;
   }
 
   .modern-button {
-    padding: 12px 24px;
+    padding: 12px 20px;
     font-size: 1rem;
   }
 
   .elegant-category-title {
-    padding: 16px 24px;
+    padding: 12px 20px;
     font-size: 1.25rem;
   }
 
@@ -400,35 +400,66 @@ body {
   }
 
   .hero-section {
-    height: 80vh !important;
+    height: 85vh !important;
   }
 
   .animate-fade-in-up {
     animation-duration: 0.6s;
   }
+
+  /* Mejorar espaciado en contenedores */
+  .menu-content {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  /* Optimizar tarjetas para móvil */
+  .product-name {
+    font-size: 1.125rem;
+    line-height: 1.4;
+  }
+
+  .product-description {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .product-price {
+    font-size: 1.25rem;
+  }
+
+  /* Evitar desbordamiento horizontal */
+  body {
+    overflow-x: hidden;
+  }
+
+  /* Mejorar visibilidad del rating */
+  .bg-white\/95 {
+    background-color: rgba(255, 255, 255, 0.95);
+  }
 }
 
 @media (max-width: 480px) {
   .main-title {
-    font-size: 2rem;
+    font-size: 1.875rem;
     letter-spacing: 0.02em;
   }
 
   .modern-button {
-    padding: 10px 20px;
-    font-size: 0.9rem;
+    padding: 10px 16px;
+    font-size: 0.875rem;
   }
 
   .premium-product-card {
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
   }
 
   .magazine-product-card {
-    margin: 0 4px 12px 4px;
+    margin: 0 2px 8px 2px;
   }
 
   .elegant-category-title {
-    padding: 12px 20px;
+    padding: 10px 16px;
     font-size: 1.1rem;
   }
 
@@ -437,16 +468,138 @@ body {
   }
 
   .hero-section {
-    height: 70vh !important;
+    height: 75vh !important;
   }
 
   /* Mejoras de espaciado para secciones */
   .mb-16 {
-    margin-bottom: 2rem !important;
+    margin-bottom: 1.5rem !important;
   }
 
   .p-8 {
-    padding: 1rem !important;
+    padding: 0.75rem !important;
+  }
+
+  /* Ajustar tamaños de fuente para pantallas muy pequeñas */
+  .product-name {
+    font-size: 1rem;
+  }
+
+  .product-description {
+    font-size: 0.8125rem;
+  }
+
+  .product-price {
+    font-size: 1.125rem;
+  }
+
+  /* Optimizar botones para móviles pequeños */
+  .modern-button {
+    min-height: 44px; /* Tamaño mínimo para toque fácil */
+  }
+
+  /* Mejorar accesibilidad en pantallas pequeñas */
+  .magazine-product-card {
+    border-radius: 1rem;
+  }
+}
+
+/* Mejoras para tablets y pantallas medianas */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .magazine-product-card {
+    margin: 0 8px 16px 8px;
+  }
+
+  .product-name {
+    font-size: 1.25rem;
+  }
+
+  .product-description {
+    font-size: 0.9375rem;
+  }
+
+  .product-price {
+    font-size: 1.5rem;
+  }
+
+  .hero-section {
+    height: 90vh !important;
+  }
+}
+
+/* Optimizaciones para pantallas grandes */
+@media (min-width: 1025px) {
+  .magazine-product-card {
+    margin: 0 12px 20px 12px;
+  }
+
+  .product-name {
+    font-size: 1.5rem;
+  }
+
+  .product-description {
+    font-size: 1rem;
+  }
+
+  .product-price {
+    font-size: 1.75rem;
+  }
+}
+
+/* Mejoras generales de responsive */
+@media (max-width: 640px) {
+  /* Evitar desbordamiento en elementos con ancho fijo */
+  .w-full {
+    max-width: 100%;
+  }
+
+  /* Mejorar espaciado en elementos apilados */
+  .space-y-6 > * + * {
+    margin-top: 1rem;
+  }
+
+  /* Optimizar imágenes para móviles */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Mejorar visibilidad de texto en fondos complejos */
+  .text-white {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Optimizar contenedores para evitar scroll horizontal */
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Mejoras para dispositivos táctiles */
+@media (hover: none) and (pointer: coarse) {
+  /* Eliminar efectos hover en dispositivos táctiles */
+  .group:hover .group-hover\:scale-105 {
+    transform: none;
+  }
+
+  .modern-button:hover {
+    transform: none;
+  }
+
+  .magazine-product-card:hover {
+    transform: none;
+  }
+
+  /* Aumentar área de toque para elementos interactivos */
+  button, a, input, textarea {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Mejorar espaciado entre elementos interactivos */
+  .modern-button {
+    margin: 0.25rem;
   }
 }
 
@@ -572,31 +725,66 @@ body {
   }
   
   .product-name {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     font-weight: 700;
   }
   
   .product-description {
-    font-size: 1.05rem;
+    font-size: 0.9375rem;
     font-weight: 500;
     letter-spacing: 0.02em;
-    line-height: 1.7;
+    line-height: 1.6;
   }
   
   .product-price {
-    font-size: 1.7rem;
+    font-size: 1.5rem;
     font-weight: 700;
     letter-spacing: 0.06em;
     line-height: 1.25;
   }
   
   .subcategory-title {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
   }
   
   .elegant-category-title {
-    font-size: 1.8rem;
-    padding: 0.5rem 1rem;
+    font-size: 1.6rem;
+    padding: 0.75rem 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-title {
+    font-size: 2rem;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+  }
+  
+  .product-name {
+    font-size: 1.125rem;
+    font-weight: 700;
+  }
+  
+  .product-description {
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 0.015em;
+    line-height: 1.5;
+  }
+  
+  .product-price {
+    font-size: 1.375rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    line-height: 1.2;
+  }
+  
+  .subcategory-title {
+    font-size: 1.1rem;
+  }
+  
+  .elegant-category-title {
+    font-size: 1.4rem;
+    padding: 0.625rem 1rem;
   }
 }
 
@@ -673,4 +861,72 @@ body {
   font-style: italic;
   letter-spacing: 0.015em;
   font-weight: 400;
+}
+
+/* Clases utilitarias para responsive */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Evitar desbordamiento de texto */
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Contenedor seguro para evitar scroll horizontal */
+.safe-container {
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+/* Mejoras para imagenes responsivas */
+.responsive-image {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+/* Optimización para móviles */
+@media (max-width: 640px) {
+  .safe-container {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  
+  /* Reducir efectos visuales en móviles para mejorar rendimiento */
+  .backdrop-blur-xl {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  
+  /* Simplificar animaciones en móviles */
+  .transition-all {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  
+  /* Mejorar legibilidad */
+  .text-white {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  }
+}
+
+/* Optimizaciones para tablets */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .safe-container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
 }

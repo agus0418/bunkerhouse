@@ -62,16 +62,16 @@ const ProductRatingComponent: React.FC<ProductRatingProps> = ({ product, onRatin
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-black/40 backdrop-blur-sm rounded-lg p-4"
+      className="bg-black/40 backdrop-blur-sm rounded-lg p-3 sm:p-4 w-full"
     >
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex-1">
-          <h3 className="text-lg font-semibold text-white">
+      <div className="flex items-center justify-between mb-3 sm:mb-4">
+        <div className="flex-1 pr-2">
+          <h3 className="text-base sm:text-lg font-semibold text-white">
             Valorar {product.name}
           </h3>
           <div className="flex items-center gap-2 mt-1">
-            <RatingStars rating={product.averageRating || 0} readonly size={16} />
-            <span className="text-sm text-gray-300">
+            <RatingStars rating={product.averageRating || 0} readonly size={14} />
+            <span className="text-xs sm:text-sm text-gray-300">
               ({product.ratings?.length || 0})
             </span>
           </div>
@@ -80,12 +80,12 @@ const ProductRatingComponent: React.FC<ProductRatingProps> = ({ product, onRatin
         {/* Botón de cerrar elegante */}
         <button
           onClick={onClose}
-          className="ml-4 p-2 rounded-full bg-gray-700/50 hover:bg-gray-600/70 text-gray-400 hover:text-white transition-all duration-300 group"
+          className="ml-2 sm:ml-4 p-1.5 sm:p-2 rounded-full bg-gray-700/50 hover:bg-gray-600/70 text-gray-400 hover:text-white transition-all duration-300 group"
           aria-label="Cerrar panel de valoración"
         >
-          <FaTimes 
-            size={16} 
-            className="transform group-hover:rotate-90 transition-transform duration-300" 
+          <FaTimes
+            size={14}
+            className="transform group-hover:rotate-90 transition-transform duration-300"
           />
         </button>
       </div>
@@ -95,14 +95,16 @@ const ProductRatingComponent: React.FC<ProductRatingProps> = ({ product, onRatin
           <label className="text-sm font-medium text-gray-300">
             Tu valoración
           </label>
-          <RatingStars
-            rating={rating}
-            onRatingChange={setRating}
-            size={24}
-          />
+          <div className="flex justify-center sm:justify-start">
+            <RatingStars
+              rating={rating}
+              onRatingChange={setRating}
+              size={20}
+            />
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label htmlFor="userName" className="text-sm font-medium text-gray-300">
               Nombre
@@ -112,7 +114,7 @@ const ProductRatingComponent: React.FC<ProductRatingProps> = ({ product, onRatin
               id="userName"
               value={userName}
               onChange={(e) => setUserName(e.target.value)}
-              className="w-full mt-1 px-3 py-2 bg-black/30 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
+              className="w-full mt-1 px-3 py-2 bg-black/30 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent text-sm"
               placeholder="Anónimo"
             />
           </div>
@@ -125,21 +127,21 @@ const ProductRatingComponent: React.FC<ProductRatingProps> = ({ product, onRatin
               id="comment"
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              className="w-full mt-1 px-3 py-2 bg-black/30 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
-              rows={1}
+              className="w-full mt-1 px-3 py-2 bg-black/30 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent text-sm"
+              rows={2}
               placeholder="Tu experiencia..."
             />
           </div>
         </div>
 
         {error && (
-          <div className="text-red-500 text-sm mt-2 p-2 bg-red-500/10 border border-red-500/20 rounded-md">
+          <div className="text-red-500 text-xs sm:text-sm mt-2 p-2 bg-red-500/10 border border-red-500/20 rounded-md">
             {error}
           </div>
         )}
 
         {isSuccess && (
-          <div className="text-green-400 text-sm mt-2 p-2 bg-green-500/10 border border-green-500/20 rounded-md">
+          <div className="text-green-400 text-xs sm:text-sm mt-2 p-2 bg-green-500/10 border border-green-500/20 rounded-md">
             ¡Valoración enviada exitosamente! Gracias por tu opinión.
           </div>
         )}
@@ -147,7 +149,7 @@ const ProductRatingComponent: React.FC<ProductRatingProps> = ({ product, onRatin
         <button
           type="submit"
           disabled={rating === 0 || isSubmitting}
-          className={`w-full py-2 px-4 rounded-md text-white font-medium transition-colors ${
+          className={`w-full py-2 px-4 rounded-md text-white font-medium transition-colors text-sm sm:text-base ${
             rating === 0 || isSubmitting
               ? 'bg-gray-700 cursor-not-allowed'
               : 'bg-gray-600 hover:bg-gray-700'
@@ -158,7 +160,7 @@ const ProductRatingComponent: React.FC<ProductRatingProps> = ({ product, onRatin
       </form>
 
       {product.ratings && product.ratings.length > 0 && (
-        <div className="mt-4">
+        <div className="mt-3 sm:mt-4">
           <h4 className="text-sm font-medium text-gray-300 mb-2">
             Valoraciones recientes
           </h4>
@@ -168,16 +170,16 @@ const ProductRatingComponent: React.FC<ProductRatingProps> = ({ product, onRatin
                 key={rating.id}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="bg-black/30 p-3 rounded-md"
+                className="bg-black/30 p-2 sm:p-3 rounded-md"
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-medium text-white text-sm">
+                  <span className="font-medium text-white text-xs sm:text-sm truncate">
                     {rating.userName}
                   </span>
-                  <RatingStars rating={rating.rating} readonly size={14} />
+                  <RatingStars rating={rating.rating} readonly size={12} />
                 </div>
                 {rating.comment && (
-                  <p className="text-gray-300 text-sm">{rating.comment}</p>
+                  <p className="text-gray-300 text-xs sm:text-sm line-clamp-2">{rating.comment}</p>
                 )}
                 <span className="text-xs text-gray-500 mt-1 block">
                   {new Date(rating.date).toLocaleDateString()}

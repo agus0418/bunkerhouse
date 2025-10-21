@@ -202,35 +202,35 @@ export default function Home() {
         }} 
       />
       {/* Hero Section Mejorado */}
-      <section className="hero-section relative z-10 h-[100vh] overflow-hidden">
+      <section className="hero-section relative z-10 h-[75vh] sm:h-[85vh] md:h-[100vh] overflow-hidden">
         <div className="absolute inset-0">
           {/* Fondo con gradiente elegante neutro */}
           <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black"></div>
           
           {/* Mosaico de imágenes con efectos */}
           <div className="grid grid-cols-2 md:grid-cols-4 h-full opacity-50">
-            <div 
+            <div
               className="bg-cover bg-center bg-no-repeat transform hover:scale-105 transition-transform duration-700"
               style={{
                 backgroundImage: 'url("/images/6A4A2169.jpg")',
-                filter: 'blur(3px)',
+                filter: 'blur(2px)',
               }}
             ></div>
-            <div 
+            <div
               className="bg-cover bg-center bg-no-repeat transform hover:scale-105 transition-transform duration-700"
               style={{
                 backgroundImage: 'url("/images/6A4A2176.jpg")',
-                filter: 'blur(3px)',
+                filter: 'blur(2px)',
               }}
             ></div>
-            <div 
-              className="bg-cover bg-center bg-no-repeat transform hover:scale-105 transition-transform duration-700"
+            <div
+              className="bg-cover bg-center bg-no-repeat transform hover:scale-105 transition-transform duration-700 hidden md:block"
               style={{
                 backgroundImage: 'url("/images/6A4A2177.jpg")',
               }}
             ></div>
-            <div 
-              className="bg-cover bg-center bg-no-repeat transform hover:scale-105 transition-transform duration-700"
+            <div
+              className="bg-cover bg-center bg-no-repeat transform hover:scale-105 transition-transform duration-700 hidden md:block"
               style={{
                 backgroundImage: 'url("/images/6A4A2178.jpg")',
               }}
@@ -242,74 +242,74 @@ export default function Home() {
           
           {/* Efectos de luz sutiles y optimizados */}
           <div className="absolute inset-0">
-            <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-white/3 rounded-full blur-3xl opacity-60"></div>
-            <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-amber-500/5 rounded-full blur-3xl opacity-40"></div>
+            <div className="absolute top-1/4 left-1/4 w-32 h-32 sm:w-48 sm:h-48 md:w-64 md:h-64 bg-white/3 rounded-full blur-3xl opacity-60"></div>
+            <div className="absolute bottom-1/4 right-1/4 w-32 h-32 sm:w-48 sm:h-48 md:w-64 md:h-64 bg-amber-500/5 rounded-full blur-3xl opacity-40"></div>
           </div>
         </div>
         
-        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center p-4">
-          <div className="mb-8 animate-fade-in-up">
-            <div className="inline-block p-4 rounded-full bg-white/15 backdrop-blur-sm mb-6">
-              <FaUtensils className="text-4xl text-white" />
+        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center p-4 sm:p-6">
+          <div className="mb-6 sm:mb-8 animate-fade-in-up w-full max-w-4xl mx-auto">
+            <div className="inline-block p-3 sm:p-4 rounded-full bg-white/15 backdrop-blur-sm mb-4 sm:mb-6">
+              <FaUtensils className="text-3xl sm:text-4xl text-white" />
             </div>
             
             {/* Logo Principal */}
-            <div className="mb-6 flex justify-center">
-              <div className="relative w-56 h-28 sm:w-72 sm:h-36 md:w-80 md:h-40 lg:w-96 lg:h-48 logo-container">
+            <div className="mb-4 sm:mb-6 flex justify-center">
+              <div className="relative w-48 h-24 sm:w-56 sm:h-28 md:w-72 md:h-36 lg:w-80 lg:h-40 xl:w-96 xl:h-48 logo-container">
                 <Image
                   src="/images/Logo Blanco sin fondo.png"
                   alt="Bunkerhouse Logo"
                   fill
                   className="object-contain"
                   priority
-                  sizes="(max-width: 640px) 256px, (max-width: 768px) 320px, (max-width: 1024px) 384px, 448px"
+                  sizes="(max-width: 640px) 192px, (max-width: 768px) 224px, (max-width: 1024px) 288px, (max-width: 1280px) 320px, 384px"
                 />
               </div>
             </div>
             
-            <div className="h-1 w-32 bg-gradient-to-r from-gray-400 via-white to-gray-400 mx-auto rounded-full mb-6"></div>
+            <div className="h-0.5 sm:h-1 w-24 sm:w-32 bg-gradient-to-r from-gray-400 via-white to-gray-400 mx-auto rounded-full mb-4 sm:mb-6"></div>
       
           </div>
           
-          <div className="flex flex-col sm:flex-row items-center justify-center space-y-6 sm:space-y-0 sm:space-x-8">
+          <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6 md:space-x-8 w-full max-w-2xl mx-auto px-4">
             <button
               onClick={() => handleTabClick('COMIDAS')}
-              className={`modern-button group px-10 py-4 rounded-2xl text-lg font-semibold flex items-center space-x-3 focus:outline-none transition-all duration-500 transform hover:scale-105 active:scale-95 ${
-                activeTab === 'COMIDAS' 
-                  ? 'bg-white text-black shadow-2xl shadow-black/30' 
+              className={`modern-button group w-full sm:w-auto px-6 sm:px-8 md:px-10 py-3 sm:py-4 rounded-2xl text-base sm:text-lg font-semibold flex items-center justify-center space-x-2 sm:space-x-3 focus:outline-none transition-all duration-500 transform hover:scale-105 active:scale-95 ${
+                activeTab === 'COMIDAS'
+                  ? 'bg-white text-black shadow-2xl shadow-black/30'
                   : 'bg-white/10 backdrop-blur-sm text-white hover:bg-white/20'
               }`}
               aria-label="Ir a sección de comidas"
             >
-              <FaUtensils className="text-xl group-hover:rotate-12 transition-transform duration-300" />
+              <FaUtensils className="text-lg sm:text-xl group-hover:rotate-12 transition-transform duration-300" />
               <span style={{ fontFamily: "'Mileast', serif" }}>Comidas</span>
               <div className="absolute inset-0 rounded-2xl bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </button>
             <button
               onClick={() => handleTabClick('BEBIDAS')}
-              className={`modern-button group px-10 py-4 rounded-2xl text-lg font-semibold flex items-center space-x-3 focus:outline-none transition-all duration-500 transform hover:scale-105 active:scale-95 ${
-                activeTab === 'BEBIDAS' 
-                  ? 'bg-white text-black shadow-2xl shadow-black/30' 
+              className={`modern-button group w-full sm:w-auto px-6 sm:px-8 md:px-10 py-3 sm:py-4 rounded-2xl text-base sm:text-lg font-semibold flex items-center justify-center space-x-2 sm:space-x-3 focus:outline-none transition-all duration-500 transform hover:scale-105 active:scale-95 ${
+                activeTab === 'BEBIDAS'
+                  ? 'bg-white text-black shadow-2xl shadow-black/30'
                   : 'bg-white/10 backdrop-blur-sm text-white hover:bg-white/20'
               }`}
               aria-label="Ir a sección de bebidas"
             >
-              <FaGlassMartiniAlt className="text-xl group-hover:rotate-12 transition-transform duration-300" />
+              <FaGlassMartiniAlt className="text-lg sm:text-xl group-hover:rotate-12 transition-transform duration-300" />
               <span style={{ fontFamily: "'Mileast', serif" }}>Bebidas</span>
               <div className="absolute inset-0 rounded-2xl bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </button>
           </div>
           
           {/* Indicador de scroll */}
-          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-            <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
-              <div className="w-1 h-3 bg-white/70 rounded-full mt-2 animate-pulse"></div>
+          <div className="absolute bottom-6 sm:bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <div className="w-5 h-8 sm:w-6 sm:h-10 border-2 border-white/50 rounded-full flex justify-center">
+              <div className="w-1 h-2 sm:h-3 bg-white/70 rounded-full mt-1.5 sm:mt-2 animate-pulse"></div>
             </div>
           </div>
         </div>
       </section>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 menu-content">
+      <div className="relative z-10 max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-8 sm:py-12 menu-content">
         {Object.entries(filteredProducts).map(([mainCategoryKey, subCategoriesObject]) => (
           (isMobileView || activeTab === mainCategoryKey) && (
             <section key={mainCategoryKey} id={mainCategoryKey.toLowerCase()} className="mb-16">
@@ -339,7 +339,15 @@ export default function Home() {
                 }
 
                 return (
-                  <div key={subCategoryKey} className="mb-16 p-8 rounded-3xl bg-gradient-to-br from-black/40 via-gray-900/50 to-black/40 backdrop-blur-xl shadow-2xl">
+                  <div key={subCategoryKey} className="mb-8 sm:mb-12 md:mb-16 p-4 sm:p-6 md:p-8 rounded-3xl backdrop-blur-xl shadow-2xl relative overflow-hidden">
+                    {/* Midnight Ember Background */}
+                    <div
+                      className="absolute inset-0 z-0"
+                      style={{
+                        background: "radial-gradient(ellipse at center, #3d2914 0%, #2a1810 30%, #1a0f0a 60%, #0d0806 100%)"
+                      }}
+                    />
+                    <div className="relative z-10">
                     <div className="flex items-center justify-center mb-8">
                       <div className="flex items-center space-x-4 px-6 py-3 bg-gradient-to-r from-gray-800/80 to-gray-900/80 rounded-full">
                         <div className="w-3 h-3 rounded-full bg-gradient-to-r from-gray-400 to-white animate-pulse"></div>
@@ -349,7 +357,7 @@ export default function Home() {
                         <div className="w-3 h-3 rounded-full bg-gradient-to-r from-white to-gray-400 animate-pulse"></div>
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 gap-8">
+                    <div className="grid grid-cols-1 gap-6 sm:gap-8">
                       {productsInSubCategory.map((product, index) => (
                         <div 
                           key={product.id}
@@ -362,6 +370,7 @@ export default function Home() {
                           />
                         </div>
                       ))}
+                    </div>
                     </div>
                   </div>
                 );

@@ -1,0 +1,145 @@
+﻿ID,Tipo,SKU,Nombre,Publicado,Descripción,"Precio normal",Categorías,Imágenes,"Nombre del atributo 1","Valor(es) del atributo 1","Atributo visible 1","Atributo global 1"
+1292,simple,BH_5X1V2FE_BH0801292,"Saint Felicient",1,,16000,"VINOS TINTOS",https://bunkerhouse.com.ar/wp-content/uploads/2024/12/pexels-photo-391213.webp,,,,
+1293,simple,BH_5J5PQZI_BH0791293,Nicassia,1,,15000,"VINOS TINTOS",https://bunkerhouse.com.ar/wp-content/uploads/2024/12/pexels-photo-391213.webp,,,,
+1294,simple,BH_FD18X71_BH0781294,"Las Perdices",1,,12000,"VINOS TINTOS",https://bunkerhouse.com.ar/wp-content/uploads/2024/12/pexels-photo-391213.webp,,,,
+1295,simple,BH_6ZPZ42Z_BH0771295,"Perro Callejero",1,,10000,"VINOS TINTOS",https://bunkerhouse.com.ar/wp-content/uploads/2024/12/pexels-photo-391213.webp,,,,
+1296,simple,BH_193G5J4_BH0761296,"Cordero con Piel de Lobo",1,,7000,"VINOS TINTOS",https://bunkerhouse.com.ar/wp-content/uploads/2024/12/pexels-photo-391213.webp,,,,
+1297,simple,BH_GEQ3JDI_BH0751297,Nicassia,1,,"14000,00","VINOS BLANCOS",https://bunkerhouse.com.ar/wp-content/uploads/2024/11/white_wine-scaled.jpg,,,,
+1298,simple,BH_27QV9Q4_BH0741298,"Las Perdices",1,,12000,"VINOS BLANCOS",https://bunkerhouse.com.ar/wp-content/uploads/2024/11/white_wine-scaled.jpg,,,,
+1299,simple,BH_1979P6G_BH0731299,"Chandon Extra Brut",1,,22000,CHAMPAGNE,https://bunkerhouse.com.ar/wp-content/uploads/2024/11/white_champagne-scaled.jpg,,,,
+1300,simple,BH_Z8VD9FZ_BH0721300,"Chandon Delice",1,,22000,CHAMPAGNE,https://bunkerhouse.com.ar/wp-content/uploads/2024/11/white_champagne-scaled.jpg,,,,
+1301,simple,BH_V4O1VDK_BH0711301,Salentein,1,,18000,CHAMPAGNE,https://bunkerhouse.com.ar/wp-content/uploads/2024/11/white_champagne-scaled.jpg,,,,
+1302,simple,BH_4G7Y7C8_BH0701302,"Pinina Heineken",1,,4000,CERVEZAS,https://bunkerhouse.com.ar/wp-content/uploads/2024/11/beer_rubia.png,,,,
+1303,simple,BH_BADR4XE_BH0691303,"Pinina Sol",1,,3500,CERVEZAS,https://bunkerhouse.com.ar/wp-content/uploads/2024/11/beer_rubia.png,,,,
+1305,simple,BH_7Y29SYC_BH0671305,"Agua Sin Gas",1,,2000,"SIN ALCOHOL",https://bunkerhouse.com.ar/wp-content/uploads/2024/12/glass-of-water-4087606_1920.jpg,,,,
+1306,simple,BH_974O4R9_BH0661306,"Agua Con Gas",1,,2000,"SIN ALCOHOL",https://bunkerhouse.com.ar/wp-content/uploads/2024/12/glass-of-water-4087606_1920.jpg,,,,
+1307,simple,BH_UYGRLTL_BH0651307,Sprite,1,,2500,"SIN ALCOHOL",https://bunkerhouse.com.ar/wp-content/uploads/2024/12/pngimg.com-sprite_PNG98770.png,,,,
+1308,simple,BH_99EBAGN_BH0641308,"Coca Cola",1,,2500,"SIN ALCOHOL",https://bunkerhouse.com.ar/wp-content/uploads/2024/12/pexels-photo-4113669.webp,,,,
+1309,simple,BH_6TP66L8_BH0631309,"Coca Cola Zero",1,,2500,"SIN ALCOHOL",https://bunkerhouse.com.ar/wp-content/uploads/2024/12/pexels-photo-4113669.webp,,,,
+1310,simple,BH_I46163B_BH0621310,"Agua Saborizada",1,,2000,"SIN ALCOHOL",https://bunkerhouse.com.ar/wp-content/uploads/2024/12/awa-pom-5001-195f3b34e593ea7f5516727707180487-1024-1024.jpg,,,,
+1311,variable,BH_17GX4OL_BH0611311,"Limonada Clásica",1,,,"SIN ALCOHOL",https://bunkerhouse.com.ar/wp-content/uploads/2024/12/pexels-photo-1320997.webp,Tamaño,"Jarra, Vaso",1,1
+1312,variable,BH_NAAH9B8_BH0601312,"Limonada con Sprite",1,,,"SIN ALCOHOL",https://bunkerhouse.com.ar/wp-content/uploads/2024/12/pexels-photo-1320997.webp,Tamaño,"Jarra, Vaso",1,1
+1313,variable,BH_6P8YA37_BH0591313,"Limonada con Arándanos",1,,,"SIN ALCOHOL",https://bunkerhouse.com.ar/wp-content/uploads/2024/12/pexels-photo-1320997.webp,Tamaño,"Jarra, Vaso",1,1
+1314,simple,BH_US7D99G_BH0581314,Speed,1,,"2500,00","SIN ALCOHOL",https://bunkerhouse.com.ar/wp-content/uploads/2024/12/7798119220299_02.png,,,,
+1315,simple,BH_D6RYKH2_BH0571315,"Gin Beefeater",1,,6000,TRAGOS,https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg,,,,
+1316,simple,BH_MA2G18Q_BH0561316,"Gin Heráclito",1,,5000,TRAGOS,https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg,,,,
+1317,variable,BH_1W26WNK_BH0551317,"Fernet Branca",1,,,TRAGOS,https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg,Tamaño,"Jarra, Vaso",1,1
+1318,simple,BH_S6XB9BW_BH0541318,"Gancia Batido",1,,4000,TRAGOS,https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg,Tamaño,"Jarra, Vaso",1,1
+1319,variable,BH_4MZ1I3K_BH0531319,Vodka,1,,,TRAGOS,https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg,Tamaño,"Jarra, Vaso",1,1
+1320,simple,BH_8K64KV7_BH0521320,"Classic Mojito",1,,4000,TRAGOS,https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg,,,,
+1321,simple,BH_5EJXCZ4_BH0511321,Negroni,1,,5500,TRAGOS,https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg,,,,
+1322,simple,BH_833E9R1_BH0501322,Daikiri,1,,"4000,00",TRAGOS,https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg,,,,
+1323,simple,BH_8C49N65_BH0491323,Caipiroska,1,,5000,TRAGOS,https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg,,,,
+1324,simple,BH_TKM7F8J_BH0481324,Caipiriña,1,,5000,TRAGOS,https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg,,,,
+1325,simple,BH_FSL714G_BH0471325,Campari,1,,4500,TRAGOS,https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg,,,,
+1326,simple,BH_8M6OACZ_BH0461326,"John Collins",1,,5000,TRAGOS,https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg,,,,
+1327,simple,BH_9U9HLO6_BH0451327,"Cuba Libre",1,,6000,TRAGOS,https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg,,,,
+1328,simple,BH_SFUW68X_BH0441328,Aperol,1,,4500,TRAGOS,https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg,,,,
+1329,simple,BH_5Y2J9KD_BH0431329,"Aperol Spritz",1,,7000,TRAGOS,https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg,,,,
+1330,simple,BH_25873G1_BH0421330,Cynar,1,,4500,TRAGOS,https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg,,,,
+1331,simple,BH_9PQX532_BH0411331,Ginebra,1,,3500,TRAGOS,https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg,,,,
+1332,simple,BH_X67LPJ1_BH0401332,"Vermouth Rosso",1,,4000,TRAGOS,https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg,,,,
+1333,simple,BH_P15GUD7_BH0391333,Collins,1,,4500,TRAGOS,https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg,,,,
+1334,simple,BH_9S3GA2X_BH0381334,"Ciabatta de crudo",1,"Jamón crudo, rucula, parmesano, mayonesa verde",5500,FRIOS,https://bunkerhouse.com.ar/wp-content/uploads/2024/12/caprese.jpg,,,,
+1335,simple,BH_8VI913S_BH0371335,"Ciabatta capresse",1,"Tomate, albahaca, muzarella, pasta untable",4500,FRIOS,https://bunkerhouse.com.ar/wp-content/uploads/2024/12/caprese.jpg,,,,
+1336,variable,BH_WRK386M_BH0361336,"La clasica",1,"<p>Mila, cubos de queso, fritas, salamin  de campo, simples de miga, mayo de la casa,pan ( come 2 pican 3 ) Extras:</p><ul><li>Verdeo $1000</li><li>Cheddar $2000</li><li>Barbacoa $2000</li><li>Mayonesa $1000</li></ul>",,PICADAS,https://bunkerhouse.com.ar/wp-content/uploads/2024/12/BULLANGA-5.jpg,Porcion,"1/2 Picada, Completa",1,1
+1337,variable,BH_5549AVM_BH0351337,"La del medio",1,"<p>Mila, variedad de quesos, fritas, aceitunas negras, mayo, bastoncitos de muzarella, simple de miga</p>",,PICADAS,https://bunkerhouse.com.ar/wp-content/uploads/2024/12/BULLANGA-5.jpg,Porcion,"1/2 Picada, Completa",1,1
+1338,variable,BH_D78C9JV_BH0341338,"Super bunker",1,"<p>Mila, variedad de quesos, salamín, dados de muzarella, fritas, jamón crudo, mini empanaditas, simples de miga, pan, aceitunas, dúo de mayonesas</p>",,PICADAS,https://bunkerhouse.com.ar/wp-content/uploads/2024/12/BULLANGA-5.jpg,Porcion,"1/2 Picada, Completa",1,1
+1339,simple,BH_9O35SCE_BH0331339,"Duo de tacos",-1," Taco bistec+1 taco de pollo",6500,PICADAS,https://bunkerhouse.com.ar/wp-content/uploads/2024/12/BULLANGA-5.jpg,,,,
+1340,simple,BH_VS42D8N_BH0321340,"Duo de quesadillas",-1,"De verdeo y panceta + jamón y queso",5500,PICADAS,https://bunkerhouse.com.ar/wp-content/uploads/2024/12/BULLANGA-5.jpg,,,,
+1341,simple,BH_1J5ATI5_BH0311341,"Bondiolita a la cerveza negra",-1,"Bondiola braseada, cebolla caramelizada,cheddar, pan brioge c/papas",10000,"ENTRE PANES CALIENTES",https://bunkerhouse.com.ar/wp-content/uploads/2024/12/sandwich-de-bondiola-braseada-a-la-42Y46YQZZNALLCCUDTRGGLIZ3Y.webp,,,,
+1342,simple,BH_PPVSU95_BH0301342,"Focaccia de entraña",-1,"Focaccia, entraña macerada al romero y oliva, cherrys confitados, cebolla caramelizada, rucula, queso danbo, c/papas",12000,"ENTRE PANES CALIENTES",https://bunkerhouse.com.ar/wp-content/uploads/2024/12/focaccia-de-cebolla-caramelizada-foto-principal.webp,,,,
+1343,simple,BH_N15R981_BH0291343,"Lomito en pan negro",-1,"Pan en tinta de calamar, lomito, mayonesa de zanahoria, rucula,tiritas de queso sale c/ papas",12000,"ENTRE PANES CALIENTES",,,,,
+1344,simple,BH_6TZ84BF_BH0281344,"Sándwich a la oriental",1,"Vegetales salteados, lechuga, mayonesa de zanahoria",7000,"ENTRE PANES CALIENTES",https://bunkerhouse.com.ar/wp-content/uploads/2024/12/sandwiches-vegetales.webp,,,,
+1345,simple,BH_5DPR24Y_BH0271345,"La del pueblo",1,"<p>Pan, bife, queso, lechuga, tomate, mayonesa sale c/ papas</p>",8000,BURGERS,https://bunkerhouse.com.ar/wp-content/uploads/2024/11/hamburger.png,,,,
+1346,simple,BH_6LS2XGD_BH0261346,"Casa de humo",1,"Pan, bife de 150grs,rucula panceta ahumada, cheddar, aros de cebolla crujiente, salsa barbacoa c/papas",9000,BURGERS,https://bunkerhouse.com.ar/wp-content/uploads/2024/11/hamburger.png,,,,
+1347,simple,BH_F13AO39_BH0251347,"Texas picante",-1,"Pan, bife de 150 grs, jalapeño, queso de pimienta, lechuga, tomate, salsa bunker",8200,BURGERS,https://bunkerhouse.com.ar/wp-content/uploads/2024/11/hamburger.png,,,,
+1348,simple,BH_A62212L_BH0241348,Bunker,1,"Doble bife, champiñones, cebolla, caramelizada, doble cheddar mayo bunker c/papas",9000,BURGERS,https://bunkerhouse.com.ar/wp-content/uploads/2024/11/hamburger.png,,,,
+1349,simple,BH_PP5O1I3_BH0231349,"Bunker XL",1,"Triple bife, rúcula, crocante de panceta, cheddar, sale c/ papas",9800,BURGERS,https://bunkerhouse.com.ar/wp-content/uploads/2024/11/hamburger.png,,,,
+1350,simple,BH_4ZKD11U_BH0221350,"Saltaditos de lomo",1,"Tiritas de lomo, vegetales, salsa de soja",8000,"AL WOK (sin tacc)",https://bunkerhouse.com.ar/wp-content/uploads/2024/12/6d9342cfd301-lomo-saltado-t.webp,,,,
+1351,simple,BH_5481TYY_BH0211351,"A la oriental",1,"Verduras salteadas, mix de semilla, salsa de soja",7000,"AL WOK (sin tacc)",https://bunkerhouse.com.ar/wp-content/uploads/2024/12/saltat-de-verdures-amb-salsa-de-soja-i-mel-alemany.webp,,,,
+1352,simple,BH_2SWKJ46_BH0201352,"Pollito bunker",1,"Tiritas de pollo macerados en salsa teriyaki, hongos, brocoli, zanahoria",8000,"AL WOK (sin tacc)",https://bunkerhouse.com.ar/wp-content/uploads/2024/12/pollo_teriyaki.webp,,,,
+1353,variable,BH_793TFR7_BH0191353,"La común",1,,,PAPAS,https://bunkerhouse.com.ar/wp-content/uploads/2024/11/fresh-potatoes-fri-with-souce-scaled.jpg,Porcion,"1/2 Porcion, Completa",1,1
+1354,simple,BH_BJMS597_BH0181354,"Con cheddar y crocante de panceta",1,,7500,PAPAS,https://bunkerhouse.com.ar/wp-content/uploads/2024/11/fresh-potatoes-fri-with-souce-scaled.jpg,,,,
+1355,simple,BH_K56R4N3_BH0171355,"Al verdeo",1,,7000,PAPAS,https://bunkerhouse.com.ar/wp-content/uploads/2024/11/fresh-potatoes-fri-with-souce-scaled.jpg,,,,
+1356,simple,BH_9974L76_BH0161356,"Papas Bravas",-1,,7000,PAPAS,https://bunkerhouse.com.ar/wp-content/uploads/2024/11/fresh-potatoes-fri-with-souce-scaled.jpg,,,,
+1357,simple,BH_5CTC774_BH0151357,Muzarella,1,"Salsa, queso, oregano, olivas",7000,PIZZAS,https://bunkerhouse.com.ar/wp-content/uploads/2024/12/4e475ddf-2c43-4d47-b69c-990a92e91029-26f258f7fdb6a2b9fb16276674103675-640-0.webp,,,,
+1358,simple,BH_9CVO8YW_BH0141358,Fugazza,1,"Salsa, queso, cebolla",7500,PIZZAS,https://bunkerhouse.com.ar/wp-content/uploads/2024/12/fugazza-argentina_web.jpg.webp,,,,
+1359,simple,BH_4VD62N8_BH0131359,"Rucula y parmesano",1,"Salsa, muza, rucula y parmesano",8000,PIZZAS,https://bunkerhouse.com.ar/wp-content/uploads/2024/12/1515520232039.webp,,,,
+1360,simple,BH_P54BXNU_BH0121360,"Roquefort y peras",1,"Queso, roquefort, peras y nueces",8000,PIZZAS,https://bunkerhouse.com.ar/wp-content/uploads/2024/12/maxresdefault.webp,,,,
+1361,simple,BH_1L2IP81_BH0111361,"Sándwich de bondiola C/Papas",1,,11000,"SIN TACC",,,,,
+1362,simple,BH_U1MT14B_BH0101362,"Burguer del pueblo C/Papas",1,,9000,"SIN TACC",,,,,
+1363,simple,BH_WAMGSM8_BH0091363,Muzarella,1,"<p>Salsa, queso, oregano, olivas</p><ul><li>Mayonesa $1000</li><li>Cheddar $ 1500</li><li>Aceitunas $ 2000</li></ul>",7500,"SIN TACC",https://bunkerhouse.com.ar/wp-content/uploads/2024/11/pizza_sin_tacc_1.jpg,,,,
+1364,simple,BH_1X6N2IG_BH0081364,"Rucula y parmesano",1,"<p>Salsa, muza, rucula y parmesano</p><ul><li>Mayonesa $1000</li><li>Cheddar $ 1500</li><li>Aceitunas $ 2000</li></ul>",8500,"SIN TACC",https://bunkerhouse.com.ar/wp-content/uploads/2024/11/pizza_sin_tacc_1.jpg,,,,
+1365,simple,BH_54GGXSJ_BH0071365,Fugazza,1,"<p>Salsa, queso, cebolla</p><ul><li>Mayonesa $1000</li><li>Cheddar $ 1500</li><li>Aceitunas $ 2000</li></ul>",8000,"SIN TACC",https://bunkerhouse.com.ar/wp-content/uploads/2024/11/pizza_sin_tacc_1.jpg,,,,
+1366,simple,BH_77A3MWX_BH0061366,"Frutas flambeadas al rhum",-1,"Frutas de estación, rhum, azúcar, helado, salsa de chocolate",7500,DULCES,https://bunkerhouse.com.ar/wp-content/uploads/2024/12/cake-921943_1920.jpg,,,,
+1367,simple,BH_2TKA92G_BH0051367,Tiramisú,-1,Porcion,5000,DULCES,https://bunkerhouse.com.ar/wp-content/uploads/2024/12/cake-921943_1920.jpg,,,,
+1368,simple,BH_NO48B6X_BH0041368,"Peras al Malbec c/ helado",-1,,6500,DULCES,https://bunkerhouse.com.ar/wp-content/uploads/2024/12/cake-921943_1920.jpg,,,,
+1369,simple,BH_JKS4H59_BH0031369,Chocotorta,-1,Porcion,2500,"DULCES, DULCES > SHOT",https://bunkerhouse.com.ar/wp-content/uploads/2024/12/cake-921943_1920.jpg,,,,
+1370,simple,BH_53OH9HI_BH0021370,Tiramisú,-1,Porcion,2500,"DULCES, DULCES > SHOT",https://bunkerhouse.com.ar/wp-content/uploads/2024/12/cake-921943_1920.jpg,,,,
+1371,simple,BH_2EHGIMU_BH0011371,"Cheescake de frutos rojos",-1,Porcion,2500,"DULCES, DULCES > SHOT",https://bunkerhouse.com.ar/wp-content/uploads/2024/12/cake-921943_1920.jpg,,,,
+1431,"variation, virtual",BH_17GX4OL_BH0611311-01,"Limonada Clásica - Jarra",1,,9000,,,Tamaño,Jarra,,1
+1432,"variation, virtual",BH_17GX4OL_BH0611311-02,"Limonada Clásica - Vaso",1,,4000,,,Tamaño,Vaso,,1
+1433,variation,BH_NAAH9B8_BH0601312-01,"Limonada con Sprite - Jarra",1,,9000,,,Tamaño,Jarra,,1
+1434,variation,BH_NAAH9B8_BH0601312-02,"Limonada con Sprite - Vaso",1,,4000,,,Tamaño,Vaso,,1
+1435,"variation, virtual",BH_6P8YA37_BH0591313-01,"Limonada con Arándanos - Jarra",1,,9500,,,Tamaño,Jarra,,1
+1436,"variation, virtual",BH_6P8YA37_BH0591313-02,"Limonada con Arándanos - Vaso",1,,4500,,,Tamaño,Vaso,,1
+1440,variation,BH_4MZ1I3K_BH0531319-01,"Vodka - Jarra",1,,6000,,,Tamaño,Jarra,,1
+1441,variation,BH_4MZ1I3K_BH0531319-02,"Vodka - Vaso",1,,3500,,,Tamaño,Vaso,,1
+1442,variation,BH_1W26WNK_BH0551317-01,"Fernet Branca - Jarra",1,,6000,,,Tamaño,Jarra,,1
+1443,variation,BH_1W26WNK_BH0551317-02,"Fernet Branca - Vaso",1,,3500,,,Tamaño,Vaso,,1
+1560,simple,BH_V23248H1560_BH001,"Cynar julep",1,,5000,TRAGOS,https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg,,,,
+1564,simple,BH_SGGNIHG1564_BH001,"Miller 330",1,"Cerveza pinina",3500,CERVEZAS,https://bunkerhouse.com.ar/wp-content/uploads/2024/12/beer_rubia.png,,,,
+1624,simple,BH_KBE7Q411624_BH001,"Barón b",1,,40000,CHAMPAGNE,https://bunkerhouse.com.ar/wp-content/uploads/2024/12/white_champagne-scaled-1.jpg,,,,
+1625,simple,BH_PA3WC6I1625_BH001,"Santa Julia blanco",1,,8000,"VINOS BLANCOS",https://bunkerhouse.com.ar/wp-content/uploads/2024/12/white_wine-scaled-1.jpg,,,,
+1626,simple,BH_YHP2P691626_BH001,"Dv catena malbec",1,,22000,"VINOS TINTOS",https://bunkerhouse.com.ar/wp-content/uploads/2024/12/pexels-photo-391213.webp,,,,
+1630,variable,BH_1TOMT2N1630_BH001,"Limonada Citric",1,,,"SIN ALCOHOL",https://bunkerhouse.com.ar/wp-content/uploads/2024/12/pexels-photo-1320997.webp,Tamaño,"Jarra, Vaso",1,1
+1631,variable,BH_24UK6211631_BH001,"Limonada frutos rojos",1,,,"SIN ALCOHOL",https://bunkerhouse.com.ar/wp-content/uploads/2024/12/pexels-photo-1320997.webp,Tamaño,"Jarra, Vaso",1,1
+1632,simple,BH_4HDD3Q51632_BH001,"Vodka + paso de los toros",1,,3000,"TRAGOS, TRAGOS > VODKA",https://bunkerhouse.com.ar/wp-content/uploads/2024/12/cocteles_1-scaled-1.jpg,,,,
+1633,simple,BH_GFWTE2O1633_BH001,"Vodka + sprite",1,,3000,"TRAGOS, TRAGOS > VODKA",https://bunkerhouse.com.ar/wp-content/uploads/2024/11/cocteles_1-scaled.jpg,,,,
+1634,simple,BH_ZR619721634_BH001,"Vodka + speed",1,,3500,"TRAGOS, TRAGOS > VODKA",https://bunkerhouse.com.ar/wp-content/uploads/2024/12/cocteles_1-scaled-1.jpg,,,,
+1635,simple,BH_Y8I14PS1635_BH001,"Vodka + red bull",1,,4200,"TRAGOS, TRAGOS > VODKA",https://bunkerhouse.com.ar/wp-content/uploads/2024/12/cocteles_1-scaled-1.jpg,,,,
+1636,simple,BH_DJ1WN2Y1636_BH001,"Vodka + mango loco",1,,4200,TODAS,https://bunkerhouse.com.ar/wp-content/uploads/2024/12/cocteles_1-scaled-1.jpg,,,,
+1637,simple,BH_3I5W72U1637_BH001,"Las Perdices Torrontes",1,,12000,"VINOS BLANCOS",https://bunkerhouse.com.ar/wp-content/uploads/2024/12/white_wine-scaled-1.jpg,,,,
+1638,simple,BH_RGLS7Q21638_BH001,"Pinta sta fe",1,,2500,CERVEZAS,https://bunkerhouse.com.ar/wp-content/uploads/2024/12/beer_rubia.png,,,,
+1639,simple,BH_Z41BRRX1639_BH001,"Pinta heineken",1,,4000,CERVEZAS,https://bunkerhouse.com.ar/wp-content/uploads/2024/12/beer_rubia.png,,,,
+1640,simple,BH_TGN93331640_BH001,"Chopp heineken 500cc",1,,6000,CERVEZAS,https://bunkerhouse.com.ar/wp-content/uploads/2024/12/beer_rubia.png,,,,
+1641,simple,BH_BP9Z79D1641_BH001,"Jhonie walker double Black",1,,12000,TRAGOS,https://bunkerhouse.com.ar/wp-content/uploads/2024/12/cocteles_1-scaled-1.jpg,,,,
+1642,simple,BH_YZHK1NW1642_BH001,"Chivas 12",1,,9000,TRAGOS,https://bunkerhouse.com.ar/wp-content/uploads/2024/12/cocteles_1-scaled-1.jpg,,,,
+1643,simple,BH_6YD9F7Y1643_BH001,"Medida fernet",1,,2500,TRAGOS,https://bunkerhouse.com.ar/wp-content/uploads/2024/12/cocteles_1-scaled-1.jpg,,,,
+1646,variation,BH_24UK6211631_BH001-01,"Limonada frutos rojos - Jarra",1,,9500,,https://bunkerhouse.com.ar/wp-content/uploads/2024/12/pexels-photo-1320997.webp,Tamaño,Jarra,,1
+1647,variation,BH_24UK6211631_BH001-02,"Limonada frutos rojos - Vaso",1,,4500,,,Tamaño,Vaso,,1
+1648,variation,BH_1TOMT2N1630_BH001-01,"Limonada Citric - Jarra",1,,9500,,,Tamaño,Jarra,,1
+1649,variation,BH_1TOMT2N1630_BH001-02,"Limonada Citric - Vaso",1,,4500,,,Tamaño,Vaso,,1
+1652,variation,BH_WRK386M_BH0361336-02,"La clasica - Completa",1,,18000,,,Porcion,Completa,,1
+1656,variation,BH_5549AVM_BH0351337-02,"La del medio - Completa",1,,26000,,,Porcion,Completa,,1
+1657,variation,BH_D78C9JV_BH0341338-01,"Super bunker - 1/2 Picada",1,,25000,,,Porcion,"1/2 Picada",,1
+1658,variation,BH_D78C9JV_BH0341338-02,"Super bunker - Completa",1,,40000,,,Porcion,Completa,,1
+1699,variation,BH_793TFR7_BH0191353-01,"La común - 1/2 Porcion",1,,0,,,Porcion,"1/2 Porcion",,1
+1700,variation,BH_793TFR7_BH0191353-02,"La común - Completa",1,,6000,,,Porcion,Completa,,1
+1772,simple,BH_T8CJYE61772_BH001,"Gin Tanqueray",1,,7500,TRAGOS,https://bunkerhouse.com.ar/wp-content/uploads/2024/12/cocteles_1-scaled-1.jpg,,,,
+1841,simple,,"Super Lomito en pan casero (Para 2)",-1,"<p>Lomo, mayonesa, rucula, tomate, jamón, queso, sale con papas</p>",20000,"ENTRE PANES CALIENTES",https://bunkerhouse.com.ar/wp-content/uploads/2025/01/lomito.webp,,,,
+1842,simple,,"Lomito en pan de miga",1,"<p>Lomito, lechuga, tomate, doble queso, doble jamón, mayonesa</p>",19000,"ENTRE PANES CALIENTES",https://bunkerhouse.com.ar/wp-content/uploads/2025/01/lomito.webp,,,,
+1844,simple,,"Lomito en pan torpedo",-1,"Lomo, lechuga, tomate, doble queso, doble jamón, mayonesa",14000,"ENTRE PANES CALIENTES",https://bunkerhouse.com.ar/wp-content/uploads/2025/01/lomito.webp,,,,
+1845,simple,BH_KX968JL1845_BH001,"Picada Chopera",1,"Salamín, queso, jamón cocido, aceitunas, pan",10000,PICADAS,https://bunkerhouse.com.ar/wp-content/uploads/2024/12/BULLANGA-5.jpg,,,,
+1846,simple,,Rabas,-1,,14000,PICADAS,https://bunkerhouse.com.ar/wp-content/uploads/2025/01/rabas.webp,,,,
+1881,simple,BH_7CDGZ5U1881_BH001,"MILANESA C/ PAPAS FRITAS O MEZCLUN DE VEGETALES",1,,12500,"PLATOS ELABORADOS","https://bunkerhouse.com.ar/wp-content/uploads/2025/07/milanesa-con-papas-fritas.webp, https://bunkerhouse.com.ar/wp-content/uploads/2025/07/images.webp",,,,
+1882,simple,BH_OP96URR1882_BH001,"MEZCLUN DE VEGETALES",1,,12500,"PLATOS ELABORADOS",https://bunkerhouse.com.ar/wp-content/uploads/2025/07/images.webp,,,,
+1884,simple,BH_582HEY71884_BH001,"BONDIOLA A LA CERVEZA NEGRA C/ MIL HOJAS DE PAPAS O ENSALADA",1,,16000,"PLATOS ELABORADOS",https://bunkerhouse.com.ar/wp-content/uploads/2025/07/images-1.webp,,,,
+1887,simple,BH_U8UI6I41887_BH001,"FILET DE SURUBÍ EN SALSA 4 QUESOS C/ PAPITAS FRITAS CUADRADAS",1,,20000,"PLATOS ELABORADOS",https://bunkerhouse.com.ar/wp-content/uploads/2025/07/surubi625x408.webp,,,,
+1891,simple,BH_LWKW6M41891_BH001,"SORRENTINOS ( CONSULTAR SABORES)",1,"<ul>\n 	<li>Verdeo $ 4000</li>\n 	<li>4 quesos $ 5000</li>\n 	<li>Hongos de pino a la crema $ 6000</li>\n 	<li>Roja $ 3000</li>\n</ul>",6000,"PLATOS ELABORADOS > PASTAS, PLATOS ELABORADOS",https://bunkerhouse.com.ar/wp-content/uploads/2025/07/sorrentinos-caseros-de-ricota-jamon-y-mozzarella_web.webp,,,,
+1892,simple,BH_7M357NE1892_BH001,"TALLARINES AL HUEVO",1,"<ul>\n 	<li>Verdeo $ 4000</li>\n 	<li>4 quesos $ 5000</li>\n 	<li>Hongos de pino a la crema $ 6000</li>\n 	<li>Roja $ 3000</li>\n</ul>",4500,"PLATOS ELABORADOS > PASTAS, PLATOS ELABORADOS",https://bunkerhouse.com.ar/wp-content/uploads/2025/07/tall.webp,,,,
+1899,simple,BH_FX3T8BK1899_BH001,"Fernet Branca",1,"Fernet Branca con Coca Cola",4000,COCKTAILS,https://bunkerhouse.com.ar/wp-content/uploads/2025/07/shutterstock_2140552827-scaled-1.webp,,,,
+1909,simple,BH_256T1K51909_BH001,"Gin tonic Blu",1,"Gin Blu con tonica",5000,COCKTAILS,https://bunkerhouse.com.ar/wp-content/uploads/2025/07/0BE0zi9W6cgYlgzy9LKf5ML34iASNyVTyvdWjpn5.webp,,,,
+1910,simple,BH_5GC3Z7F1910_BH001,"Carpano Originale",1,"Carpano Rosso, Soda y aceituna",4300,COCKTAILS,https://bunkerhouse.com.ar/wp-content/uploads/2025/07/Carpano-Rosso-001-Mercado.webp,,,,
+1911,simple,BH_1DHAR991911_BH001,"Carpano Orange",1,"Carpano Rosso, soda y una rodaja de naranja",4000,COCKTAILS,https://bunkerhouse.com.ar/wp-content/uploads/2025/07/c1-965cf7eab581b2d14215756305806242-1024-1024.webp,,,,
+1912,simple,BH_K4OFNE91912_BH001,"Carpano Bianco Tonic",1,"Carpano Bianco, tonica y rodaja de limón",4000,COCKTAILS,https://bunkerhouse.com.ar/wp-content/uploads/2025/07/0c9c52265667bb43f85c5c03485de6a1.webp,,,,
+1913,simple,BH_2JWK3VM1913_BH001,"Mint tonic",1,"Branca Menta ricetta italiana con tonica",3500,COCKTAILS,https://bunkerhouse.com.ar/wp-content/uploads/2025/07/b38824b7e6d848537acde69794d40139.webp,,,,
+1914,simple,BH_RRY9JKN1914_BH001,"Sernova Tonic",1,"Vodka Sernova con tónica",4000,COCKTAILS,https://bunkerhouse.com.ar/wp-content/uploads/2025/07/sernova-evolution-tonic.webp,,,,
+1915,simple,BH_811N6IZ1915_BH001,"Punt e Mes tonic",1,"Punt e mes, tónica y rodaja de limón",4000,COCKTAILS,https://bunkerhouse.com.ar/wp-content/uploads/2025/07/a07493_f0db0652b203487583579757585696d2_mv2.webp,,,,
+1921,variable,BH_6227S141921_BH001,"La Del Pueblo",1,"Milanesas, papas fritas, pan, aderezos",,PICADAS,https://bunkerhouse.com.ar/wp-content/uploads/2024/12/BULLANGA-5.jpg,Porcion,"1/2 Picada, Completa",1,1
+1922,variation,,"La Del Pueblo - Completa",1,,18000,,,Porcion,Completa,,1
+1923,simple,BH_5S816P81923_BH001,Tostado,1,"Miga, jamón cocido, tybo\n<div id=""gtx-trans"" style=""position: absolute; left: 359px; top: 45px;"">\n<div class=""gtx-trans-icon""></div>\n</div>",6500,"ENTRE PANES CALIENTES",https://bunkerhouse.com.ar/wp-content/uploads/2025/01/lomito.webp,,,,
+1924,simple,BH_P54BXNU_BH0121360-1,"Roquefort y peras (copia)",-1,"Queso, roquefort, peras y nueces",8000,PIZZAS,https://bunkerhouse.com.ar/wp-content/uploads/2024/12/maxresdefault.webp,,,,
+1925,simple,BH_5CTC774_BH0151357-1,Napolitana,1,"Salsa, queso, rodajas de tomate",7000,PIZZAS,https://bunkerhouse.com.ar/wp-content/uploads/2025/09/8metlvp345_portada-pizza.webp,,,,
+1927,simple,BH_5CTC774_BH0151357-2,Calabresa,1,"Salsa, queso, cantimpalo\n<div id=""gtx-trans"" style=""position: absolute; left: 375px; top: 45px;"">\n<div class=""gtx-trans-icon""></div>\n</div>",8000,PIZZAS,https://bunkerhouse.com.ar/wp-content/uploads/2025/09/pizza-calabrese-with-salami-mozzarella-rosemary-and-calabrian-chile-paste.webp,,,,

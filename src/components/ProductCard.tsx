@@ -49,9 +49,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onRatingSubmit }) =>
   };
 
   return (
-    <div className="magazine-product-card group relative" style={{ fontFamily: "'Mileast', 'Montserrat', 'Maxwell Regular', 'Bonaro Clean', 'Newry Demo', serif" }}>
-      <div className="relative backdrop-blur-xl bg-gradient-to-br from-black/85 via-gray-900/95 to-black/85 rounded-3xl overflow-hidden shadow-2xl">
-        <div className="flex items-stretch min-h-[180px] md:flex-row flex-col">
+    <div className="magazine-product-card group relative w-full safe-container" style={{ fontFamily: "'Mileast', 'Montserrat', 'Maxwell Regular', 'Bonaro Clean', 'Newry Demo', serif" }}>
+      <div className="relative backdrop-blur-xl bg-gradient-to-br from-black/85 via-gray-900/95 to-black/85 rounded-3xl overflow-hidden shadow-2xl w-full" style={{ backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)`, backgroundSize: '20px 20px' }}>
+        <div className="flex items-stretch min-h-[180px] md:flex-row flex-col w-full">
           {/* Imagen del producto - Estilo revista */}
           <div className="relative w-full md:w-48 h-48 md:h-auto md:flex-shrink-0 bg-gradient-to-br from-gray-800 to-gray-900">
             {!imageError && localProduct.image ? (
@@ -60,7 +60,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onRatingSubmit }) =>
                 alt={localProduct.name}
                 fill
                 className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-                sizes="192px"
+                sizes="(max-width: 768px) 100vw, 192px"
                 onError={() => setImageError(true)}
               />
             ) : (
@@ -71,30 +71,30 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onRatingSubmit }) =>
           </div>
 
           {/* Contenido del producto - Estilo revista premium */}
-          <div className="flex-1 p-4 md:p-8 flex flex-col justify-between">
+          <div className="flex-1 p-3 sm:p-4 md:p-6 lg:p-8 flex flex-col justify-between w-full">
             
             {/* Header del producto */}
-            <div className="mb-3 md:mb-6">
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex-1">
-                  <h3 className="product-name text-xl font-bold text-white leading-tight tracking-wide">
+            <div className="mb-2 sm:mb-3 md:mb-6">
+              <div className="flex items-start justify-between mb-2 sm:mb-3">
+                <div className="flex-1 pr-2">
+                  <h3 className="product-name text-lg sm:text-xl font-bold text-white leading-tight tracking-wide text-ellipsis">
                     {localProduct.name}
                   </h3>
                   
                   {/* Línea decorativa */}
-                  <div className="w-16 h-0.5 bg-gradient-to-r from-gray-400 to-transparent mt-2"></div>
+                  <div className="w-12 sm:w-16 h-0.5 bg-gradient-to-r from-gray-400 to-transparent mt-1 sm:mt-2"></div>
                 </div>
                 
                 {/* Rating badge elegante */}
-                <div 
-                  className="bg-white/95 backdrop-blur-sm px-2 md:px-3 py-1 md:py-1.5 rounded-full flex items-center gap-1 md:gap-2 cursor-pointer ml-2 md:ml-4 flex-shrink-0"
+                <div
+                  className="bg-white/95 backdrop-blur-sm px-2 py-1 sm:px-3 sm:py-1.5 rounded-full flex items-center gap-1 sm:gap-2 cursor-pointer ml-1 sm:ml-2 md:ml-4 flex-shrink-0"
                   onClick={() => setShowRating(true)}
                 >
-                  <FaStar className="text-yellow-500" size={12} />
-                  <span className="text-sm font-bold text-gray-800">
+                  <FaStar className="text-yellow-500" size={10} />
+                  <span className="text-xs sm:text-sm font-bold text-gray-800">
                     {localProduct.averageRating?.toFixed(1) || '0.0'}
                   </span>
-                  <span className="text-xs text-gray-600">
+                  <span className="text-xs text-gray-600 hidden sm:inline">
                     ({localProduct.ratings?.length || 0})
                   </span>
                 </div>
@@ -102,8 +102,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onRatingSubmit }) =>
               
               {/* Descripción elegante */}
               {localProduct.description && (
-                <div className="mb-4">
-                  <p className="product-description text-gray-300 text-base leading-relaxed font-light">
+                <div className="mb-2 sm:mb-4">
+                  <p className="product-description text-gray-300 text-sm sm:text-base leading-relaxed font-light line-clamp-2">
                     {localProduct.description}
                   </p>
                 </div>
@@ -111,32 +111,32 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onRatingSubmit }) =>
             </div>
 
             {/* Sección de precios premium */}
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {localProduct.variations && localProduct.variations.length > 0 ? (
-                <div className="space-y-3">
-                  <div className="text-xs uppercase tracking-widest text-gray-400 font-medium mb-3">Opciones Disponibles</div>
+                <div className="space-y-2 sm:space-y-3">
+                  <div className="text-xs uppercase tracking-widest text-gray-400 font-medium mb-2 sm:mb-3">Opciones Disponibles</div>
                   {localProduct.variations.map((variation, index) => (
-                    <div key={variation.id} className="flex justify-between items-center py-2">
-                      <div className="flex items-center gap-3">
+                    <div key={variation.id} className="flex justify-between items-center py-1 sm:py-2">
+                      <div className="flex items-center gap-2 sm:gap-3">
                         <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-gray-400 to-white"></div>
-                        <span className="product-variation text-gray-300">{variation.name}</span>
+                        <span className="product-variation text-gray-300 text-sm sm:text-base text-ellipsis">{variation.name}</span>
                       </div>
-                                          <span className="product-price text-lg font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent tracking-wider">
-                      ${variation.price}
-                    </span>
+                      <span className="product-price text-base sm:text-lg font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent tracking-wider">
+                        ${variation.price}
+                      </span>
                     </div>
                   ))}
                 </div>
               ) : (
                 <div className="flex justify-between items-end">
                   <div>
-                    <div className="text-xs uppercase tracking-widest text-gray-400 font-medium mb-1">Precio</div>
+                    
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-gradient-to-r from-gray-400 to-white"></div>
-                      <span className="text-gray-400 text-sm">Precio único</span>
+                      <span className="text-gray-400 text-sm sm:text-base">Precio</span>
                     </div>
                   </div>
-                  <p className="product-price text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent tracking-wider">
+                  <p className="product-price text-lg sm:text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent tracking-wider">
                     ${localProduct.price}
                   </p>
                 </div>
