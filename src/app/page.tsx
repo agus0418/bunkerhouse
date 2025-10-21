@@ -309,24 +309,17 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-black w-full relative text-white">
-      {/* Midnight Radial Glow Background */}
-      <div 
-        className="absolute inset-0 z-0" 
-        style={{ 
-          background: ` 
-            radial-gradient(circle at 50% 50%, 
-              rgba(226, 232, 240, 0.2) 0%, 
-              rgba(226, 232, 240, 0.1) 25%, 
-              rgba(226, 232, 240, 0.05) 35%, 
-              transparent 50% 
-            ) 
-          `, 
-        }} 
+    <main className="min-h-screen w-full bg-[#020617] relative text-white overflow-x-hidden">
+      {/* Orange Radial Glow Background */}
+      <div
+        className="absolute inset-0 z-0 overflow-hidden"
+        style={{
+          backgroundImage: `radial-gradient(circle 500px at 50% 100px, rgba(249,115,22,0.4), transparent)`,
+        }}
       />
       {/* Hero Section Mejorado */}
-      <section className="hero-section relative z-10 h-[75vh] sm:h-[85vh] md:h-[100vh] overflow-hidden">
-        <div className="absolute inset-0">
+      <section className="hero-section relative z-10 h-[75vh] sm:h-[85vh] md:h-[100vh] overflow-hidden w-full">
+        <div className="absolute inset-0 w-full overflow-hidden">
           {/* Fondo con gradiente elegante neutro */}
           <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black"></div>
           
@@ -370,7 +363,7 @@ export default function Home() {
           </div>
         </div>
         
-        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center p-4 sm:p-6">
+        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center p-4 sm:p-6 w-full max-w-full">
           <div className="mb-6 sm:mb-8 animate-fade-in-up w-full max-w-4xl mx-auto">
             <div className="inline-block p-3 sm:p-4 rounded-full bg-white/15 backdrop-blur-sm mb-4 sm:mb-6">
               <FaUtensils className="text-3xl sm:text-4xl text-white" />
@@ -433,7 +426,7 @@ export default function Home() {
       </section>
 
       {/* Barra de navegación sticky con búsqueda */}
-      <div className="sticky top-0 z-40 bg-black/90 backdrop-blur-xl border-b border-gray-800/50 transition-all duration-300">
+      <div className="sticky top-0 z-40 bg-black/90 backdrop-blur-xl border-b border-gray-800/50 transition-all duration-300 w-full overflow-hidden">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
           <div className="flex items-center justify-between py-3 sm:py-4">
             {/* Navegación principal */}
@@ -527,7 +520,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-8 sm:py-12 menu-content">
+      <div className="relative z-10 max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-8 sm:py-12 menu-content w-full overflow-hidden">
         {searchTerm && (
           <div className="mb-8 text-center">
             <h2 className="text-xl font-semibold text-white mb-2">
