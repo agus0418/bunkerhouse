@@ -5,7 +5,7 @@ import { collection, onSnapshot, query, orderBy, doc, updateDoc, arrayUnion } fr
 import { db } from '@/lib/firebase';
 import { Product, ProductRating } from '@/types/firebase';
 import ProductCard from '@/components/ProductCard';
-import { FaUtensils, FaGlassMartiniAlt } from 'react-icons/fa';
+import { FaUtensils, FaGlassMartiniAlt, FaArrowUp, FaSearch } from 'react-icons/fa';
 import Image from 'next/image';
 
 export default function Home() {
@@ -13,6 +13,10 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('COMIDAS');
   const [isMobileView, setIsMobileView] = useState(false);
+  const [showScrollToComidas, setShowScrollToComidas] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showSearch, setShowSearch] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
     const checkMobileView = () => {
@@ -21,6 +25,46 @@ export default function Home() {
     checkMobileView();
     window.addEventListener('resize', checkMobileView);
     return () => window.removeEventListener('resize', checkMobileView);
+  }, []);
+
+  // Atajos de teclado
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      // Ctrl/Cmd + K para abrir búsqueda
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        setShowSearch(true);
+      }
+      // Escape para cerrar búsqueda
+      if (e.key === 'Escape' && showSearch) {
+        setShowSearch(false);
+        setSearchTerm('');
+      }
+      // 1 para ir a comidas
+      if (e.key === '1' && !showSearch) {
+        handleTabClick('COMIDAS');
+      }
+      // 2 para ir a bebidas
+      if (e.key === '2' && !showSearch) {
+        handleTabClick('BEBIDAS');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [showSearch]);
+
+  // Indicador de progreso de scroll
+  useEffect(() => {
+    const updateScrollProgress = () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const scrollPercent = (scrollTop / docHeight) * 100;
+      setScrollProgress(scrollPercent);
+    };
+
+    window.addEventListener('scroll', updateScrollProgress);
+    return () => window.removeEventListener('scroll', updateScrollProgress);
   }, []);
 
   // Detectar qué sección está visible y actualizar el tab activo
@@ -37,8 +81,13 @@ export default function Home() {
         
         if (scrollPosition >= comidasTop && scrollPosition < bebidasTop) {
           setActiveTab('COMIDAS');
+          setShowScrollToComidas(false);
         } else if (scrollPosition >= bebidasTop) {
           setActiveTab('BEBIDAS');
+          // Mostrar el botón cuando el usuario esté en la sección de bebidas
+          setShowScrollToComidas(true);
+        } else {
+          setShowScrollToComidas(false);
         }
       }
     };
@@ -96,10 +145,59 @@ export default function Home() {
     return groups;
   }, {});
 
+  // Filtrar productos por término de búsqueda
+  const filteredBySearch = searchTerm.trim() === ''
+    ? products
+    : products.filter(product =>
+        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.category.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+
+  const groupedFilteredProducts: { [key: string]: { [key: string]: Product[] } } = filteredBySearch.reduce((groups: { [key: string]: { [key: string]: Product[] } }, product) => {
+    const mainCategory = product.type;
+    const subCategory = product.category;
+    
+    if (!groups[mainCategory]) {
+      groups[mainCategory] = {};
+    }
+    if (!groups[mainCategory][subCategory]) {
+      groups[mainCategory][subCategory] = [];
+    }
+    groups[mainCategory][subCategory].push(product);
+    return groups;
+  }, {});
+
   const filteredProducts: { COMIDAS: { [key: string]: Product[] }; BEBIDAS: { [key: string]: Product[] } } = {
-    COMIDAS: groupedProducts['COMIDAS'] || {},
-    BEBIDAS: groupedProducts['BEBIDAS'] || {}
+    COMIDAS: groupedFilteredProducts['COMIDAS'] || {},
+    BEBIDAS: groupedFilteredProducts['BEBIDAS'] || {}
   };
+
+  // Contar productos por categoría
+  const productCounts = {
+    COMIDAS: Object.values(groupedFilteredProducts['COMIDAS'] || {}).reduce((acc, products) => acc + products.length, 0),
+    BEBIDAS: Object.values(groupedFilteredProducts['BEBIDAS'] || {}).reduce((acc, products) => acc + products.length, 0)
+  };
+
+  // Obtener subcategorías populares
+  const getPopularCategories = () => {
+    const categories: { [key: string]: number } = {};
+    Object.entries(groupedFilteredProducts).forEach(([mainCategory, subCategories]) => {
+      Object.entries(subCategories).forEach(([subCategory, products]) => {
+        const key = `${mainCategory}-${subCategory}`;
+        categories[key] = products.length;
+      });
+    });
+    return Object.entries(categories)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 4)
+      .map(([key, count]) => {
+        const [mainCategory, subCategory] = key.split('-');
+        return { mainCategory, subCategory, count };
+      });
+  };
+
+  const popularCategories = getPopularCategories();
 
   const handleTabClick = (tab: 'COMIDAS' | 'BEBIDAS') => {
     setActiveTab(tab);
@@ -130,6 +228,31 @@ export default function Home() {
         });
       }
     }
+  };
+
+  const scrollToComidas = () => {
+    const comidasSection = document.getElementById('comidas');
+    if (comidasSection) {
+      const headerOffset = isMobileView ? 80 : 120;
+      const elementPosition = comidasSection.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth"
+      });
+    }
+  };
+
+  const toggleSearch = () => {
+    setShowSearch(!showSearch);
+    if (!showSearch) {
+      setSearchTerm('');
+    }
+  };
+
+  const clearSearch = () => {
+    setSearchTerm('');
   };
 
   const handleRatingSubmit = async (productId: string, rating: ProductRating) => {
@@ -309,29 +432,148 @@ export default function Home() {
         </div>
       </section>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-8 sm:py-12 menu-content">
-        {Object.entries(filteredProducts).map(([mainCategoryKey, subCategoriesObject]) => (
-          (isMobileView || activeTab === mainCategoryKey) && (
-            <section key={mainCategoryKey} id={mainCategoryKey.toLowerCase()} className="mb-16">
-              <div className="relative mb-12">
-                <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                  <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-400/50 to-transparent"></div>
+      {/* Barra de navegación sticky con búsqueda */}
+      <div className="sticky top-0 z-40 bg-black/90 backdrop-blur-xl border-b border-gray-800/50 transition-all duration-300">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+          <div className="flex items-center justify-between py-3 sm:py-4">
+            {/* Navegación principal */}
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <button
+                onClick={() => handleTabClick('COMIDAS')}
+                className={`flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-full text-sm sm:text-base font-medium transition-all duration-300 ${
+                  activeTab === 'COMIDAS'
+                    ? 'bg-white text-black shadow-lg'
+                    : 'text-gray-300 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                <FaUtensils className="text-sm sm:text-base" />
+                <span className="hidden sm:inline">Comidas</span>
+              </button>
+              <button
+                onClick={() => handleTabClick('BEBIDAS')}
+                className={`flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-full text-sm sm:text-base font-medium transition-all duration-300 ${
+                  activeTab === 'BEBIDAS'
+                    ? 'bg-white text-black shadow-lg'
+                    : 'text-gray-300 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                <FaGlassMartiniAlt className="text-sm sm:text-base" />
+                <span className="hidden sm:inline">Bebidas</span>
+              </button>
+            </div>
+
+            {/* Indicadores de progreso */}
+            <div className="hidden md:flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <div className={`h-1 w-16 rounded-full transition-all duration-300 ${
+                  activeTab === 'COMIDAS' ? 'bg-white' : 'bg-gray-600'
+                }`}></div>
+                <span className="text-xs text-gray-400">Comidas</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className={`h-1 w-16 rounded-full transition-all duration-300 ${
+                  activeTab === 'BEBIDAS' ? 'bg-white' : 'bg-gray-600'
+                }`}></div>
+                <span className="text-xs text-gray-400">Bebidas</span>
+              </div>
+            </div>
+
+            {/* Botón de búsqueda */}
+            <button
+              onClick={toggleSearch}
+              className={`p-2 rounded-full transition-all duration-300 ${
+                showSearch
+                  ? 'bg-white text-black'
+                  : 'text-gray-300 hover:text-white hover:bg-white/10'
+              }`}
+              aria-label="Buscar productos"
+            >
+              <FaSearch className="text-sm sm:text-base" />
+            </button>
+          </div>
+
+          {/* Barra de búsqueda */}
+          {showSearch && (
+            <div className="pb-4">
+              <div className="relative max-w-md mx-auto">
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Buscar platos, bebidas..."
+                  className="w-full px-4 py-2 pl-10 pr-10 bg-white/10 border border-gray-700 rounded-full text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent"
+                  autoFocus
+                />
+                <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                {searchTerm && (
+                  <button
+                    onClick={clearSearch}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                    aria-label="Limpiar búsqueda"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+              {searchTerm && (
+                <div className="text-center mt-2">
+                  <p className="text-sm text-gray-400">
+                    {filteredBySearch.length} {filteredBySearch.length === 1 ? 'resultado' : 'resultados'} encontrados
+                  </p>
                 </div>
-                <div className="relative flex justify-center">
-                  <div className="elegant-category-title px-8 py-4 bg-gradient-to-r from-black/90 to-gray-900/90 backdrop-blur-xl rounded-2xl shadow-2xl flex items-center space-x-4 group hover:scale-105 transition-all duration-500">
-                    <div className="p-2 rounded-full bg-gradient-to-r from-gray-600 to-gray-800 group-hover:from-white group-hover:to-gray-200 transition-all duration-300">
-                      {mainCategoryKey === 'COMIDAS' ? 
-                        <FaUtensils className="text-2xl text-white group-hover:text-black transition-colors duration-300" /> : 
-                        <FaGlassMartiniAlt className="text-2xl text-white group-hover:text-black transition-colors duration-300" />
-                      }
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-8 sm:py-12 menu-content">
+        {searchTerm && (
+          <div className="mb-8 text-center">
+            <h2 className="text-xl font-semibold text-white mb-2">
+              Resultados de búsqueda para "{searchTerm}"
+            </h2>
+            {filteredBySearch.length === 0 && (
+              <div className="text-gray-400 py-8">
+                <p>No se encontraron productos que coincidan con tu búsqueda.</p>
+                <button
+                  onClick={clearSearch}
+                  className="mt-4 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
+                >
+                  Limpiar búsqueda
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {Object.entries(filteredProducts).map(([mainCategoryKey, subCategoriesObject]) => {
+          const hasProducts = Object.values(subCategoriesObject).some(products => products.length > 0);
+          
+          if (!hasProducts) return null;
+          
+          return (
+            (isMobileView || activeTab === mainCategoryKey || searchTerm) && (
+              <section key={mainCategoryKey} id={mainCategoryKey.toLowerCase()} className="mb-16">
+                <div className="relative mb-12">
+                  <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                    <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-400/50 to-transparent"></div>
+                  </div>
+                  <div className="relative flex justify-center">
+                    <div className="elegant-category-title px-8 py-4 bg-gradient-to-r from-black/90 to-gray-900/90 backdrop-blur-xl rounded-2xl shadow-2xl flex items-center space-x-4 group hover:scale-105 transition-all duration-500">
+                      <div className="p-2 rounded-full bg-gradient-to-r from-gray-600 to-gray-800 group-hover:from-white group-hover:to-gray-200 transition-all duration-300">
+                        {mainCategoryKey === 'COMIDAS' ?
+                          <FaUtensils className="text-2xl text-white group-hover:text-black transition-colors duration-300" /> :
+                          <FaGlassMartiniAlt className="text-2xl text-white group-hover:text-black transition-colors duration-300" />
+                        }
+                      </div>
+                      <span className="text-2xl font-bold bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
+                        {mainCategoryKey}
+                      </span>
+                      <div className="w-2 h-2 rounded-full bg-gradient-to-r from-gray-400 to-white animate-pulse"></div>
                     </div>
-                    <span className="text-2xl font-bold bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
-                      {mainCategoryKey}
-                    </span>
-                    <div className="w-2 h-2 rounded-full bg-gradient-to-r from-gray-400 to-white animate-pulse"></div>
                   </div>
                 </div>
-              </div>
               
               {Object.entries(subCategoriesObject).map(([subCategoryKey, productsInSubCategory]) => {
                 if (productsInSubCategory.length === 0) {
@@ -375,10 +617,25 @@ export default function Home() {
                   </div>
                 );
               })}
-            </section>
-          )
-        ))}
+              </section>
+            )
+          );
+        })}
       </div>
+
+      {/* Botón flotante para volver a comidas */}
+      {showScrollToComidas && (
+        <button
+          onClick={scrollToComidas}
+          className="fixed bottom-6 right-6 z-50 p-3 bg-white/90 backdrop-blur-sm text-black rounded-full shadow-lg hover:bg-white hover:scale-110 transition-all duration-300 group"
+          aria-label="Volver a sección de comidas"
+        >
+          <FaUtensils className="text-lg group-hover:rotate-12 transition-transform duration-300" />
+          <span className="absolute right-full mr-3 top-1/2 transform -translate-y-1/2 bg-black/80 text-white px-2 py-1 rounded text-sm whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            Volver a Comidas
+          </span>
+        </button>
+      )}
     </main>
   );
 }

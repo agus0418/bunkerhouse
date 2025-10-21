@@ -930,3 +930,110 @@ body {
     padding-right: 1rem;
   }
 }
+
+/* Indicador de scroll mejorado */
+.scroll-indicator {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  z-index: 9999;
+  transition: width 0.3s ease;
+}
+
+/* Efectos de hover mejorados para navegación */
+.nav-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.nav-button:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+/* Animación de entrada para categorías populares */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.category-tag {
+  animation: slideInUp 0.5s ease-out;
+  animation-fill-mode: both;
+}
+
+.category-tag:nth-child(1) { animation-delay: 0.1s; }
+.category-tag:nth-child(2) { animation-delay: 0.2s; }
+.category-tag:nth-child(3) { animation-delay: 0.3s; }
+.category-tag:nth-child(4) { animation-delay: 0.4s; }
+
+/* Efecto de pulso para botones activos */
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(255, 255, 255, 0);
+  }
+}
+
+.active-nav {
+  animation: pulse 2s infinite;
+}
+
+/* Mejoras para accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  .category-tag,
+  .nav-button::before,
+  .active-nav {
+    animation: none;
+  }
+}
+
+/* Efecto de brillo para búsqueda */
+.search-glow:focus {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3), 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+/* Indicador de resultados de búsqueda */
+.search-results-indicator {
+  position: relative;
+  overflow: hidden;
+}
+
+.search-results-indicator::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  width: 100%;
+  background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
