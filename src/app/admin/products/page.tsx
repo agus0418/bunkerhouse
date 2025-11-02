@@ -39,6 +39,7 @@ export default function ProductsPage() {
   const [activeTab, setActiveTab] = useState<TabType>('COMIDAS');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string | null>(null);
+  const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all');
   const [allUniqueCategories, setAllUniqueCategories] = useState<string[]>([]);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -404,7 +405,10 @@ export default function ProductsPage() {
     const searchMatch = !searchQuery || 
                         product.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                         (product.description || '').toLowerCase().includes(searchQuery.toLowerCase());
-    return tabMatch && categoryMatch && searchMatch;
+    const statusMatch = filterStatus === 'all' || 
+                       (filterStatus === 'active' && product.isActive !== false) ||
+                       (filterStatus === 'inactive' && product.isActive === false);
+    return tabMatch && categoryMatch && searchMatch && statusMatch;
   });
 
   const handleCloseModals = () => {
@@ -525,31 +529,62 @@ export default function ProductsPage() {
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <h1 className="text-2xl sm:text-3xl font-semibold text-white">Gestión de Productos</h1>
-        <button
-          onClick={() => {
-            setSelectedProduct({
-              id: '', // Indicar que es nuevo
-              name: '',
-              price: 0,
-              category: '',
-              type: 'COMIDAS',
-              variations: [],
-              image: '',
-              description: '',
-              ratings: [],
-              averageRating: 0
-            }); 
-            setIsEditModalOpen(true);
-            setIsVariationsModalOpen(false);
-            handleCloseVariationModals();
-          }}
-          className="w-full sm:w-auto px-4 py-2.5 text-sm font-medium text-white bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors flex items-center justify-center shadow-md"
-        >
-          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-          Nuevo Producto
-        </button>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+          <div className="flex items-center gap-2 bg-gray-800 rounded-lg p-1">
+            <button
+              onClick={() => setFilterStatus('all')}
+              className={`px-3 py-1.5 rounded-lg transition-colors text-sm font-medium ${filterStatus === 'all'
+                ? 'bg-blue-600 text-white'
+                : 'text-gray-400 hover:text-white'
+                }`}
+            >
+              Todos ({products.length})
+            </button>
+            <button
+              onClick={() => setFilterStatus('active')}
+              className={`px-3 py-1.5 rounded-lg transition-colors text-sm font-medium ${filterStatus === 'active'
+                ? 'bg-green-600 text-white'
+                : 'text-gray-400 hover:text-white'
+                }`}
+            >
+              Activos ({products.filter(p => p.isActive !== false).length})
+            </button>
+            <button
+              onClick={() => setFilterStatus('inactive')}
+              className={`px-3 py-1.5 rounded-lg transition-colors text-sm font-medium ${filterStatus === 'inactive'
+                ? 'bg-red-600 text-white'
+                : 'text-gray-400 hover:text-white'
+                }`}
+            >
+              Inactivos ({products.filter(p => p.isActive === false).length})
+            </button>
+          </div>
+          <button
+            onClick={() => {
+              setSelectedProduct({
+                id: '', // Indicar que es nuevo
+                name: '',
+                price: 0,
+                category: '',
+                type: 'COMIDAS',
+                variations: [],
+                image: '',
+                description: '',
+                ratings: [],
+                averageRating: 0
+              }); 
+              setIsEditModalOpen(true);
+              setIsVariationsModalOpen(false);
+              handleCloseVariationModals();
+            }}
+            className="w-full sm:w-auto px-4 py-2.5 text-sm font-medium text-white bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors flex items-center justify-center shadow-md"
+          >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+            Nuevo Producto
+          </button>
+        </div>
       </div>
 
       <div className="mb-6 p-4 bg-gray-800 rounded-lg shadow">

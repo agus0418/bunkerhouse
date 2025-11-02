@@ -11,6 +11,7 @@ export default function ProductManagement() {
   const [isLoading, setIsLoading] = useState(true);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all');
   const [newProduct, setNewProduct] = useState({
     name: '',
     price: 0,
@@ -30,7 +31,7 @@ export default function ProductManagement() {
         id: doc.id,
         ...doc.data()
       })) as Product[];
-      
+
       setProducts(productsData);
       setIsLoading(false);
     });
@@ -78,7 +79,8 @@ export default function ProductManagement() {
         ...newProduct,
         id: newProductRef.id,
         ratings: [],
-        averageRating: 0
+        averageRating: 0,
+        isActive: true
       });
       setNewProduct({
         name: '',
@@ -95,6 +97,23 @@ export default function ProductManagement() {
     }
   };
 
+  const handleToggleActive = async (product: Product) => {
+    try {
+      const productRef = doc(db, 'products', product.id);
+      await updateDoc(productRef, {
+        isActive: !product.isActive
+      });
+    } catch (error) {
+      console.error('Error al cambiar estado del producto:', error);
+    }
+  };
+
+  const filteredProducts = products.filter(product => {
+    if (filterStatus === 'active') return product.isActive !== false;
+    if (filterStatus === 'inactive') return product.isActive === false;
+    return true;
+  });
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -105,15 +124,46 @@ export default function ProductManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h2 className="text-2xl font-bold text-white">Gestión de Productos</h2>
-        <button
-          onClick={() => setShowAddForm(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-        >
-          <FaPlus />
-          <span>Agregar Producto</span>
-        </button>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 bg-gray-800 rounded-lg p-1">
+            <button
+              onClick={() => setFilterStatus('all')}
+              className={`px-4 py-2 rounded-lg transition-colors ${filterStatus === 'all'
+                ? 'bg-blue-600 text-white'
+                : 'text-gray-400 hover:text-white'
+                }`}
+            >
+              Todos ({products.length})
+            </button>
+            <button
+              onClick={() => setFilterStatus('active')}
+              className={`px-4 py-2 rounded-lg transition-colors ${filterStatus === 'active'
+                ? 'bg-green-600 text-white'
+                : 'text-gray-400 hover:text-white'
+                }`}
+            >
+              Activos ({products.filter(p => p.isActive !== false).length})
+            </button>
+            <button
+              onClick={() => setFilterStatus('inactive')}
+              className={`px-4 py-2 rounded-lg transition-colors ${filterStatus === 'inactive'
+                ? 'bg-red-600 text-white'
+                : 'text-gray-400 hover:text-white'
+                }`}
+            >
+              Inactivos ({products.filter(p => p.isActive === false).length})
+            </button>
+          </div>
+          <button
+            onClick={() => setShowAddForm(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+          >
+            <FaPlus />
+            <span>Agregar</span>
+          </button>
+        </div>
       </div>
 
       <AnimatePresence>
@@ -207,7 +257,7 @@ export default function ProductManagement() {
       </AnimatePresence>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {products.map((product) => (
+        {filteredProducts.map((product) => (
           <motion.div
             key={product.id}
             initial={{ opacity: 0, y: 20 }}
@@ -286,7 +336,15 @@ export default function ProductManagement() {
                   )}
                 </div>
                 <div className="space-y-2">
-                  <h3 className="text-xl font-semibold text-white">{product.name}</h3>
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xl font-semibold text-white">{product.name}</h3>
+                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${product.isActive !== false
+                      ? 'bg-green-600/20 text-green-400'
+                      : 'bg-red-600/20 text-red-400'
+                      }`}>
+                      {product.isActive !== false ? 'Activo' : 'Inactivo'}
+                    </span>
+                  </div>
                   <p className="text-gray-400">{product.category}</p>
                   <p className="text-green-400 font-semibold">${product.price}</p>
                   <p className="text-gray-400 text-sm">{product.description}</p>
@@ -296,21 +354,32 @@ export default function ProductManagement() {
                     <span className="text-sm">{product.ratings?.length || 0} valoraciones</span>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 mt-4">
+                <div className="space-y-2 mt-4">
                   <button
-                    onClick={() => handleEdit(product)}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    onClick={() => handleToggleActive(product)}
+                    className={`w-full px-4 py-2 rounded-lg transition-colors font-semibold ${product.isActive !== false
+                      ? 'bg-orange-600 hover:bg-orange-700 text-white'
+                      : 'bg-green-600 hover:bg-green-700 text-white'
+                      }`}
                   >
-                    <FaEdit />
-                    <span>Editar</span>
+                    {product.isActive !== false ? 'Deshabilitar' : 'Habilitar'}
                   </button>
-                  <button
-                    onClick={() => handleDelete(product.id)}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                  >
-                    <FaTrash />
-                    <span>Eliminar</span>
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleEdit(product)}
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      <FaEdit />
+                      <span>Editar</span>
+                    </button>
+                    <button
+                      onClick={() => handleDelete(product.id)}
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                    >
+                      <FaTrash />
+                      <span>Eliminar</span>
+                    </button>
+                  </div>
                 </div>
               </>
             )}

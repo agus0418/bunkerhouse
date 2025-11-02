@@ -309,12 +309,13 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen w-full bg-[#020617] relative text-white overflow-x-hidden">
-      {/* Orange Radial Glow Background */}
+    <main className="min-h-screen w-full bg-stone-900 relative text-white overflow-x-hidden">
+      {/* Copper & Bronze Background */}
       <div
-        className="absolute inset-0 z-0 overflow-hidden"
+        className="absolute inset-0 z-0"
         style={{
-          backgroundImage: `radial-gradient(circle 500px at 50% 100px, rgba(249,115,22,0.4), transparent)`,
+          backgroundImage: `radial-gradient(circle at 50% 50%, rgba(194, 65, 12, 0.18) 0%, rgba(194, 65, 12, 0.1) 25%, rgba(194, 65, 12, 0.04) 35%, transparent 50%)`,
+          backgroundSize: "100% 100%",
         }}
       />
       {/* Hero Section Mejorado */}
@@ -436,7 +437,7 @@ export default function Home() {
                 className={`flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-full text-sm sm:text-base font-medium transition-all duration-300 ${
                   activeTab === 'COMIDAS'
                     ? 'bg-white text-black shadow-lg'
-                    : 'text-gray-300 hover:text-white hover:bg-white/10'
+                    : 'text-white hover:bg-white/10'
                 }`}
               >
                 <FaUtensils className="text-sm sm:text-base" />
@@ -447,7 +448,7 @@ export default function Home() {
                 className={`flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-full text-sm sm:text-base font-medium transition-all duration-300 ${
                   activeTab === 'BEBIDAS'
                     ? 'bg-white text-black shadow-lg'
-                    : 'text-gray-300 hover:text-white hover:bg-white/10'
+                    : 'text-white hover:bg-white/10'
                 }`}
               >
                 <FaGlassMartiniAlt className="text-sm sm:text-base" />

@@ -1,4 +1,4 @@
-const XLSX = require('xlsx');
+const ExcelJS = require('exceljs');
 const path = require('path');
 
 // Datos de ejemplo - Reemplaza esto con los datos reales de tu Firebase
@@ -64,7 +64,7 @@ const sampleProducts = [
   }
 ];
 
-function exportProductsToExcel() {
+async function exportProductsToExcel() {
   try {
     console.log('📊 Generando archivo Excel con productos...');
     
@@ -119,31 +119,30 @@ function exportProductsToExcel() {
     console.log(`📊 Procesados: ${productCount} productos, ${variationCount} variaciones`);
 
     // Crear el libro de Excel
-    const workbook = XLSX.utils.book_new();
+    const workbook = new ExcelJS.Workbook();
     
     // Crear hoja principal con todos los datos
-    const worksheet = XLSX.utils.json_to_sheet(excelData);
+    const worksheet = workbook.addWorksheet('Productos Completos');
     
-    // Ajustar ancho de columnas
-    const columnWidths = [
-      { wch: 15 }, // ID Producto
-      { wch: 30 }, // Nombre Producto
-      { wch: 50 }, // Descripción
-      { wch: 20 }, // Categoría
-      { wch: 10 }, // Tipo
-      { wch: 12 }, // Precio Base
-      { wch: 40 }, // Imagen
-      { wch: 8 },  // Activo
-      { wch: 15 }, // Tiene Variaciones
-      { wch: 15 }, // ID Variación
-      { wch: 30 }, // Nombre Variación
-      { wch: 12 }, // Precio Variación
-      { wch: 30 }  // Tags Variación
+    // Definir columnas con anchos
+    worksheet.columns = [
+      { header: 'ID Producto', key: 'ID Producto', width: 15 },
+      { header: 'Nombre Producto', key: 'Nombre Producto', width: 30 },
+      { header: 'Descripción', key: 'Descripción', width: 50 },
+      { header: 'Categoría', key: 'Categoría', width: 20 },
+      { header: 'Tipo', key: 'Tipo', width: 10 },
+      { header: 'Precio Base', key: 'Precio Base', width: 12 },
+      { header: 'Imagen', key: 'Imagen', width: 40 },
+      { header: 'Activo', key: 'Activo', width: 8 },
+      { header: 'Tiene Variaciones', key: 'Tiene Variaciones', width: 15 },
+      { header: 'ID Variación', key: 'ID Variación', width: 15 },
+      { header: 'Nombre Variación', key: 'Nombre Variación', width: 30 },
+      { header: 'Precio Variación', key: 'Precio Variación', width: 12 },
+      { header: 'Tags Variación', key: 'Tags Variación', width: 30 }
     ];
-    worksheet['!cols'] = columnWidths;
-
-    // Agregar la hoja al libro
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Productos Completos');
+    
+    // Agregar datos
+    worksheet.addRows(excelData);
 
     // Crear hoja resumen por categorías
     const categorySummary = {};
@@ -180,14 +179,14 @@ function exportProductsToExcel() {
       return cleanSummary;
     });
 
-    const summaryWorksheet = XLSX.utils.json_to_sheet(summaryData);
-    summaryWorksheet['!cols'] = [
-      { wch: 25 }, // Categoría
-      { wch: 15 }, // Total Productos
-      { wch: 15 }, // Total Variaciones
-      { wch: 15 }  // Productos Activos
+    const summaryWorksheet = workbook.addWorksheet('Resumen por Categorías');
+    summaryWorksheet.columns = [
+      { header: 'Categoría', key: 'Categoría', width: 25 },
+      { header: 'Total Productos', key: 'Total Productos', width: 15 },
+      { header: 'Total Variaciones', key: 'Total Variaciones', width: 15 },
+      { header: 'Productos Activos', key: 'Productos Activos', width: 15 }
     ];
-    XLSX.utils.book_append_sheet(workbook, summaryWorksheet, 'Resumen por Categorías');
+    summaryWorksheet.addRows(summaryData);
 
     // Crear hoja solo de productos (sin variaciones)
     const productsOnly = excelData.filter((row, index, array) => {
@@ -205,19 +204,19 @@ function exportProductsToExcel() {
       'Tiene Variaciones': row['Tiene Variaciones']
     }));
 
-    const productsOnlyWorksheet = XLSX.utils.json_to_sheet(productsOnly);
-    productsOnlyWorksheet['!cols'] = [
-      { wch: 15 }, // ID Producto
-      { wch: 30 }, // Nombre Producto
-      { wch: 50 }, // Descripción
-      { wch: 20 }, // Categoría
-      { wch: 10 }, // Tipo
-      { wch: 12 }, // Precio Base
-      { wch: 40 }, // Imagen
-      { wch: 8 },  // Activo
-      { wch: 15 }  // Tiene Variaciones
+    const productsOnlyWorksheet = workbook.addWorksheet('Solo Productos');
+    productsOnlyWorksheet.columns = [
+      { header: 'ID Producto', key: 'ID Producto', width: 15 },
+      { header: 'Nombre Producto', key: 'Nombre Producto', width: 30 },
+      { header: 'Descripción', key: 'Descripción', width: 50 },
+      { header: 'Categoría', key: 'Categoría', width: 20 },
+      { header: 'Tipo', key: 'Tipo', width: 10 },
+      { header: 'Precio Base', key: 'Precio Base', width: 12 },
+      { header: 'Imagen', key: 'Imagen', width: 40 },
+      { header: 'Activo', key: 'Activo', width: 8 },
+      { header: 'Tiene Variaciones', key: 'Tiene Variaciones', width: 15 }
     ];
-    XLSX.utils.book_append_sheet(workbook, productsOnlyWorksheet, 'Solo Productos');
+    productsOnlyWorksheet.addRows(productsOnly);
 
     // Generar nombre de archivo con timestamp
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-').split('T')[0];
@@ -225,7 +224,7 @@ function exportProductsToExcel() {
     const filePath = path.join(process.cwd(), fileName);
 
     // Escribir el archivo
-    XLSX.writeFile(workbook, filePath);
+    await workbook.xlsx.writeFile(filePath);
 
     console.log(`✅ Archivo Excel generado exitosamente:`);
     console.log(`📁 Ubicación: ${filePath}`);
