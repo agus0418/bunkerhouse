@@ -77,39 +77,41 @@ body {
   max-width: 100vw;
 }
 
-/* Fondo elegante para la carta - OPTIMIZADO */
+/* Fondo elegante para la carta - OPTIMIZADO PARA MÓVIL */
 .elegant-menu-bg {
   background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
   position: relative;
 }
 
-.elegant-menu-bg::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: 
-    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.008) 1px, transparent 1px),
-    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.012) 1px, transparent 1px);
-  background-size: 60px 60px, 100px 100px;
-  background-position: 0 0, 50px 50px;
-  opacity: 0.6;
-  pointer-events: none;
-  z-index: 0;
-}
+@media (min-width: 769px) {
+  .elegant-menu-bg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+      radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.008) 1px, transparent 1px),
+      radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.012) 1px, transparent 1px);
+    background-size: 60px 60px, 100px 100px;
+    background-position: 0 0, 50px 50px;
+    opacity: 0.6;
+    pointer-events: none;
+    z-index: 0;
+  }
 
-.elegant-menu-bg::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  animation: subtleFloat 15s ease-in-out infinite;
-  pointer-events: none;
-  z-index: 0;
+  .elegant-menu-bg::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    animation: subtleFloat 15s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
 }
 
 /* Elementos de contenido sobre el fondo */
@@ -118,16 +120,28 @@ body {
   z-index: 1;
 }
 
-/* Sección elegante para categorías - OPTIMIZADA */
+/* Sección elegante para categorías - OPTIMIZADA PARA MÓVIL */
 .elegant-section-bg {
   background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
-  box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.4),
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+}
+
+@media (min-width: 769px) {
+  .elegant-section-bg {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    transition: all 0.3s ease;
+  }
 }
 
 /* Título de categoría elegante - OPTIMIZADO */
@@ -186,24 +200,30 @@ body {
   transform: translateY(-2px);
 }
 
-/* Tarjetas de productos estilo revista - OPTIMIZADAS */
+/* Tarjetas de productos estilo revista - OPTIMIZADAS PARA MÓVIL */
 .magazine-product-card {
   font-family: 'Mileast', 'Montserrat', 'Maxwell Regular', 'Bonaro Clean', 'Newry Demo', serif;
-  transition: none;
+  transition: opacity 0.2s ease;
   position: relative;
   overflow: hidden;
-  will-change: transform;
   transform-origin: center;
 }
 
-.magazine-product-card:hover {
-  transform: none;
-  box-shadow: none;
-}
+@media (min-width: 769px) {
+  .magazine-product-card {
+    will-change: transform;
+    transition: transform 0.3s ease;
+  }
+  
+  .magazine-product-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  }
 
-/* Efecto de escala sutil para imágenes */
-.group:hover .group-hover\:scale-103 {
-  transform: scale(1.03);
+  /* Efecto de escala sutil para imágenes solo en desktop */
+  .group:hover .group-hover\:scale-105 {
+    transform: scale(1.05);
+  }
 }
 
 /* Tarjetas de productos premium (fallback) */
@@ -353,27 +373,42 @@ body {
   animation: float 3s ease-in-out infinite;
 }
 
-/* Efectos de glassmorphism */
+/* Efectos de glassmorphism - OPTIMIZADOS PARA MÓVIL */
 .glass-effect {
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* Botones modernos */
+@media (min-width: 769px) {
+  .glass-effect {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+}
+
+/* Botones modernos - OPTIMIZADOS PARA MÓVIL */
 .modern-button {
   position: relative;
   overflow: hidden;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: all 0.2s ease;
 }
 
-.modern-button:hover {
-  box-shadow: 
-    0 20px 40px rgba(0, 0, 0, 0.5),
-    0 0 20px rgba(255, 255, 255, 0.2);
+@media (min-width: 769px) {
+  .modern-button {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .modern-button:hover {
+    box-shadow:
+      0 20px 40px rgba(0, 0, 0, 0.5),
+      0 0 20px rgba(255, 255, 255, 0.2);
+  }
 }
 
 /* Responsive Design Improvements */
@@ -827,10 +862,26 @@ body {
   }
 }
 
-/* Animación sutil para el fondo - OPTIMIZADA */
+/* Animación sutil para el fondo - OPTIMIZADA Y DESHABILITADA EN MÓVIL */
 @keyframes subtleFloat {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-5px); }
+}
+
+@media (max-width: 768px) {
+  /* Deshabilitar animaciones que consumen recursos en móvil */
+  .animate-float,
+  .animate-pulse,
+  .animate-bounce {
+    animation: none !important;
+  }
+  
+  /* Reducir gradientes complejos */
+  .elegant-menu-bg::before,
+  .elegant-menu-bg::after,
+  .menu-content::after {
+    display: none !important;
+  }
 }
 
 /* Efecto de partículas decorativas */
@@ -902,8 +953,8 @@ body {
   object-fit: cover;
 }
 
-/* Optimización para móviles */
-@media (max-width: 640px) {
+/* Optimización para móviles - MEJORADA */
+@media (max-width: 768px) {
   .safe-container {
     padding-left: 0.5rem;
     padding-right: 0.5rem;
@@ -911,18 +962,45 @@ body {
   
   /* Reducir efectos visuales en móviles para mejorar rendimiento */
   .backdrop-blur-xl {
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+  }
+  
+  .backdrop-blur-lg {
+    backdrop-filter: blur(6px) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
   }
   
   /* Simplificar animaciones en móviles */
   .transition-all {
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition: opacity 0.2s ease, transform 0.2s ease !important;
+  }
+  
+  .transition-transform {
+    transition: transform 0.2s ease !important;
   }
   
   /* Mejorar legibilidad */
   .text-white {
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  }
+  
+  /* Deshabilitar efectos hover en móvil */
+  .group:hover .group-hover\:scale-105 {
+    transform: none !important;
+  }
+  
+  .group:hover .group-hover\:scale-103 {
+    transform: none !important;
+  }
+  
+  /* Reducir sombras complejas */
+  .shadow-2xl {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+  }
+  
+  .shadow-xl {
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25) !important;
   }
 }
 

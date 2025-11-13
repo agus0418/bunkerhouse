@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import { motion } from 'framer-motion';
 import { Product, ProductRating } from '@/types/firebase';
 import RatingStars from './RatingStars';
@@ -10,7 +10,7 @@ interface ProductRatingProps {
   onClose: () => void;
 }
 
-const ProductRatingComponent: React.FC<ProductRatingProps> = ({ product, onRatingSubmit, onClose }) => {
+const ProductRatingComponent: React.FC<ProductRatingProps> = memo(({ product, onRatingSubmit, onClose }) => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const [userName, setUserName] = useState('');
@@ -18,7 +18,7 @@ const ProductRatingComponent: React.FC<ProductRatingProps> = ({ product, onRatin
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (rating === 0) return;
 
@@ -56,12 +56,13 @@ const ProductRatingComponent: React.FC<ProductRatingProps> = ({ product, onRatin
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [rating, comment, userName, onRatingSubmit, onClose]);
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
       className="bg-black/40 backdrop-blur-sm rounded-lg p-3 sm:p-4 w-full"
     >
       <div className="flex items-center justify-between mb-3 sm:mb-4">
@@ -165,11 +166,12 @@ const ProductRatingComponent: React.FC<ProductRatingProps> = ({ product, onRatin
             Valoraciones recientes
           </h4>
           <div className="space-y-2">
-            {product.ratings.slice(0, 2).map((rating) => (
+            {product.ratings.slice(0, 2).map((rating, index) => (
               <motion.div
                 key={rating.id}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1, duration: 0.2 }}
                 className="bg-black/30 p-2 sm:p-3 rounded-md"
               >
                 <div className="flex items-center justify-between mb-1">
@@ -191,6 +193,7 @@ const ProductRatingComponent: React.FC<ProductRatingProps> = ({ product, onRatin
       )}
     </motion.div>
   );
-};
+});
 
-export default ProductRatingComponent; 
+ProductRatingComponent.displayName = 'ProductRatingComponent';
+export default ProductRatingComponent;

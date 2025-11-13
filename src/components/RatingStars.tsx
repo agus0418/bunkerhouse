@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { FaStar } from 'react-icons/fa';
 
@@ -9,7 +9,7 @@ interface RatingStarsProps {
   onRatingChange?: (rating: number) => void;
 }
 
-const RatingStars: React.FC<RatingStarsProps> = ({
+const RatingStars: React.FC<RatingStarsProps> = memo(({
   rating,
   readonly = false,
   size = 24,
@@ -17,11 +17,11 @@ const RatingStars: React.FC<RatingStarsProps> = ({
 }) => {
   const stars = [1, 2, 3, 4, 5];
 
-  const handleClick = (value: number) => {
+  const handleClick = useCallback((value: number) => {
     if (!readonly && onRatingChange) {
       onRatingChange(value);
     }
-  };
+  }, [readonly, onRatingChange]);
 
   return (
     <div className="flex items-center gap-1">
@@ -41,6 +41,7 @@ const RatingStars: React.FC<RatingStarsProps> = ({
       ))}
     </div>
   );
-};
+});
 
-export default RatingStars; 
+RatingStars.displayName = 'RatingStars';
+export default RatingStars;

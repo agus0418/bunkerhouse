@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { collection, onSnapshot, query, orderBy, doc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Product, ProductRating } from '@/types/firebase';
@@ -27,85 +27,85 @@ export default function Home() {
     return () => window.removeEventListener('resize', checkMobileView);
   }, []);
 
-  // Atajos de teclado
-  useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      // Ctrl/Cmd + K para abrir búsqueda
-      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-        e.preventDefault();
-        setShowSearch(true);
-      }
-      // Escape para cerrar búsqueda
-      if (e.key === 'Escape' && showSearch) {
-        setShowSearch(false);
-        setSearchTerm('');
-      }
-      // 1 para ir a comidas
-      if (e.key === '1' && !showSearch) {
-        handleTabClick('COMIDAS');
-      }
-      // 2 para ir a bebidas
-      if (e.key === '2' && !showSearch) {
-        handleTabClick('BEBIDAS');
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
+  // Atajos de teclado - optimizado con useCallback
+  const handleKeyPress = useCallback((e: KeyboardEvent) => {
+    // Ctrl/Cmd + K para abrir búsqueda
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      e.preventDefault();
+      setShowSearch(true);
+    }
+    // Escape para cerrar búsqueda
+    if (e.key === 'Escape' && showSearch) {
+      setShowSearch(false);
+      setSearchTerm('');
+    }
+    // 1 para ir a comidas
+    if (e.key === '1' && !showSearch) {
+      handleTabClick('COMIDAS');
+    }
+    // 2 para ir a bebidas
+    if (e.key === '2' && !showSearch) {
+      handleTabClick('BEBIDAS');
+    }
   }, [showSearch]);
 
-  // Indicador de progreso de scroll
   useEffect(() => {
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [handleKeyPress]);
+
+  // Indicador de progreso de scroll - optimizado con throttling
+  useEffect(() => {
+    let ticking = false;
     const updateScrollProgress = () => {
       const scrollTop = window.scrollY;
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const scrollPercent = (scrollTop / docHeight) * 100;
+      const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
       setScrollProgress(scrollPercent);
+      ticking = false;
     };
 
-    window.addEventListener('scroll', updateScrollProgress);
-    return () => window.removeEventListener('scroll', updateScrollProgress);
-  }, []);
-
-  // Detectar qué sección está visible y actualizar el tab activo
-  useEffect(() => {
-    const handleScroll = () => {
-      const comidasSection = document.getElementById('comidas');
-      const bebidasSection = document.getElementById('bebidas');
-      
-      if (comidasSection && bebidasSection) {
-        const scrollPosition = window.scrollY + window.innerHeight / 2;
-        
-        const comidasTop = comidasSection.offsetTop;
-        const bebidasTop = bebidasSection.offsetTop;
-        
-        if (scrollPosition >= comidasTop && scrollPosition < bebidasTop) {
-          setActiveTab('COMIDAS');
-          setShowScrollToComidas(false);
-        } else if (scrollPosition >= bebidasTop) {
-          setActiveTab('BEBIDAS');
-          // Mostrar el botón cuando el usuario esté en la sección de bebidas
-          setShowScrollToComidas(true);
-        } else {
-          setShowScrollToComidas(false);
-        }
-      }
-    };
-
-    // Throttle scroll events para mejor performance
-    let ticking = false;
-    const throttledHandleScroll = () => {
+    const throttledUpdate = () => {
       if (!ticking) {
-        requestAnimationFrame(() => {
-          handleScroll();
-          ticking = false;
-        });
+        requestAnimationFrame(updateScrollProgress);
         ticking = true;
       }
     };
 
-    window.addEventListener('scroll', throttledHandleScroll);
-    return () => window.removeEventListener('scroll', throttledHandleScroll);
+    window.addEventListener('scroll', throttledUpdate, { passive: true });
+    return () => window.removeEventListener('scroll', throttledUpdate);
+  }, []);
+
+  // Detectar qué sección está visible y actualizar el tab activo - optimizado
+  useEffect(() => {
+    let ticking = false;
+    const handleScroll = () => {
+      const comidasSection = document.getElementById('comidas');
+      const bebidasSection = document.getElementById('bebidas');
+      
+      if (comidasSection && bebidasSection && !ticking) {
+        ticking = true;
+        requestAnimationFrame(() => {
+          const scrollPosition = window.scrollY + window.innerHeight / 2;
+          const comidasTop = comidasSection.offsetTop;
+          const bebidasTop = bebidasSection.offsetTop;
+          
+          if (scrollPosition >= comidasTop && scrollPosition < bebidasTop) {
+            setActiveTab('COMIDAS');
+            setShowScrollToComidas(false);
+          } else if (scrollPosition >= bebidasTop) {
+            setActiveTab('BEBIDAS');
+            setShowScrollToComidas(true);
+          } else {
+            setShowScrollToComidas(false);
+          }
+          ticking = false;
+        });
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   useEffect(() => {
@@ -131,56 +131,64 @@ export default function Home() {
     return () => unsubscribe();
   }, []);
 
-  const groupedProducts: { [key: string]: { [key: string]: Product[] } } = products.reduce((groups: { [key: string]: { [key: string]: Product[] } }, product) => {
-    const mainCategory = product.type;
-    const subCategory = product.category;
+  // Optimizar el agrupamiento de productos con useMemo
+  const groupedProducts = useMemo(() => {
+    return products.reduce((groups: { [key: string]: { [key: string]: Product[] } }, product) => {
+      const mainCategory = product.type;
+      const subCategory = product.category;
+      
+      if (!groups[mainCategory]) {
+        groups[mainCategory] = {};
+      }
+      if (!groups[mainCategory][subCategory]) {
+        groups[mainCategory][subCategory] = [];
+      }
+      groups[mainCategory][subCategory].push(product);
+      return groups;
+    }, {});
+  }, [products]);
+
+  // Filtrar productos por término de búsqueda - optimizado con useMemo
+  const filteredBySearch = useMemo(() => {
+    if (searchTerm.trim() === '') return products;
     
-    if (!groups[mainCategory]) {
-      groups[mainCategory] = {};
-    }
-    if (!groups[mainCategory][subCategory]) {
-      groups[mainCategory][subCategory] = [];
-    }
-    groups[mainCategory][subCategory].push(product);
-    return groups;
-  }, {});
+    const term = searchTerm.toLowerCase();
+    return products.filter(product =>
+      product.name.toLowerCase().includes(term) ||
+      product.description?.toLowerCase().includes(term) ||
+      product.category.toLowerCase().includes(term)
+    );
+  }, [products, searchTerm]);
 
-  // Filtrar productos por término de búsqueda
-  const filteredBySearch = searchTerm.trim() === ''
-    ? products
-    : products.filter(product =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+  const groupedFilteredProducts = useMemo(() => {
+    return filteredBySearch.reduce((groups: { [key: string]: { [key: string]: Product[] } }, product) => {
+      const mainCategory = product.type;
+      const subCategory = product.category;
+      
+      if (!groups[mainCategory]) {
+        groups[mainCategory] = {};
+      }
+      if (!groups[mainCategory][subCategory]) {
+        groups[mainCategory][subCategory] = [];
+      }
+      groups[mainCategory][subCategory].push(product);
+      return groups;
+    }, {});
+  }, [filteredBySearch]);
 
-  const groupedFilteredProducts: { [key: string]: { [key: string]: Product[] } } = filteredBySearch.reduce((groups: { [key: string]: { [key: string]: Product[] } }, product) => {
-    const mainCategory = product.type;
-    const subCategory = product.category;
-    
-    if (!groups[mainCategory]) {
-      groups[mainCategory] = {};
-    }
-    if (!groups[mainCategory][subCategory]) {
-      groups[mainCategory][subCategory] = [];
-    }
-    groups[mainCategory][subCategory].push(product);
-    return groups;
-  }, {});
-
-  const filteredProducts: { COMIDAS: { [key: string]: Product[] }; BEBIDAS: { [key: string]: Product[] } } = {
+  const filteredProducts = useMemo(() => ({
     COMIDAS: groupedFilteredProducts['COMIDAS'] || {},
     BEBIDAS: groupedFilteredProducts['BEBIDAS'] || {}
-  };
+  }), [groupedFilteredProducts]);
 
-  // Contar productos por categoría
-  const productCounts = {
+  // Contar productos por categoría - optimizado
+  const productCounts = useMemo(() => ({
     COMIDAS: Object.values(groupedFilteredProducts['COMIDAS'] || {}).reduce((acc, products) => acc + products.length, 0),
     BEBIDAS: Object.values(groupedFilteredProducts['BEBIDAS'] || {}).reduce((acc, products) => acc + products.length, 0)
-  };
+  }), [groupedFilteredProducts]);
 
-  // Obtener subcategorías populares
-  const getPopularCategories = () => {
+  // Obtener subcategorías populares - optimizado
+  const popularCategories = useMemo(() => {
     const categories: { [key: string]: number } = {};
     Object.entries(groupedFilteredProducts).forEach(([mainCategory, subCategories]) => {
       Object.entries(subCategories).forEach(([subCategory, products]) => {
@@ -195,11 +203,9 @@ export default function Home() {
         const [mainCategory, subCategory] = key.split('-');
         return { mainCategory, subCategory, count };
       });
-  };
+  }, [groupedFilteredProducts]);
 
-  const popularCategories = getPopularCategories();
-
-  const handleTabClick = (tab: 'COMIDAS' | 'BEBIDAS') => {
+  const handleTabClick = useCallback((tab: 'COMIDAS' | 'BEBIDAS') => {
     setActiveTab(tab);
     
     // Hacer scroll directo a la categoría específica
@@ -228,9 +234,9 @@ export default function Home() {
         });
       }
     }
-  };
+  }, [isMobileView]);
 
-  const scrollToComidas = () => {
+  const scrollToComidas = useCallback(() => {
     const comidasSection = document.getElementById('comidas');
     if (comidasSection) {
       const headerOffset = isMobileView ? 80 : 120;
@@ -242,18 +248,18 @@ export default function Home() {
         behavior: "smooth"
       });
     }
-  };
+  }, [isMobileView]);
 
-  const toggleSearch = () => {
+  const toggleSearch = useCallback(() => {
     setShowSearch(!showSearch);
     if (!showSearch) {
       setSearchTerm('');
     }
-  };
+  }, [showSearch]);
 
-  const clearSearch = () => {
+  const clearSearch = useCallback(() => {
     setSearchTerm('');
-  };
+  }, []);
 
   const handleRatingSubmit = async (productId: string, rating: ProductRating) => {
     if (!productId) {
@@ -329,27 +335,27 @@ export default function Home() {
             <div
               className="bg-cover bg-center bg-no-repeat transform hover:scale-105 transition-transform duration-700"
               style={{
-                backgroundImage: 'url("/images/6A4A2169.jpg")',
+                backgroundImage: 'url("/images/6A4A2169.webp")',
                 filter: 'blur(2px)',
               }}
             ></div>
             <div
               className="bg-cover bg-center bg-no-repeat transform hover:scale-105 transition-transform duration-700"
               style={{
-                backgroundImage: 'url("/images/6A4A2176.jpg")',
+                backgroundImage: 'url("/images/6A4A2176.webp")',
                 filter: 'blur(2px)',
               }}
             ></div>
             <div
               className="bg-cover bg-center bg-no-repeat transform hover:scale-105 transition-transform duration-700 hidden md:block"
               style={{
-                backgroundImage: 'url("/images/6A4A2177.jpg")',
+                backgroundImage: 'url("/images/6A4A2177.webp")',
               }}
             ></div>
             <div
               className="bg-cover bg-center bg-no-repeat transform hover:scale-105 transition-transform duration-700 hidden md:block"
               style={{
-                backgroundImage: 'url("/images/6A4A2178.jpg")',
+                backgroundImage: 'url("/images/6A4A2178.webp")',
               }}
             ></div>
           </div>

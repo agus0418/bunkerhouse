@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, memo, useCallback } from 'react';
 import Image from 'next/image';
 import { Product } from '@/types/firebase';
 import { FaStar, FaImage } from 'react-icons/fa';
@@ -9,12 +9,11 @@ interface ProductCardProps {
   onRatingSubmit?: (productId: string, rating: any) => Promise<void>;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, onRatingSubmit }) => {
+const ProductCard: React.FC<ProductCardProps> = memo(({ product, onRatingSubmit }) => {
   const [showRating, setShowRating] = useState(false);
-  const [localProduct, setLocalProduct] = useState(product);
   const [imageError, setImageError] = useState(false);
 
-  const handleRatingSubmit = async (rating: any) => {
+  const handleRatingSubmit = useCallback(async (rating: any) => {
     console.log('Iniciando envío de valoración:', { productId: product.id, rating });
     
     if (!onRatingSubmit) {
@@ -26,41 +25,26 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onRatingSubmit }) =>
       console.log('Llamando a onRatingSubmit...');
       await onRatingSubmit(product.id, rating);
       console.log('onRatingSubmit completado exitosamente');
-      
-      // Actualizar el producto local con la nueva valoración
-      const updatedRatings = [...(localProduct.ratings || []), rating];
-      const newAverageRating = updatedRatings.reduce((acc, curr) => acc + curr.rating, 0) / updatedRatings.length;
-      
-      console.log('Actualizando estado local:', { 
-        newRatings: updatedRatings.length, 
-        newAverageRating 
-      });
-      
-      setLocalProduct({
-        ...localProduct,
-        ratings: updatedRatings,
-        averageRating: newAverageRating
-      });
-      
       setShowRating(false);
     } catch (error) {
       console.error('Error en handleRatingSubmit:', error);
     }
-  };
+  }, [product.id, onRatingSubmit]);
 
   return (
     <div className="magazine-product-card group relative w-full safe-container" style={{ fontFamily: "'Mileast', 'Montserrat', 'Maxwell Regular', 'Bonaro Clean', 'Newry Demo', serif" }}>
-      <div className="relative backdrop-blur-xl bg-gradient-to-br from-black/85 via-gray-900/95 to-black/85 rounded-3xl overflow-hidden shadow-2xl w-full" style={{ backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)`, backgroundSize: '20px 20px' }}>
+      <div className="relative backdrop-blur-lg bg-gradient-to-br from-black/85 via-gray-900/95 to-black/85 rounded-3xl overflow-hidden shadow-2xl w-full">
         <div className="flex items-stretch min-h-[180px] md:flex-row flex-col w-full">
-          {/* Imagen del producto - Estilo revista */}
+          {/* Imagen del producto - Optimizada */}
           <div className="relative w-full md:w-48 h-48 md:h-auto md:flex-shrink-0 bg-gradient-to-br from-gray-800 to-gray-900">
-            {!imageError && localProduct.image ? (
+            {!imageError && product.image ? (
               <Image
-                src={localProduct.image}
-                alt={localProduct.name}
+                src={product.image}
+                alt={product.name}
                 fill
-                className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                className="object-cover"
                 sizes="(max-width: 768px) 100vw, 192px"
+                loading="lazy"
                 onError={() => setImageError(true)}
               />
             ) : (
@@ -70,7 +54,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onRatingSubmit }) =>
             )}
           </div>
 
-          {/* Contenido del producto - Estilo revista premium */}
+          {/* Contenido del producto - Optimizado */}
           <div className="flex-1 p-3 sm:p-4 md:p-6 lg:p-8 flex flex-col justify-between w-full">
             
             {/* Header del producto */}
@@ -78,10 +62,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onRatingSubmit }) =>
               <div className="flex items-start justify-between mb-2 sm:mb-3">
                 <div className="flex-1 pr-2">
                   <h3 className="product-name text-lg sm:text-xl font-bold text-white leading-tight tracking-wide text-ellipsis">
-                    {localProduct.name}
+                    {product.name}
                   </h3>
                   
-                  {/* Línea decorativa */}
+                  {/* Línea decorativa simplificada */}
                   <div className="w-12 sm:w-16 h-0.5 bg-gradient-to-r from-gray-400 to-transparent mt-1 sm:mt-2"></div>
                 </div>
                 
@@ -92,19 +76,19 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onRatingSubmit }) =>
                 >
                   <FaStar className="text-yellow-500" size={10} />
                   <span className="text-xs sm:text-sm font-bold text-gray-800">
-                    {localProduct.averageRating?.toFixed(1) || '0.0'}
+                    {product.averageRating?.toFixed(1) || '0.0'}
                   </span>
                   <span className="text-xs text-gray-600 hidden sm:inline">
-                    ({localProduct.ratings?.length || 0})
+                    ({product.ratings?.length || 0})
                   </span>
                 </div>
               </div>
               
               {/* Descripción elegante */}
-              {localProduct.description && (
+              {product.description && (
                 <div className="mb-2 sm:mb-4">
                   <p className="product-description text-gray-300 text-sm sm:text-base leading-relaxed font-light line-clamp-2">
-                    {localProduct.description}
+                    {product.description}
                   </p>
                 </div>
               )}
@@ -112,10 +96,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onRatingSubmit }) =>
 
             {/* Sección de precios premium */}
             <div className="space-y-2 sm:space-y-3">
-              {localProduct.variations && localProduct.variations.length > 0 ? (
+              {product.variations && product.variations.length > 0 ? (
                 <div className="space-y-2 sm:space-y-3">
                   <div className="text-xs uppercase tracking-widest text-gray-400 font-medium mb-2 sm:mb-3">Opciones Disponibles</div>
-                  {localProduct.variations.map((variation, index) => (
+                  {product.variations.map((variation) => (
                     <div key={variation.id} className="flex justify-between items-center py-1 sm:py-2">
                       <div className="flex items-center gap-2 sm:gap-3">
                         <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-gray-400 to-white"></div>
@@ -130,14 +114,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onRatingSubmit }) =>
               ) : (
                 <div className="flex justify-between items-end">
                   <div>
-                    
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-gradient-to-r from-gray-400 to-white"></div>
                       <span className="text-gray-400 text-sm sm:text-base">Precio</span>
                     </div>
                   </div>
                   <p className="product-price text-lg sm:text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent tracking-wider">
-                    ${localProduct.price}
+                    ${product.price}
                   </p>
                 </div>
               )}
@@ -150,7 +133,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onRatingSubmit }) =>
       {showRating && (
         <div className="p-4">
           <ProductRatingComponent
-            product={localProduct}
+            product={product}
             onRatingSubmit={handleRatingSubmit}
             onClose={() => setShowRating(false)}
           />
@@ -158,6 +141,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onRatingSubmit }) =>
       )}
     </div>
   );
-};
+});
 
+ProductCard.displayName = 'ProductCard';
 export default ProductCard;
